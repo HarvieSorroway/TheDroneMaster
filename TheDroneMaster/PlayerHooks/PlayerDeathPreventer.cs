@@ -43,6 +43,12 @@ namespace TheDroneMaster
 
             if (AcceptableDamageCount > 0) result = true;
 
+            if (DeathPreventCounter > 0)
+            {
+                result = true;
+            }
+            else AcceptableDamageCount--;
+
             try
             {
                 if (player.grabbedBy != null)
@@ -89,12 +95,7 @@ namespace TheDroneMaster
                 }
             }
 
-
-            if (DeathPreventCounter > 0)
-            {
-                result = true;
-            }
-            else AcceptableDamageCount--;
+            if (player.room != null && player.room.waterObject != null && player.room.waterObject.WaterIsLethal) result = false;
             DeathPreventCounter = 5;
 
             if (deathExplosion)
@@ -105,6 +106,7 @@ namespace TheDroneMaster
             if (!result)
             {
                 module.port.ClearOutAllDrones();
+                AcceptableDamageCount = -1;
             }
             Plugin.Log(acceptableDamageCount.ToString () + deathExplosion.ToString() + result.ToString() + DeathPreventCounter.ToString());
             return result;

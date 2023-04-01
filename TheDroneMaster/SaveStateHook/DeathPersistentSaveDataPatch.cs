@@ -72,6 +72,10 @@ namespace TheDroneMaster
                 {
                     if (TotalHeader + unit.header == header)
                     {
+                        for(int k = self.unrecognizedSaveStrings.Count - 1;k >= 0; k--)
+                        {
+                            if (self.unrecognizedSaveStrings[k].Contains(header)) self.unrecognizedSaveStrings.RemoveAt(k);
+                        }
                         unit.LoadDatas(array2[1]);
                         Plugin.Log(unit.header + " load from string : " + array2[1]);
                     }
