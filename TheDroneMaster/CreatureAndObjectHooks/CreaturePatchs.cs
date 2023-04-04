@@ -126,7 +126,7 @@ namespace TheDroneMaster
             if (otherObject != null && otherObject is LaserDrone) return;
 
             Player player = otherObject as Player;
-            if (player != null && PlayerPatchs.modules.TryGetValue(player, out var module) && module.ownDrones)
+            if (player != null && PlayerPatchs.modules.TryGetValue(player, out var module) && module.ownDrones && self.AI.CurrentPlayerAggression(player.abstractCreature) > 0f)
             {
                 if(self.Consious && !self.dead && module.playerDeathPreventer.canTakeDownThisDamage(player, "daddy consume"))
                 {

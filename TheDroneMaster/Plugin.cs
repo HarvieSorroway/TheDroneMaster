@@ -43,10 +43,15 @@ namespace TheDroneMaster
         public static OnMouseButtonUp onMouseButtonUp;
         public static FrameUpdate frameUpdate;
 
+        public static string falseRectName;
+        public static string trueRectName;
+
         public DroneMasterConfig config;
 
         public Dictionary<Player, List<LaserDrone>> dronesForPlayer = new Dictionary<Player, List<LaserDrone>>();
 
+        public static int down = 0;
+        public static int subStract = 0;
         //hook
 
         public Plugin()
@@ -104,6 +109,49 @@ namespace TheDroneMaster
 
             MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
             inited = true;
+
+            On.Player.Update += Player_Update;
+        }
+
+        private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        {
+            orig.Invoke(self, eu);
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                down++;
+                subStract++;
+            }
+
+            if (down > 0)
+            {
+                var state = self.playerState;
+
+                if (subStract != down)
+                {
+                    var foodMeter = self.room.game.cameras[0].hud.foodMeter;
+                    if (!foodMeter.circles[foodMeter.showCount].eaten)
+                    {
+                        int aimQuater = state.quarterFoodPoints - 1;
+                        bool dontAddFour = false;
+                        if (aimQuater < 0)
+                        {
+                            aimQuater += 4;
+                            dontAddFour = true;
+                        }
+                        for (int i = 0; i < aimQuater + (dontAddFour ? 0 : 4); i++)
+                        {
+                            self.AddQuarterFood();
+                        }
+                        down--;
+                    }
+                }
+
+                if (subStract == down)
+                {
+                    self.SubtractFood(1);
+                    subStract--;
+                }
+            }
         }
 
         public void LoadResources(RainWorld rainWorld)
@@ -122,7 +170,14 @@ namespace TheDroneMaster
 
             rainWorld.Shaders.Add("CustomHoloGrid", FShader.CreateShader("CustomHoloGrid", customHoloGridShader));
 
+            FAtlas falseRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectFalse");
+            falseRectName = falseRect.name;
+
+            FAtlas trueRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectTrue");
+            trueRectName = trueRect.name;
+
             ab.Unload(false);
+
         }
 
         public delegate void OnMouseButtonDown(int button);

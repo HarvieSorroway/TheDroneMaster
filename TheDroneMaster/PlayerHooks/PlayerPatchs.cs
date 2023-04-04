@@ -33,10 +33,26 @@ namespace TheDroneMaster
             On.Player.MovementUpdate += Player_MovementUpdate;
             On.Player.Jump += Player_Jump;
 
+            //On.Player.ReleaseGrasp += Player_ReleaseGrasp;
+
             On.Player.Die += Player_Die;
             On.Player.Destroy += Player_Destroy;
 
             Hook player_get_CanPutSpearToBack_Hook = new Hook(typeof(Player).GetProperty("CanPutSpearToBack", propFlags).GetGetMethod(), typeof(PlayerPatchs).GetMethod("Player_get_CanPutSpearOnBack", methodFlags));
+        }
+
+        private static void Player_ReleaseGrasp(On.Player.orig_ReleaseGrasp orig, Player self, int grasp)
+        {
+            if(modules.TryGetValue(self,out var module) && module.ownDrones)
+            {
+                if (self.grasps != null && self.grasps.Length > grasp + 1)
+                {
+                    var gra = self.grasps[grasp];
+                    Creature creature = gra.grabbed as Creature;
+                    if (creature != null) self.room.AddObject(new CreatureScanner(creature, self.DangerPos + Vector2.up * 40f,self.room , module.laserColor, module));
+                }
+            }
+            orig.Invoke(self, grasp);
         }
 
         public static bool Player_get_CanPutSpearOnBack(orig_Player_CanPutSpearToBack orig,Player self)

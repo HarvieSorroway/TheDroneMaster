@@ -98,18 +98,19 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>DroneMasterRes.resx</DependentUpon>
     </Compile>
+    <Compile Include="DronePort\CreatureScanner.cs" />
     <Compile Include="Fixer.cs" />
     <Compile Include="LaserDrone\DroneLaserGun.cs" />
     <Compile Include="OracleHooks\InGameTrasnlatorPatch.cs" />
     <Compile Include="PearlReader\PearlReaderPatchs.cs" />
     <Compile Include="PearlReader\PortPearlReader.cs" />
-    <Compile Include="PlayerHooks\DronePortGraphics.cs" />
+    <Compile Include="DronePort\DronePortGraphics.cs" />
     <Compile Include="PlayerHooks\MetalGills.cs" />
     <Compile Include="PlayerHooks\PlayerDeathPreventer.cs" />
     <Compile Include="PlayerHooks\PlayerGraphicsPatch.cs" />
     <Compile Include="PlayerHooks\PlayerPatchs.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="PlayerHooks\DronePort.cs" />
+    <Compile Include="DronePort\DronePort.cs" />
     <Compile Include="LaserDrone\LaserDrone.cs" />
     <Compile Include="LaserDrone\LaserDroneAI.cs" />
     <Compile Include="LaserDrone\LaserDroneCritob.cs" />
