@@ -88,6 +88,7 @@
     <Compile Include="CreatureAndObjectHooks\CreaturePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
+    <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />
     <Compile Include="DroneHUD\DroneHUD.cs" />
     <Compile Include="DroneHUD\DroneUI.cs" />

@@ -23,6 +23,8 @@ namespace TheDroneMaster
         public Configurable<int> ChargeRequiresCounter;
         public Configurable<bool> KillTagFromPlayer;
         public Configurable<bool> HateCicadas;
+        public Configurable<bool> Invincible;
+        public Configurable<bool> OverPowerdSuperJump;
 
         public Configurable<bool> moreEnemies;
         public Configurable<bool> canBackSpear;
@@ -44,6 +46,8 @@ namespace TheDroneMaster
             ChargeRequiresCounter = config.Bind<int>("DroneMaster_Drone_ChargeRequiresCounter", 80);
             KillTagFromPlayer = config.Bind<bool>("DroneMaster_Drone_KillTagFromPlayer", true);
             HateCicadas = config.Bind<bool>("DroneMaster_Drone_HateCicades", true);
+            Invincible = config.Bind<bool>("DroneMaster_Drone_Invincible", false);
+            OverPowerdSuperJump = config.Bind<bool>("DroneMaster_Drone_OverPowerdSuperJump", false);
 
             moreEnemies = config.Bind<bool>("DroneMaster_Difficulty_MoreEnemies", false);
             canBackSpear = config.Bind <bool> ("DroneMaster_Difficulty_CanBackSpear", true);
@@ -91,6 +95,17 @@ namespace TheDroneMaster
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },
+                new OpCheckBox(Invincible,30f,300f-160f - biasY),
+                new OpLabel(160f,300f - 160f - biasY,"Make drones invincible", false)
+                {
+                    verticalAlignment = OpLabel.LabelVAlignment.Center
+                },
+                new OpCheckBox(OverPowerdSuperJump,30f,300f-190f - biasY),
+                new OpLabel(160f,300f - 190f - biasY,"Make you jump much higher and run faster when grab a drone", false)
+                {
+                    verticalAlignment = OpLabel.LabelVAlignment.Center
+                },
+
             };
 
             difficultySettingsElements = new UIelement[]

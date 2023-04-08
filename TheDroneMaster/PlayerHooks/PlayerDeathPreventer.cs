@@ -43,7 +43,7 @@ namespace TheDroneMaster
 
             if (AcceptableDamageCount > 0) result = true;
 
-            if (DeathPreventCounter > 0)
+            if (DeathPreventCounter > 0 && AcceptableDamageCount > -1)
             {
                 result = true;
             }

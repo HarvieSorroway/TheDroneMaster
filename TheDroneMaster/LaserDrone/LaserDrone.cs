@@ -15,7 +15,7 @@ namespace TheDroneMaster
         public readonly float maxAcceleration = 0.5f;
         public readonly float maxDeltaCourse = 15f;
         public readonly float acceptableDistance = 35f;
-        public readonly float _maxVelocity = 10f;
+        public readonly float _maxVelocity = 20f;
 
         public static bool pauseMovement = false;
 
@@ -66,7 +66,7 @@ namespace TheDroneMaster
         public MovementType movementType = MovementType.FacingFoward;
 
         public bool notInSameRoom => owner != null && room != owner.room && !inShortcut && !owner.inShortcut;
-        public float MaxVelocity => _maxVelocity * (AI.pathFinder.DoneMappingAccessibility ? 1f : 0.7f) * (forceUsingTempPather ? 0.5f : 1f);
+        public float MaxVelocity => _maxVelocity * (AI.pathFinder.DoneMappingAccessibility ? 1f : 0.7f);
 
 
         public LaserDrone(AbstractCreature abstractCreature) : base(abstractCreature,abstractCreature.world)
@@ -112,7 +112,7 @@ namespace TheDroneMaster
             if (notInSameRoom) notInSameRoomCounter++;
             if (dontEnterShortcutCounter > 0) dontEnterShortcutCounter--;
             if (dontRecieveDamageCount > 0) dontRecieveDamageCount--;
-            if (!AI.pathFinder.DoneMappingAccessibility) shortcutDelay = 40;
+            if (shortcutDelay > 0) shortcutDelay--;
 
 
             CallBackUpdate();
@@ -152,7 +152,8 @@ namespace TheDroneMaster
             followingPos = bodyChunks[0].pos;
 
             StandardPather pather = AI.pathFinder as StandardPather;
-            TempPather tempPather = AI.tempPather;
+            //TempPather tempPather = AI.tempPather;
+            LaserDroneQuickPather quickPather = AI.quickPather;
 
             MovementConnection movementConnection = null;
             if (pather != null && pather.DoneMappingAccessibility && !forceUsingTempPather)
@@ -172,15 +173,35 @@ namespace TheDroneMaster
                     dontEnterShortcutCounter++;
                     return;
                 }
-                IntVector2 nextTile = new IntVector2(0, 0);
-                nextTile = tempPather.Update(DangerPos, room);
+                IntVector2? nextTile;
+                //nextTile = tempPather.Update(DangerPos, room);
+                nextTile = quickPather.UpdatePath(DangerPos, room);
 
-                if (tempPather.path.Count > 0 && room.GetTile(nextTile).shortCut != 0 && shortcutDelay == 0)
+                //if (tempPather.path.Count > 0 && room.GetTile(nextTile).shortCut != 0 && shortcutDelay == 0)
+                //{
+                //    SuckedIntoShortCut(nextTile, false);
+                //    tempPather.ActuallyFollowPathIndex++;
+                //}
+                if(nextTile != null)
                 {
-                    SuckedIntoShortCut(nextTile, false);
-                    tempPather.ActuallyFollowPathIndex++;
+                    if (room.shortcutData(nextTile.Value).shortCutType != ShortcutData.Type.DeadEnd && shortcutDelay == 0)
+                    {
+                        SuckedIntoShortCut(nextTile.Value, false);
+                        quickPather.MoveNext();
+                    }
+                    else
+                    {
+                        MoveTowards(room.MiddleOfTile(nextTile.Value), room.MiddleOfTile(quickPather.dest));
+                    }
+
+                    if (Custom.DistLess(room.MiddleOfTile(nextTile.Value), DangerPos, 15f))
+                    {
+                        quickPather.MoveNext();
+                    }
+
                 }
-                MoveTowards(room.MiddleOfTile(nextTile), room.MiddleOfTile(tempPather.Dest));
+
+                //MoveTowards(room.MiddleOfTile(nextTile.Value), room.MiddleOfTile(tempPather.Dest));
             }
 
             if (Submersion > .5)
@@ -203,7 +224,19 @@ namespace TheDroneMaster
 
         public void GrabbedUpdate()
         {
-            if(owner.bodyMode != Player.BodyModeIndex.ClimbingOnBeam)owner.mainBodyChunk.vel += Vector2.up * owner.gravity * 0.8f;
+            if(owner.bodyMode != Player.BodyModeIndex.ClimbingOnBeam)
+            {
+                owner.mainBodyChunk.vel += Vector2.up * owner.gravity * 0.8f;
+            }
+
+            if (Plugin.instance.config.OverPowerdSuperJump.Value)
+            {
+                Vector2 adder = owner.input[0].analogueDir;
+                adder.x *= 0.25f;
+                adder.y *= 0.4f;
+                owner.mainBodyChunk.vel += adder;
+            }
+
             if (owner.bodyMode != Player.BodyModeIndex.ZeroG)
             {
                 Vector2 airBoost = owner.input[0].analogueDir * 0.2f;
@@ -400,7 +433,7 @@ namespace TheDroneMaster
                     {
                         case MovementType.FacingFoward:
                             Vector2 dir = Custom.DirVec(firstChunk.pos, moveTo);
-                            accelereation = Vector2.Distance(firstChunk.pos, moveTo) / 5f;
+                            accelereation = Vector2.Distance(firstChunk.pos, moveTo) / 4f;
                             accelereation = Mathf.Clamp(accelereation, 0f, maxAcceleration);
 
                             bodyChunks[0].vel += accelereation * dir;
@@ -419,19 +452,16 @@ namespace TheDroneMaster
                             var currentDir = bodyChunks[0].vel.normalized;
 
                             dir = Vector2.Lerp(currentDir, aimDir, 0.05f);
-                            vel = Custom.LerpMap(Vector2.Distance(firstChunk.pos, moveTo), 0f, 60f, 0f, MaxVelocity * 1.5f);
+                            vel = Custom.LerpMap(Vector2.Distance(firstChunk.pos, moveTo), 0f, 120f, 0f, MaxVelocity * 0.75f);
 
                             Vector2 thisVel = dir * vel;
 
-                            thisVel = Vector2.ClampMagnitude(thisVel, MaxVelocity * 1.5f);
+                            thisVel = Vector2.ClampMagnitude(thisVel, MaxVelocity * 0.75f);
 
                             bodyChunks[0].vel = thisVel;
                             break;
                     }
                 }
-
-                //change look dir
-                
             }
             catch(Exception e)
             {
@@ -519,7 +549,11 @@ namespace TheDroneMaster
 
         public void ChangeMovementType(MovementType newType)
         {
-            if (newType != movementType && movementType != MovementType.CallBack) { movementType = newType; Plugin.Log("ChangeMovementType " + newType.ToString()); }
+            if (newType != movementType && movementType != MovementType.CallBack) 
+            {
+                movementType = newType;
+                //Plugin.Log("ChangeMovementType " + newType.ToString());
+            }
         }
 
         public void CallBackUpdate()
@@ -532,10 +566,16 @@ namespace TheDroneMaster
                     CollideWithTerrain = false;
                 }
 
-                callBackLerpFactor += Time.deltaTime * (freezeControls ? 0f : 1f);
-                if (callBackLerpFactor >= 1f) Des("Calling back drone",false);
+                Vector2 dir = (owner.DangerPos - DangerPos).normalized;
+                float distance = Vector2.Distance(owner.DangerPos, DangerPos);
 
-                bodyChunks[0].HardSetPosition(Vector2.Lerp(startCallBackPos.Value, owner.mainBodyChunk.pos, callBackLerpFactor));
+                Vector2 delta = dir * Mathf.Min(7f, distance);
+                bodyChunks[0].HardSetPosition(DangerPos + delta);
+
+                if (Custom.DistLess(DangerPos, owner.DangerPos,5f))
+                {
+                    Des("Call back",false);
+                }
                 return;
             }
         }
@@ -647,6 +687,7 @@ namespace TheDroneMaster
 
         public void RecieveDamage()
         {
+            if (Plugin.instance.config.Invincible.Value) return;
             life--;
             if(currentDrone.TryGetTarget(out var drone))
             {

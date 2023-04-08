@@ -14,7 +14,8 @@ namespace TheDroneMaster
         public LaserDrone drone;
         public DroneCommandSystem commandSystem;
         public Tracker.CreatureRepresentation _attackTarget;
-        public TempPather tempPather;//only use when necensary;
+        //public TempPather tempPather;
+        public LaserDroneQuickPather quickPather;//only use when necensary;
         public Tracker.CreatureRepresentation attackTarget
         {
             get => _attackTarget;
@@ -45,7 +46,8 @@ namespace TheDroneMaster
             this.drone = drone;
             drone.AI = this;
             commandSystem = new DroneCommandSystem(this);
-            tempPather = new TempPather();
+            //tempPather = new TempPather();
+            quickPather = new LaserDroneQuickPather(this);
 
             AddModule(new StandardPather(this, abstractDrone.world, abstractDrone));
             AddModule(new Tracker(this, 10, 10, 600, 0.5f, 5, 5, 10));
@@ -205,7 +207,7 @@ namespace TheDroneMaster
         public float AttackCoordScore(WorldCoordinate coord)
         {
             if (coord == null) return float.MaxValue;
-            if (coord.NodeDefined || coord.room != creature.pos.room || !pathFinder.CoordinateReachableAndGetbackable(coord) || drone.room.GetTile(coord).Solid)
+            if (coord.room != creature.pos.room || drone.room.GetTile(coord).Solid)
             {
                 return float.MaxValue;
             }
@@ -237,7 +239,7 @@ namespace TheDroneMaster
         public float ProtectCoordScore(WorldCoordinate coord)
         {
             if (coord == null) return float.MaxValue;
-            if (coord.NodeDefined || coord.room != creature.pos.room || !pathFinder.CoordinateReachableAndGetbackable(coord) || drone.room.GetTile(coord).Solid)
+            if (coord.room != creature.pos.room || drone.room.GetTile(coord).Solid)
             {
                 return float.MaxValue;
             }
@@ -256,7 +258,7 @@ namespace TheDroneMaster
         public float IdleCoordScore(WorldCoordinate coord)
         {
             if (coord == null) return float.MaxValue;
-            if (coord.NodeDefined || coord.room != creature.pos.room || !pathFinder.CoordinateReachableAndGetbackable(coord) || drone.room.GetTile(coord).Solid)
+            if (coord.room != creature.pos.room || drone.room.GetTile(coord).Solid || coord.room != creature.pos.room)
             {
                 return float.MaxValue;
             }
@@ -299,7 +301,8 @@ namespace TheDroneMaster
         public void SetDest(WorldCoordinate dest)
         {
             drone.abstractCreature.abstractAI.SetDestination(dest);
-            tempPather.SetDest(dest);
+            //tempPather.SetDest(dest);
+            quickPather.SetDest(dest);
         }
 
         public override PathCost TravelPreference(MovementConnection coord, PathCost cost)
@@ -513,6 +516,86 @@ namespace TheDroneMaster
             ActuallyFollowPathIndex = 0;
             path.Clear();
             QuickConnectivity.QuickPath(room, StaticWorld.GetCreatureTemplate(LaserDroneCritob.LaserDrone), startCoord.Tile, Dest.Tile, 4000, 1000, true, ref path);
+        }
+    }
+
+    public class LaserDroneQuickPather
+    {
+        public LaserDroneAI droneAI;
+        public QuickPathFinder updatingPather;
+
+        public int currentFollowIndex = 0;
+        public int forceFollowPathCounter = 0;
+
+        public bool shouldChangePath = false;
+        public WorldCoordinate dest;
+
+        public QuickPath currentPath;
+
+        public LaserDroneQuickPather(LaserDroneAI ai)
+        {
+            droneAI = ai;
+        }
+
+        public void SetDest(WorldCoordinate newDest)
+        {
+            if(newDest != dest)
+            {
+                dest = newDest;
+                shouldChangePath = true;
+            }
+        }
+
+        public IntVector2? UpdatePath(Vector2 current,Room room)
+        {
+            IntVector2? result = null;
+            IntVector2 currentTile = room.GetTilePosition(current);
+
+            if (room == null) return result;
+            if (droneAI.drone.owner == null) return result;
+            if (droneAI.drone.room != droneAI.drone.owner.room) return result;
+
+            if (forceFollowPathCounter > 0) forceFollowPathCounter--;
+            
+            if (currentPath != null && currentPath.tiles != null) result = currentPath.tiles[currentFollowIndex];
+
+            if (shouldChangePath)
+            {
+                if(updatingPather == null && forceFollowPathCounter == 0)
+                {
+                    updatingPather = new QuickPathFinder(currentTile, dest.Tile, room.aimap, StaticWorld.GetCreatureTemplate(LaserDroneCritob.LaserDrone));
+                }
+
+                if(updatingPather != null)
+                {
+                    int step = 0;
+                    while (updatingPather.status == 0 && step < 240)
+                    {
+                        step++;
+                        updatingPather.Update();
+                    }
+                    if (updatingPather.status == 0)
+                    {
+                        return result;
+                    }
+
+                    currentPath = updatingPather.ReturnPath();
+                    updatingPather = null;
+                    forceFollowPathCounter = 160;
+                    currentFollowIndex = 0;
+                    if (currentPath == null) return result;
+                    else
+                    {
+                        shouldChangePath = false;
+                    }     
+                }  
+            }
+            return result;
+        }
+
+        public void MoveNext()
+        {
+            currentFollowIndex = Mathf.Min(currentFollowIndex + 1, currentPath.tiles.Length - 1);
         }
     }
 }

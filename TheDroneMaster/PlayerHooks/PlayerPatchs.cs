@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using MonoMod.RuntimeDetour;
 using RWCustom;
 using SlugBase;
 using SlugBase.DataTypes;
 using SlugBase.Features;
-using Random = UnityEngine.Random;
+using System;
 using System.Reflection;
-using MonoMod.RuntimeDetour;
+using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace TheDroneMaster
 {
@@ -32,6 +27,7 @@ namespace TheDroneMaster
             On.Player.checkInput += Player_checkInput;
             On.Player.MovementUpdate += Player_MovementUpdate;
             On.Player.Jump += Player_Jump;
+            On.Player.SpearStick += Player_SpearStick;
 
             //On.Player.ReleaseGrasp += Player_ReleaseGrasp;
 
@@ -41,15 +37,26 @@ namespace TheDroneMaster
             Hook player_get_CanPutSpearToBack_Hook = new Hook(typeof(Player).GetProperty("CanPutSpearToBack", propFlags).GetGetMethod(), typeof(PlayerPatchs).GetMethod("Player_get_CanPutSpearOnBack", methodFlags));
         }
 
-        private static void Player_ReleaseGrasp(On.Player.orig_ReleaseGrasp orig, Player self, int grasp)
+        private static bool Player_SpearStick(On.Player.orig_SpearStick orig, Player self, Weapon source, float dmg, BodyChunk chunk, PhysicalObject.Appendage.Pos appPos, Vector2 direction)
         {
+            bool result = orig.Invoke(self, source, dmg, chunk, appPos, direction);
+
             if(modules.TryGetValue(self,out var module) && module.ownDrones)
             {
-                if (self.grasps != null && self.grasps.Length > grasp + 1)
+                if (module.playerDeathPreventer.DeathPreventCounter > 0 && module.playerDeathPreventer.AcceptableDamageCount >= 0) result = false; 
+            }
+            return result;
+        }
+
+        private static void Player_ReleaseGrasp(On.Player.orig_ReleaseGrasp orig, Player self, int grasp)
+        {
+            if (modules.TryGetValue(self, out var module) && module.ownDrones)
+            {
+                Creature creature = self.grasps[grasp].grabbed as Creature;
+                if (creature != null)
                 {
-                    var gra = self.grasps[grasp];
-                    Creature creature = gra.grabbed as Creature;
-                    if (creature != null) self.room.AddObject(new CreatureScanner(creature, self.DangerPos + Vector2.up * 40f,self.room , module.laserColor, module));
+                    CreatureScanner scanner = new CreatureScanner(creature, self.DangerPos + new Vector2(0, 60), self.room, module.laserColor,module);
+                    self.room.AddObject(scanner);
                 }
             }
             orig.Invoke(self, grasp);
@@ -159,7 +166,7 @@ namespace TheDroneMaster
                 //if some creature like lizard grab player for more than 60 frames, record as the player's death
                 if (self.dangerGraspTime == 60 && self.AI == null)
                 {
-                    if (module.playerDeathPreventer.canTakeDownThisDamage(self,"player update"))
+                    if (module.playerDeathPreventer.canTakeDownThisDamage(self, "player update"))
                     {
                         self.dead = false;
                         self.aerobicLevel = 0f;
@@ -168,6 +175,7 @@ namespace TheDroneMaster
                             if (self.room.world.game.cameras[0].hud.textPrompt.gameOverMode) self.room.world.game.cameras[0].hud.textPrompt.gameOverMode = false;
                         }
                     }
+                    else self.Die();
                 }
             }
         }

@@ -199,23 +199,21 @@ namespace TheDroneMaster
                         if(playLightningSounds) Player.room.PlaySound(SoundID.Zapper_Disrupted_LOOP, Player.mainBodyChunk);
                     }
 
-                    UpdatableAndDeletable[] array = null;
-                    try
+                    var vultures = from crit in Player.room.updateList where crit is Vulture select crit as Vulture;
+                    if (vultures != null)
                     {
-                        Player.room.updateList.CopyTo(array);
-                    }
-                    catch
-                    {
-                        return;
-                    }
-                    foreach (var obj in array)
-                    {
-                        Spear spear = obj as Spear;
-                        if (spear != null && spear.stuckInObject == Player)
+                        foreach (var vulture in vultures)
                         {
-                            spear.stuckInObject = null;
-                            spear.ChangeMode(Weapon.Mode.Free);
-                            spear.SetRandomSpin();
+                            if (vulture.IsKing)
+                            {
+                                foreach (var tusk in vulture.kingTusks.tusks)
+                                {
+                                    if (tusk.impaleChunk != null && tusk.impaleChunk.owner == Player)
+                                    {
+                                        tusk.SwitchMode(KingTusks.Tusk.Mode.Dangling);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
