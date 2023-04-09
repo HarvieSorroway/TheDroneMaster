@@ -109,49 +109,6 @@ namespace TheDroneMaster
 
             MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
             inited = true;
-
-            On.Player.Update += Player_Update;
-        }
-
-        private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
-        {
-            orig.Invoke(self, eu);
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                down++;
-                subStract++;
-            }
-
-            if (down > 0)
-            {
-                var state = self.playerState;
-
-                if (subStract != down)
-                {
-                    var foodMeter = self.room.game.cameras[0].hud.foodMeter;
-                    if (!foodMeter.circles[foodMeter.showCount].eaten)
-                    {
-                        int aimQuater = state.quarterFoodPoints - 1;
-                        bool dontAddFour = false;
-                        if (aimQuater < 0)
-                        {
-                            aimQuater += 4;
-                            dontAddFour = true;
-                        }
-                        for (int i = 0; i < aimQuater + (dontAddFour ? 0 : 4); i++)
-                        {
-                            self.AddQuarterFood();
-                        }
-                        down--;
-                    }
-                }
-
-                if (subStract == down)
-                {
-                    self.SubtractFood(1);
-                    subStract--;
-                }
-            }
         }
 
         public void LoadResources(RainWorld rainWorld)

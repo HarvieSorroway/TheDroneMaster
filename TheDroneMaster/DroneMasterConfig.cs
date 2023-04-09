@@ -20,6 +20,7 @@ namespace TheDroneMaster
         public Configurable<bool> UsingPlayerInput;
 
         public Configurable<float> DamagePerShot;
+        public Configurable<float> CountPerKarma;
         public Configurable<int> ChargeRequiresCounter;
         public Configurable<bool> KillTagFromPlayer;
         public Configurable<bool> HateCicadas;
@@ -43,6 +44,7 @@ namespace TheDroneMaster
             UsingPlayerInput = config.Bind<bool>("DroneMaster_UsingMouseInput", false);
 
             DamagePerShot = config.Bind<float>("DroneMaster_Drone_DamagePerShot", 1.15f);
+            CountPerKarma = config.Bind<float>("DroneMaster_Drone_CountPerKarma", 0.5f);
             ChargeRequiresCounter = config.Bind<int>("DroneMaster_Drone_ChargeRequiresCounter", 80);
             KillTagFromPlayer = config.Bind<bool>("DroneMaster_Drone_KillTagFromPlayer", true);
             HateCicadas = config.Bind<bool>("DroneMaster_Drone_HateCicades", true);
@@ -76,32 +78,41 @@ namespace TheDroneMaster
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },
-                new OpSlider(ChargeRequiresCounter,new Vector2(30f,300f-70f - biasY),100)
+                new OpFloatSlider(CountPerKarma,new Vector2(30f,300f - 70f - biasY), 100)
+                {
+                    min = 0.2f,
+                    max = 1f
+                },
+                new OpLabel(160f,300f - 70f - biasY,"Count of drones added per karma increase\n(karma * this, ceil to int, karma start from one)", false)
+                {
+                    verticalAlignment = OpLabel.LabelVAlignment.Center
+                },
+                new OpSlider(ChargeRequiresCounter,new Vector2(30f,300f - 100f - biasY))
                 {
                    min = 5,
-                   max = 200
+                   max = 200,
                 },
-                new OpLabel(160f,300f - 70f - biasY,"How many frames does drone need to charge gun", false)
+                new OpLabel(160f,300f - 100f - biasY,"How many frames does drone need to charge gun", false)
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },
-                new OpCheckBox(KillTagFromPlayer,30f,300f-100f - biasY),
-                new OpLabel(160f,300f - 100f - biasY,"Whether the creatures killed by the drone are counted as player kills", false)
+                new OpCheckBox(KillTagFromPlayer,30f,300f-130f - biasY),
+                new OpLabel(160f,300f - 130f - biasY,"Whether the creatures killed by the drone are counted as player kills", false)
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },
-                new OpCheckBox(HateCicadas,30f,300f-130f - biasY),
-                new OpLabel(160f,300f - 130f - biasY,"If you hate cicadas,enable this to make drones kill them :D(cuz i really hate them :P)", false)
+                new OpCheckBox(HateCicadas,30f,300f - 160f - biasY),
+                new OpLabel(160f,300f - 160f - biasY,"If you hate cicadas,enable this to make drones kill them :D(cuz i really hate them :P)", false)
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },
-                new OpCheckBox(Invincible,30f,300f-160f - biasY),
-                new OpLabel(160f,300f - 160f - biasY,"Make drones invincible", false)
+                new OpCheckBox(Invincible,30f,300f - 190f - biasY),
+                new OpLabel(160f,300f - 190f - biasY,"Make drones invincible", false)
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },
-                new OpCheckBox(OverPowerdSuperJump,30f,300f-190f - biasY),
-                new OpLabel(160f,300f - 190f - biasY,"Make you jump much higher and run faster when grab a drone", false)
+                new OpCheckBox(OverPowerdSuperJump,30f,300f - 220f - biasY),
+                new OpLabel(160f,300f - 220f - biasY,"Make you jump much higher and run faster when grab a drone", false)
                 {
                     verticalAlignment = OpLabel.LabelVAlignment.Center
                 },

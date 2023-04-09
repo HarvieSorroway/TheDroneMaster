@@ -35,7 +35,7 @@ namespace TheDroneMaster
                 int result = 1;
                 if(owner.TryGetTarget(out Player player))
                 {
-                    result = Mathf.CeilToInt((player.Karma + 1f) / 2f);
+                    result = Mathf.CeilToInt((player.Karma + 1f) * Plugin.instance.config.CountPerKarma.Value);
                 }
 
                 return result - crashedDroneCount;
