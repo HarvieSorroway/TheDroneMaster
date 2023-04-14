@@ -145,8 +145,9 @@ namespace TheDroneMaster
         private static void Creature_SpitOutOfShortCut(On.Creature.orig_SpitOutOfShortCut orig, Creature self, IntVector2 pos, Room newRoom, bool spitOutAllSticks)
         {
             orig.Invoke(self,pos,newRoom,spitOutAllSticks);
+
             Player player = self as Player;
-            if(player != null && modules.TryGetValue(player,out var module) && module.ownDrones)
+            if(player != null && modules.TryGetValue(player,out var module) && module.ownDrones && newRoom != null)
             {
                 module.port.lastSpitOutShortcut = pos;
                 module.port.lastSpitOutRoom = new WeakReference<Room>(newRoom);

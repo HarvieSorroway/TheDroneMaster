@@ -15,22 +15,42 @@ namespace TheDroneMaster.GameHook
             On.Menu.SleepAndDeathScreen.Update += SleepAndDeathScreen_Update;
         }
 
+
         private static void SleepAndDeathScreen_GetDataFromGame(On.Menu.SleepAndDeathScreen.orig_GetDataFromGame orig, Menu.SleepAndDeathScreen self, Menu.KarmaLadderScreen.SleepDeathScreenDataPackage package)
         {
-            Plugin.Log("SleepScreen get data from game" + package.characterStats.name.ToString());
+            var game = self.manager.oldProcess as RainWorldGame;
+            ProcessManagerPatch.modules.TryGetValue(self.manager, out var managerModule);
+            if (game != null && RainWorldGamePatch.modules.TryGetValue(game, out var module))
+            {
+                if(module.IsDroneMasterDream && module.packageFromSleepScreen != null)
+                {
+                    package = module.packageFromSleepScreen;
+                    package.saveState = managerModule.saveStateBuffer;
+                    managerModule.tempProgressionBuffer.currentSaveState = package.saveState;
+                    managerModule.tempProgressionBuffer.SaveProgressionAndDeathPersistentDataOfCurrentState(false, false);
+
+                    managerModule.saveStateBuffer = null;
+                    managerModule.tempProgressionBuffer = null;
+                }
+                else
+                {
+                    if (managerModule.saveStateBuffer == null) managerModule.saveStateBuffer = package.saveState;
+                }
+
+            }
+
             orig.Invoke(self, package);
         }
 
         private static void SleepAndDeathScreen_Update(On.Menu.SleepAndDeathScreen.orig_Update orig, Menu.SleepAndDeathScreen self)
         {
-            Plugin.Log("Sleep Screen update");
             orig.Invoke(self);
 
             if (ProcessManagerPatch.modules.TryGetValue(self.manager, out var managerModule))
             {
                 if (managerModule.droneMasterDreamNumber != -1)
                 {
-                    if (self.manager.fadeToBlack > 0.1f)
+                    if (self.manager.fadeToBlack < 0.9f)
                     {
                         self.manager.fadeToBlack = 1f;
                         self.scene.RemoveSprites();

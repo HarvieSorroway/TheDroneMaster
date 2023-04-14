@@ -57,15 +57,15 @@ namespace TheDroneMaster.GameHooks
 
         private static void OverWorld_LoadFirstWorld(On.OverWorld.orig_LoadFirstWorld orig, OverWorld self)
         {
-            if(RainWorldGamePatch.modules.TryGetValue(self.game, out var gameModule))
-            {
-                if(gameModule.IsDroneMasterDream)
-                {
-                    string room = "DMD_A01";
-                    self.game.startingRoom = room;
-                    self.LoadWorld("DMD", self.PlayerCharacterNumber, false);
-                    return;
-                }
+            if(ProcessManagerPatch.current.droneMasterDreamNumber != -1)
+            {   
+                string room = "DMD_AI";
+                self.game.startingRoom = room;
+                self.LoadWorld("DMD", self.PlayerCharacterNumber, false);
+                self.FIRSTROOM = room;
+
+                Plugin.Log("OverWorld load room");
+                return;
             }
             orig.Invoke(self);
         }

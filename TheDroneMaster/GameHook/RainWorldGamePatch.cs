@@ -9,6 +9,7 @@ using static TheDroneMaster.PlayerPatchs;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using UnityEngine;
+using Menu;
 
 namespace TheDroneMaster.GameHooks
 {
@@ -17,12 +18,26 @@ namespace TheDroneMaster.GameHooks
         public static ConditionalWeakTable<RainWorldGame, RainWorldGameModule> modules = new ConditionalWeakTable<RainWorldGame, RainWorldGameModule>();
         public static void PatchOn()
         {
-            IL.RainWorldGame.RawUpdate += RainWorldGame_RawUpdate;
+            //IL.RainWorldGame.RawUpdate += RainWorldGame_RawUpdate;
 
             On.RainWorldGame.ctor += RainWorldGame_ctor;
             On.RainWorldGame.Update += RainWorldGame_Update;
             On.RainWorldGame.Win += RainWorldGame_Win;
             On.RainWorldGame.GameOver += RainWorldGame_GameOver;
+
+            On.StoryGameSession.TimeTick += StoryGameSession_TimeTick;
+        }
+
+        private static void StoryGameSession_TimeTick(On.StoryGameSession.orig_TimeTick orig, StoryGameSession self, float dt)
+        {
+            if(modules.TryGetValue(self.game,out var module))
+            {
+                if (module.IsDroneMasterDream && module.DreamFinished)
+                {
+                    return;
+                }
+            }
+            orig.Invoke(self, dt);
         }
 
         private static void RainWorldGame_RawUpdate(MonoMod.Cil.ILContext il)
@@ -89,10 +104,12 @@ namespace TheDroneMaster.GameHooks
                     if (ProcessManagerPatch.modules.TryGetValue(self.manager, out managerModule))
                     {
                         managerModule.droneMasterDreamNumber = 1;
+                        managerModule.tempProgressionBuffer = self.rainWorld.progression;
                     }
                 }
+                else return;
 
-                Plugin.Log(String.Format("RainWorldGame win, {0}, {1}",module.IsDroneMasterDream, managerModule));
+                Plugin.Log(String.Format("RainWorldGame win, {0}, {1}, {2}",module.IsDroneMasterDream, managerModule, managerModule.tempProgressionBuffer));
             }
             orig.Invoke(self, malnourished);
         }
@@ -113,6 +130,8 @@ namespace TheDroneMaster.GameHooks
             {
                 modules.Add(self, new RainWorldGameModule(self, manager));
             }
+
+            Plugin.Log(String.Format("SaveState current karma : {0}", self.GetStorySession.saveState.deathPersistentSaveData.karma));
         }
     }
 
@@ -123,6 +142,9 @@ namespace TheDroneMaster.GameHooks
         public readonly int currentDroneMasterDreamNumber = -1;
 
         public bool IsDroneMasterDream => currentDroneMasterDreamNumber != -1;
+        public bool DreamFinished { get; private set; }
+
+        public KarmaLadderScreen.SleepDeathScreenDataPackage packageFromSleepScreen;
 
         public RainWorldGameModule(RainWorldGame game,ProcessManager manager)
         {
@@ -131,13 +153,22 @@ namespace TheDroneMaster.GameHooks
             if(ProcessManagerPatch.modules.TryGetValue(manager,out var managerModule))
             {
                 currentDroneMasterDreamNumber = managerModule.droneMasterDreamNumber;
+
+                if (manager.oldProcess is Menu.SleepAndDeathScreen && IsDroneMasterDream)
+                {
+                    var sleepScreen = manager.oldProcess as Menu.SleepAndDeathScreen;
+                    packageFromSleepScreen = sleepScreen.myGamePackage;
+
+                    game.rainWorld.progression = managerModule.tempProgressionBuffer;
+                    game.startingRoom = "DMD_A01";
+                }
+                Plugin.Log(String.Format("Init new RainWorldGame module, droneMasterDreamNumber : {0}\nPrevious mainLoopProcess : {1}", currentDroneMasterDreamNumber, manager.oldProcess));
             }
-            Plugin.Log("Init new RainWorldGame module, droneMasterDreamNumber : " + currentDroneMasterDreamNumber.ToString());
         }
 
         public void Update(RainWorldGame self)
         {
-            if (IsDroneMasterDream && self.processActive)
+            if (IsDroneMasterDream && self.processActive && !DreamFinished)
             {
                 var session = self.GetStorySession;
                 if (session == null || session.playerSessionRecords == null) return;
@@ -162,12 +193,15 @@ namespace TheDroneMaster.GameHooks
             }
 
             managerModule.droneMasterDreamNumber = -1;
+            DreamFinished = true;
 
             self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.Load;
             List<AbstractCreature> collection = new List<AbstractCreature>(self.session.Players);
-            self.session = new StoryGameSession(PlayerModule.DroneMasterName, self);
+            self.session = new StoryGameSession(PlayerModule.DroneMasterName, self) { saveState = managerModule.saveStateBuffer };
             self.session.Players = new List<AbstractCreature>(collection);
 
+
+            
             if (self.manager.musicPlayer != null)
             {
                 self.manager.musicPlayer.FadeOutAllSongs(20f);

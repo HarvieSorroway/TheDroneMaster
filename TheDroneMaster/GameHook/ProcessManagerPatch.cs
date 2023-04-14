@@ -9,6 +9,7 @@ namespace TheDroneMaster.GameHooks
 {
     public class ProcessManagerPatch
     {
+        public static ProcessManagerModule current;
         public static ConditionalWeakTable<ProcessManager, ProcessManagerModule> modules = new ConditionalWeakTable<ProcessManager, ProcessManagerModule>();
         public static void PatchOn(RainWorld rainWorld)
         {
@@ -35,6 +36,8 @@ namespace TheDroneMaster.GameHooks
     public class ProcessManagerModule
     {
         public WeakReference<ProcessManager> managerRef;
+        public PlayerProgression tempProgressionBuffer;
+        public SaveState saveStateBuffer;
 
         public int droneMasterDreamNumber = -1;
 
@@ -42,6 +45,7 @@ namespace TheDroneMaster.GameHooks
         {
             managerRef = new WeakReference<ProcessManager>(self);
             Plugin.Log("Init new ProcessMangerModule");
+            ProcessManagerPatch.current = this;
         }
     }
 }
