@@ -43,7 +43,6 @@ namespace TheDroneMaster.GameHooks
                     isDroneMasterDream = true;
                     managerModule.droneMasterDreamNumber = -1;
                 }
-
                 currentDroneMasterDreamNumber = managerModule.droneMasterDreamNumber;
             }
         }

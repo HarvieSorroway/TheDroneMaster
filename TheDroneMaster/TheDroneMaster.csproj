@@ -101,6 +101,9 @@
     </Compile>
     <Compile Include="DronePort\CreatureScanner.cs" />
     <Compile Include="Fixer.cs" />
+    <Compile Include="GameHook\GamePatch.cs" />
+    <Compile Include="GameHook\OverWorldHooks.cs" />
+    <Compile Include="GameHook\SleepDeathScreenPatch.cs" />
     <Compile Include="LaserDrone\DroneLaserGun.cs" />
     <Compile Include="OracleHooks\InGameTrasnlatorPatch.cs" />
     <Compile Include="PearlReader\PearlReaderPatchs.cs" />
@@ -119,6 +122,8 @@
     <Compile Include="LaserDrone\LaserDroneProperties.cs" />
     <Compile Include="PostEffect.cs" />
     <Compile Include="OracleHooks\SSOracleActionPatch.cs" />
+    <Compile Include="GameHook\ProcessManagerPatch.cs" />
+    <Compile Include="GameHook\RainWorldGamePatch.cs" />
     <Compile Include="SaveStateHook\DeathPersistentSaveDataPatch.cs" />
   </ItemGroup>
   <ItemGroup>

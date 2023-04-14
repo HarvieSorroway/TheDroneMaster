@@ -194,6 +194,8 @@ namespace TheDroneMaster
             public readonly SlugcatStats.Name name;
             public readonly SlugBaseCharacter character;
 
+            public static SlugcatStats.Name DroneMasterName { get; private set; }
+
             public readonly int wirelessChargeNeeds = 400;
 
             public readonly bool ownDrones;
@@ -239,6 +241,10 @@ namespace TheDroneMaster
                     if (canParse)
                     {
                         name = extEnumBase as SlugcatStats.Name;
+                        if(DroneMasterName == null)
+                        {
+                            DroneMasterName = name;
+                        }
                     }
                     //Plugin.Log(("Get PlayerName : " + name.value);
                     if (SlugBaseCharacter.TryGet(name, out character))

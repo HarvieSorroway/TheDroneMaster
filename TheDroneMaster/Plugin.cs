@@ -14,6 +14,7 @@ using SlugBase.DataTypes;
 using System.Reflection;
 using MonoMod.RuntimeDetour;
 using System.IO;
+using TheDroneMaster.GameHooks;
 
 
 #pragma warning disable CS0618
@@ -101,6 +102,7 @@ namespace TheDroneMaster
             InGameTrasnlatorPatch.Patch();
             Fixer.Patch();
             DeathPersistentSaveDataPatch.Patch();
+            GamePatch.Patch(self);
             //PearlReaderPatchs.Patch();
 
             DroneMasterEnums.RegisterValues();
