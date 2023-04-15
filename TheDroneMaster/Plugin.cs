@@ -15,6 +15,8 @@ using System.Reflection;
 using MonoMod.RuntimeDetour;
 using System.IO;
 using TheDroneMaster.GameHooks;
+using TheDroneMaster.DreamComponent;
+using TheDroneMaster.DreamComponent.OracleHooks;
 
 
 #pragma warning disable CS0618
@@ -104,6 +106,8 @@ namespace TheDroneMaster
             DeathPersistentSaveDataPatch.Patch();
             GamePatch.Patch(self);
             //PearlReaderPatchs.Patch();
+
+            OraclePatch.PatchOn();
 
             DroneMasterEnums.RegisterValues();
 

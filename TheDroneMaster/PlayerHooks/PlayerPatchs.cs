@@ -179,6 +179,11 @@ namespace TheDroneMaster
                     else self.Die();
                 }
             }
+
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                self.room.game.Win(false);
+            }
         }
 
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)

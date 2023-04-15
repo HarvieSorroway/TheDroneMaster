@@ -77,6 +77,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RW&amp;Modding\references1.9\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -89,6 +90,10 @@
     <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
+    <Compile Include="DreamComponent\DreamHook\CustomDreamBase.cs" />
+    <Compile Include="DreamComponent\DreamHook\DreamHooks.cs" />
+    <Compile Include="DreamComponent\OracleHooks\CustomOracle.cs" />
+    <Compile Include="DreamComponent\OracleHooks\OraclePatch.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />
     <Compile Include="DroneHUD\DroneHUD.cs" />
     <Compile Include="DroneHUD\DroneUI.cs" />
@@ -101,9 +106,9 @@
     </Compile>
     <Compile Include="DronePort\CreatureScanner.cs" />
     <Compile Include="Fixer.cs" />
-    <Compile Include="GameHook\GamePatch.cs" />
-    <Compile Include="GameHook\OverWorldHooks.cs" />
-    <Compile Include="GameHook\SleepDeathScreenPatch.cs" />
+    <Compile Include="DreamComponent\GameHook\GamePatch.cs" />
+    <Compile Include="DreamComponent\GameHook\OverWorldHooks.cs" />
+    <Compile Include="DreamComponent\GameHook\SleepDeathScreenPatch.cs" />
     <Compile Include="LaserDrone\DroneLaserGun.cs" />
     <Compile Include="OracleHooks\InGameTrasnlatorPatch.cs" />
     <Compile Include="PearlReader\PearlReaderPatchs.cs" />
@@ -122,8 +127,8 @@
     <Compile Include="LaserDrone\LaserDroneProperties.cs" />
     <Compile Include="PostEffect.cs" />
     <Compile Include="OracleHooks\SSOracleActionPatch.cs" />
-    <Compile Include="GameHook\ProcessManagerPatch.cs" />
-    <Compile Include="GameHook\RainWorldGamePatch.cs" />
+    <Compile Include="DreamComponent\GameHook\ProcessManagerPatch.cs" />
+    <Compile Include="DreamComponent\GameHook\RainWorldGamePatch.cs" />
     <Compile Include="SaveStateHook\DeathPersistentSaveDataPatch.cs" />
   </ItemGroup>
   <ItemGroup>
