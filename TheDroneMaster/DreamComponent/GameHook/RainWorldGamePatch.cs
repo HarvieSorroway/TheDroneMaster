@@ -173,7 +173,7 @@ namespace TheDroneMaster.GameHooks
                 var session = self.GetStorySession;
                 if (session == null || session.playerSessionRecords == null) return;
 
-                if (session.playerSessionRecords[0].time > 400)
+                if (session.playerSessionRecords[0].time > 1600)
                 {
                     EndDroneMasterDream(self);
                 }

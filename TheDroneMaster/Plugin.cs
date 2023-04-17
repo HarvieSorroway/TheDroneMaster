@@ -95,26 +95,33 @@ namespace TheDroneMaster
             orig.Invoke(self);
             if (inited) return;
 
-            PlayerPatchs.Patch();
-            PlayerGraphicsPatch.Patch();
-            HUDPatch.Patch();
-            CreaturePatchs.Patch();
-            GatePatchs.Patch();
-            SSOracleActionPatch.Patch();
-            InGameTrasnlatorPatch.Patch();
-            Fixer.Patch();
-            DeathPersistentSaveDataPatch.Patch();
-            GamePatch.Patch(self);
-            //PearlReaderPatchs.Patch();
+            try
+            {
+                PlayerPatchs.Patch();
+                PlayerGraphicsPatch.Patch();
+                HUDPatch.Patch();
+                CreaturePatchs.Patch();
+                GatePatchs.Patch();
+                SSOracleActionPatch.Patch();
+                InGameTrasnlatorPatch.Patch();
+                Fixer.Patch();
+                DeathPersistentSaveDataPatch.Patch();
+                GamePatch.Patch(self);
+                //PearlReaderPatchs.Patch();
 
-            OraclePatch.PatchOn();
+                OraclePatch.PatchOn();
 
-            DroneMasterEnums.RegisterValues();
+                DroneMasterEnums.RegisterValues();
 
-            LoadResources(self);
+                LoadResources(self);
 
-            MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
-            inited = true;
+                MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
+                inited = true;
+            }
+            catch(Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
 
         public void LoadResources(RainWorld rainWorld)

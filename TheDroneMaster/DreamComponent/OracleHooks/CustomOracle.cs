@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RWCustom;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// 生成的迭代器ID
         /// </summary>
         public virtual Oracle.OracleID OracleID => Oracle.OracleID.SS;
+
+        public virtual Oracle.OracleID InheritOracleID => null;
 
         /// <summary>
         /// 当前迭代器的gravity
@@ -56,194 +59,93 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-    public class TestSSOrcale : CustomOracle
-    {
-        public static Oracle.OracleID DMDOracle = new Oracle.OracleID("DMD", true);
-        public override string LoadRoom => "DMD_AI";
-        public override Oracle.OracleID OracleID => base.OracleID;
-
-        public TestSSOrcale()
-        {
-            gravity = 0f;
-            startPos = new Vector2(350f, 350f);
-        }
-
-        public override void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
-        {
-            oracle.oracleBehavior = new SSOracleBehavior(oracle);
-            oracle.myScreen = new OracleProjectionScreen(room, oracle.oracleBehavior);
-            room.AddObject(oracle.myScreen);
-            oracle.marbles = new List<PebblesPearl>();
-            oracle.SetUpMarbles();
-            room.gravity = 0f;
-            for (int n = 0; n < room.updateList.Count; n++)
-            {
-                if (room.updateList[n] is AntiGravity)
-                {
-                    (room.updateList[n] as AntiGravity).active = false;
-                    break;
-                }
-            }
-            oracle.arm = new Oracle.OracleArm(oracle);
-            Plugin.Log("Successfully load behaviours and surroundings!");
-        }
-
-        public override OracleGraphics InitCustomOracleGraphic(PhysicalObject ow)
-        {
-            return new TestSSOracleGraphics(ow);
-        }
-    }
+    
 
     public class CustomOracleGraphic : OracleGraphics
     {
+        public bool callBaseApplyPalette = false;
+        public bool callBaseInitiateSprites = false;
+        public bool callBaseDrawSprites = false;
+
+
         public CustomOracleGraphic(PhysicalObject ow) : base(ow)
         {
         }
-    }
 
-    public class TestSSOracleGraphics : CustomOracleGraphic
-    {
-        public TestSSOracleGraphics(PhysicalObject ow) : base (ow)
+        public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            Random.State state = Random.state;
-            Random.InitState(56);
-            this.totalSprites = 0;
-            this.armJointGraphics = new OracleGraphics.ArmJointGraphics[this.oracle.arm.joints.Length];
-
-            for (int i = 0; i < this.oracle.arm.joints.Length; i++)
-            {
-                this.armJointGraphics[i] = new OracleGraphics.ArmJointGraphics(this, this.oracle.arm.joints[i], this.totalSprites);
-                this.totalSprites += this.armJointGraphics[i].totalSprites;
-            }
-
-
-            this.firstUmbilicalSprite = this.totalSprites;
-            this.discUmbCord = new OracleGraphics.DisconnectedUbilicalCord(this, this.totalSprites);
-            this.totalSprites += this.discUmbCord.totalSprites;
-            this.discUmbCord.Reset(this.oracle.firstChunk.pos);
-
-
-            this.firstBodyChunkSprite = this.totalSprites;
-            this.totalSprites += 2;
-            this.neckSprite = this.totalSprites;
-            this.totalSprites++;
-            this.firstFootSprite = this.totalSprites;
-            this.totalSprites += 4;
-
-
-            this.halo = new OracleGraphics.Halo(this, this.totalSprites);
-            this.totalSprites += this.halo.totalSprites;
-            this.gown = new OracleGraphics.Gown(this);
-            this.robeSprite = this.totalSprites;
-            this.totalSprites++;
-
-
-            this.firstHandSprite = this.totalSprites;
-            this.totalSprites += 4;
-            this.head = new GenericBodyPart(this, 5f, 0.5f, 0.995f, this.oracle.firstChunk);
-            this.firstHeadSprite = this.totalSprites;
-            this.totalSprites += 10;
-            this.fadeSprite = this.totalSprites;
-            this.totalSprites++;
-
-
-            this.killSprite = this.totalSprites;
-            this.totalSprites++;
-
-            this.hands = new GenericBodyPart[2];
-
-            for (int j = 0; j < 2; j++)
-            {
-                this.hands[j] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, this.oracle.firstChunk);
-            }
-            this.feet = new GenericBodyPart[2];
-            for (int k = 0; k < 2; k++)
-            {
-                this.feet[k] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, this.oracle.firstChunk);
-            }
-            this.knees = new Vector2[2, 2];
-            for (int l = 0; l < 2; l++)
-            {
-                for (int m = 0; m < 2; m++)
-                {
-                    this.knees[l, m] = this.oracle.firstChunk.pos;
-                }
-            }
-            this.firstArmBaseSprite = this.totalSprites;
-            this.armBase = new OracleGraphics.ArmBase(this, this.firstArmBaseSprite);
-            this.totalSprites += this.armBase.totalSprites;
-            this.voiceFreqSamples = new float[64];
-            Random.state = state;
+            base.InitiateSprites(sLeaser, rCam);
         }
 
         public override void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             base.ApplyPalette(sLeaser, rCam, palette);
+        }
 
-            this.SLArmBaseColA = new Color(0.52156866f, 0.52156866f, 0.5137255f);
-            this.SLArmHighLightColA = new Color(0.5686275f, 0.5686275f, 0.54901963f);
-            this.SLArmBaseColB = palette.texture.GetPixel(5, 1);
-            this.SLArmHighLightColB = palette.texture.GetPixel(5, 2);
+        #region ArmJoinGraphics Modify
 
-            for (int i = 0; i < this.armJointGraphics.Length; i++)
-            {
-                this.armJointGraphics[i].ApplyPalette(sLeaser, rCam, palette);
-                armJointGraphics[i].metalColor = palette.blackColor;
-            }
-            Color color = new Color(0.105882354f, 0.27058825f, 0.34117648f);
+        /// <summary>
+        /// 用于在ApplyPalette阶段修改 ArmJointGraphics 的 metalColor
+        /// </summary>
+        /// <param name="armJointGraphics"> ArmJointGraphics 实例 </param>
+        /// <param name="sLeaser"></param>
+        /// <param name="rCam"></param>
+        /// <param name="palette"></param>
+        /// <returns></returns>
+        public virtual Color ArmJoint_MetalColor(ArmJointGraphics armJointGraphics, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+            return Color.Lerp(palette.blackColor, palette.texture.GetPixel(5, 5), 0.12f);
+        }
 
-            for (int j = 0; j < base.owner.bodyChunks.Length; j++)
-            {
-                sLeaser.sprites[this.firstBodyChunkSprite + j].color = color;
-            }
-            sLeaser.sprites[this.neckSprite].color = color;
-            sLeaser.sprites[this.HeadSprite].color = color;
-            sLeaser.sprites[this.ChinSprite].color = color;
-            for (int k = 0; k < 2; k++)
-            {
-                if (this.armJointGraphics.Length == 0)
-                {
-                    sLeaser.sprites[this.PhoneSprite(k, 0)].color = this.GenericJointBaseColor();
-                    sLeaser.sprites[this.PhoneSprite(k, 1)].color = this.GenericJointHighLightColor();
-                    sLeaser.sprites[this.PhoneSprite(k, 2)].color = this.GenericJointHighLightColor();
-                }
-                else
-                {
-                    sLeaser.sprites[this.PhoneSprite(k, 0)].color = this.armJointGraphics[0].BaseColor(default(Vector2));
-                    sLeaser.sprites[this.PhoneSprite(k, 1)].color = this.armJointGraphics[0].HighLightColor(default(Vector2));
-                    sLeaser.sprites[this.PhoneSprite(k, 2)].color = this.armJointGraphics[0].HighLightColor(default(Vector2));
-                }
-                sLeaser.sprites[this.HandSprite(k, 0)].color = color;
-                if (this.gown != null)
-                {
-                    for (int l = 0; l < 7; l++)
-                    {
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = this.gown.Color(0.4f);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = this.gown.Color(0f);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = this.gown.Color(0.4f);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 3] = this.gown.Color(0f);
-                    }
-                }
-                else
-                {
-                    sLeaser.sprites[this.HandSprite(k, 1)].color = color;
-                }
-                sLeaser.sprites[this.FootSprite(k, 0)].color = color;
-                sLeaser.sprites[this.FootSprite(k, 1)].color = color;
-            }
-            if (this.umbCord != null)
-            {
-                this.umbCord.ApplyPalette(sLeaser, rCam, palette);
-                sLeaser.sprites[this.firstUmbilicalSprite].color = palette.blackColor;
-            }
-            else if (this.discUmbCord != null)
-            {
-                this.discUmbCord.ApplyPalette(sLeaser, rCam, palette);
-            }
-            if (this.armBase != null)
-            {
-                this.armBase.ApplyPalette(sLeaser, rCam, palette);
-            }
+        /// <summary>
+        /// 用于替代 ArmJointGraphics 中的 BaseColor 方法
+        /// </summary>
+        /// <param name="armJointGraphics">ArmJointGraphics 实例</param>
+        /// <param name="pos"> 在房间中的位置，但该位置信息不是每次都会用到 </param>
+        /// <returns></returns>
+        public virtual Color ArmJoint_BaseColor(ArmJointGraphics armJointGraphics, Vector2 pos)
+        {
+            return Color.Lerp(Custom.HSL2RGB(0.025f, Mathf.Lerp(0.4f, 0.1f, Mathf.Pow(1f, 0.5f)), Mathf.Lerp(0.05f, 0.7f - 0.5f * owner.room.Darkness(armJointGraphics.myJoint.pos), Mathf.Pow(1f, 0.45f))), new Color(0f, 0f, 0.1f), Mathf.Pow(Mathf.InverseLerp(0.45f, -0.05f, 1f), 0.9f) * 0.5f);
+        }
+
+        /// <summary>
+        /// 用于替代 ArmJointGraphics 中的 HighLightColor 方法
+        /// </summary>
+        /// <param name="armJointGraphics">ArmJointGraphics 实例</param>
+        /// <param name="pos"> 在房间中的位置，但该位置信息不是每次都会用到 </param>
+        /// <returns></returns>
+        public virtual Color ArmJoint_HighLightColor(ArmJointGraphics armJointGraphics, Vector2 pos)
+        {
+            return Color.Lerp(Custom.HSL2RGB(0.025f, Mathf.Lerp(0.5f, 0.1f, Mathf.Pow(1f, 0.5f)), Mathf.Lerp(0.15f, 0.85f - 0.65f * owner.room.Darkness(armJointGraphics.myJoint.pos), Mathf.Pow(1f, 0.45f))), new Color(0f, 0f, 0.15f), Mathf.Pow(Mathf.InverseLerp(0.45f, -0.05f, 1f), 0.9f) * 0.4f);
+        }
+        #endregion
+
+        #region UbilicalCord Modify
+        /// <summary>
+        /// UbilicalCord 中的第一种电线颜色
+        /// </summary>
+        /// <param name="ubilicalCord"> UbilicalCord 实例 </param>
+        /// <returns></returns>
+        public virtual Color UbilicalCord_WireCol_1(UbilicalCord ubilicalCord)
+        {
+            return new Color(1f, 0f, 0f);
+        }
+
+        /// <summary>
+        /// UbilicalCord 中的第二种电线颜色
+        /// </summary>
+        /// <param name="ubilicalCord"> UbilicalCord 实例 </param>
+        /// <returns></returns>
+        public virtual Color UbilicalCord_WireCol_2(UbilicalCord ubilicalCord)
+        {
+            return new Color(0f, 0f, 1f);
+        }
+        #endregion
+
+        public virtual Color Gown_Color(Gown gown,float f)
+        {
+            return Custom.HSL2RGB(Mathf.Lerp(0.08f, 0.02f, Mathf.Pow(f, 2f)), Mathf.Lerp(1f, 0.8f, f), 0.5f);
         }
     }
+
 }
