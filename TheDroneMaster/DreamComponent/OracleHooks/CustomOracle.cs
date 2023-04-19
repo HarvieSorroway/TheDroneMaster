@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DreamComponent.OracleHooks;
 using UnityEngine;
+using static MonoMod.InlineRT.MonoModRule;
 using Random = UnityEngine.Random;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
@@ -67,12 +69,16 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public bool callBaseApplyPalette = false;
         public bool callBaseInitiateSprites = false;
         public bool callBaseDrawSprites = false;
+        public bool callBaseUpdate = false;
 
+        public CustomCOracleStateViz customCOracleStateViz;
 
         public CustomOracleGraphic(PhysicalObject ow) : base(ow)
         {
+            customCOracleStateViz = new CustomCOracleStateViz(oracle);
         }
 
+        #region 默认方法
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             base.InitiateSprites(sLeaser, rCam);
@@ -82,6 +88,345 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             base.ApplyPalette(sLeaser, rCam, palette);
         }
+
+        public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            if (oracle == null || oracle.room == null)
+            {
+                return;
+            }
+            Vector2 bodyPos = Vector2.Lerp(owner.firstChunk.lastPos, owner.firstChunk.pos, timeStacker);
+            Vector2 bodyDir = Custom.DirVec(Vector2.Lerp(owner.bodyChunks[1].lastPos, owner.bodyChunks[1].pos, timeStacker), bodyPos);
+            Vector2 perpendicularBodyDir = Custom.PerpendicularVector(bodyDir);
+            Vector2 lookDir = Vector2.Lerp(lastLookDir, base.lookDir, timeStacker);
+            Vector2 headPos = Vector2.Lerp(head.lastPos, head.pos, timeStacker);
+
+            for (int i = 0; i < owner.bodyChunks.Length; i++)
+            {
+                sLeaser.sprites[firstBodyChunkSprite + i].x = Mathf.Lerp(owner.bodyChunks[i].lastPos.x, owner.bodyChunks[i].pos.x, timeStacker) - camPos.x;
+                sLeaser.sprites[firstBodyChunkSprite + i].y = Mathf.Lerp(owner.bodyChunks[i].lastPos.y, owner.bodyChunks[i].pos.y, timeStacker) - camPos.y;
+            }
+
+            sLeaser.sprites[firstBodyChunkSprite].rotation = Custom.AimFromOneVectorToAnother(bodyPos, headPos) - Mathf.Lerp(14f, 0f, Mathf.Lerp(lastBreatheFac, breathFac, timeStacker));
+            sLeaser.sprites[firstBodyChunkSprite + 1].rotation = Custom.VecToDeg(bodyDir);
+
+            for (int j = 0; j < armJointGraphics.Length; j++)
+            {
+                armJointGraphics[j].DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            }
+
+            //CustomOracleGraphcis Updates
+            CustomOracleBehaviour oracleBehaviour = oracle.oracleBehavior as CustomOracleBehaviour;
+            if(oracleBehaviour != null)
+            {
+                CustomOracleDrawBehaviour(sLeaser, rCam, timeStacker, camPos, oracleBehaviour);
+            }
+            //end
+
+            sLeaser.sprites[fadeSprite].x = headPos.x - camPos.x;
+            sLeaser.sprites[fadeSprite].y = headPos.y - camPos.y;
+            sLeaser.sprites[neckSprite].x = bodyPos.x - camPos.x;
+            sLeaser.sprites[neckSprite].y = bodyPos.y - camPos.y;
+            sLeaser.sprites[neckSprite].rotation = Custom.AimFromOneVectorToAnother(bodyPos, headPos);
+            sLeaser.sprites[neckSprite].scaleY = Vector2.Distance(bodyPos, headPos);
+
+            if (gown != null)
+            {
+                gown.DrawSprite(robeSprite, sLeaser, rCam, timeStacker, camPos);
+            }
+            if (halo != null)
+            {
+                halo.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            }
+            if (armBase != null)
+            {
+                armBase.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            }
+
+            Vector2 chinDir = Custom.DirVec(headPos, bodyPos);
+            Vector2 perpendicularChinDir = Custom.PerpendicularVector(chinDir);
+            sLeaser.sprites[HeadSprite].x = headPos.x - camPos.x;
+            sLeaser.sprites[HeadSprite].y = headPos.y - camPos.y;
+            sLeaser.sprites[HeadSprite].rotation = Custom.VecToDeg(chinDir);
+            Vector2 relativeLookDir = RelativeLookDir(timeStacker);
+            Vector2 chinPos = Vector2.Lerp(headPos, bodyPos, 0.15f);
+            chinPos += perpendicularChinDir * relativeLookDir.x * 2f;
+            sLeaser.sprites[ChinSprite].x = chinPos.x - camPos.x;
+            sLeaser.sprites[ChinSprite].y = chinPos.y - camPos.y;
+
+            float eyesOpen = Mathf.Lerp(lastEyesOpen, base.eyesOpen, timeStacker);
+
+            for (int k = 0; k < 2; k++)
+            {
+                float leftOrRight = ((k == 0) ? (-1f) : 1f);
+                Vector2 eyeSpritePos = headPos + perpendicularChinDir * Mathf.Clamp(relativeLookDir.x * 3f + 2.5f * leftOrRight, -5f, 5f) + chinDir * (1f - relativeLookDir.y * 3f);
+                sLeaser.sprites[EyeSprite(k)].rotation = Custom.VecToDeg(chinDir);
+                sLeaser.sprites[EyeSprite(k)].scaleX = 1f + ((k == 0) ? Mathf.InverseLerp(-1f, -0.5f, relativeLookDir.x) : Mathf.InverseLerp(1f, 0.5f, relativeLookDir.x)) + (1f - eyesOpen);
+                sLeaser.sprites[EyeSprite(k)].scaleY = Mathf.Lerp(1f, IsPebbles ? 2f : 3f, eyesOpen);
+                sLeaser.sprites[EyeSprite(k)].x = eyeSpritePos.x - camPos.x;
+                sLeaser.sprites[EyeSprite(k)].y = eyeSpritePos.y - camPos.y;
+                sLeaser.sprites[EyeSprite(k)].alpha = 0.5f + 0.5f * eyesOpen;
+                int side = ((k < 1 != relativeLookDir.x < 0f) ? 1 : 0);
+                Vector2 phonePos = headPos + perpendicularChinDir * Mathf.Clamp(Mathf.Lerp(7f, 5f, Mathf.Abs(relativeLookDir.x)) * leftOrRight, -11f, 11f);
+                for (int l = 0; l < 2; l++)
+                {
+                    sLeaser.sprites[PhoneSprite(side, l)].rotation = Custom.VecToDeg(chinDir);
+                    sLeaser.sprites[PhoneSprite(side, l)].scaleY = 5.5f * ((l == 0) ? 1f : 0.8f) / 20f;
+                    sLeaser.sprites[PhoneSprite(side, l)].scaleX = Mathf.Lerp(3.5f, 5f, Mathf.Abs(relativeLookDir.x)) * ((l == 0) ? 1f : 0.8f) / 20f;
+                    sLeaser.sprites[PhoneSprite(side, l)].x = phonePos.x - camPos.x;
+                    sLeaser.sprites[PhoneSprite(side, l)].y = phonePos.y - camPos.y;
+                }
+                sLeaser.sprites[PhoneSprite(side, 2)].x = phonePos.x - camPos.x;
+                sLeaser.sprites[PhoneSprite(side, 2)].y = phonePos.y - camPos.y;
+                sLeaser.sprites[PhoneSprite(side, 2)].rotation = Custom.AimFromOneVectorToAnother(bodyPos, phonePos - chinDir * 40f - lookDir * 10f);
+                Vector2 handPos = Vector2.Lerp(hands[k].lastPos, hands[k].pos, timeStacker);
+                Vector2 shoulderPos = bodyPos + perpendicularBodyDir * 4f * ((k == 1) ? (-1f) : 1f);
+
+                if (IsMoon)
+                {
+                    shoulderPos += bodyDir * 3f;
+                }
+
+                Vector2 cB = handPos + Custom.DirVec(handPos, shoulderPos) * 3f + bodyDir;
+                Vector2 cA = shoulderPos + perpendicularBodyDir * 5f * ((k == 1) ? (-1f) : 1f);
+                sLeaser.sprites[HandSprite(k, 0)].x = handPos.x - camPos.x;
+                sLeaser.sprites[HandSprite(k, 0)].y = handPos.y - camPos.y;
+                Vector2 vector14 = shoulderPos - perpendicularBodyDir * 2f * ((k == 1) ? (-1f) : 1f);
+
+                float armWidth = (IsPebbles ? 4f : 2f);
+
+                for (int m = 0; m < 7; m++)
+                {
+                    float f3 = (float)m / 6f;
+                    Vector2 vector15 = Custom.Bezier(shoulderPos, cA, handPos, cB, f3);
+                    Vector2 vector16 = Custom.DirVec(vector14, vector15);
+                    Vector2 vector17 = Custom.PerpendicularVector(vector16) * ((k == 0) ? (-1f) : 1f);
+                    float num4 = Vector2.Distance(vector14, vector15);
+                    (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).MoveVertice(m * 4, vector15 - vector16 * num4 * 0.3f - vector17 * armWidth - camPos);
+                    (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).MoveVertice(m * 4 + 1, vector15 - vector16 * num4 * 0.3f + vector17 * armWidth - camPos);
+                    (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).MoveVertice(m * 4 + 2, vector15 - vector17 * armWidth - camPos);
+                    (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).MoveVertice(m * 4 + 3, vector15 + vector17 * armWidth - camPos);
+                    vector14 = vector15;
+                }
+                handPos = Vector2.Lerp(feet[k].lastPos, feet[k].pos, timeStacker);
+                shoulderPos = Vector2.Lerp(oracle.bodyChunks[1].lastPos, oracle.bodyChunks[1].pos, timeStacker);
+                Vector2 b = Vector2.Lerp(knees[k, 1], knees[k, 0], timeStacker);
+                cB = Vector2.Lerp(handPos, b, 0.9f);
+                cA = Vector2.Lerp(shoulderPos, b, 0.9f);
+                sLeaser.sprites[FootSprite(k, 0)].x = handPos.x - camPos.x;
+                sLeaser.sprites[FootSprite(k, 0)].y = handPos.y - camPos.y;
+                vector14 = shoulderPos - perpendicularBodyDir * 2f * ((k == 1) ? (-1f) : 1f);
+                armWidth = 4f;
+                float num5 = 4f;
+                for (int n = 0; n < 7; n++)
+                {
+                    float f4 = (float)n / 6f;
+                    armWidth = (IsPebbles ? 2f : Mathf.Lerp(4f, 2f, Mathf.Pow(f4, 0.5f)));
+                    Vector2 armMidPos = Custom.Bezier(shoulderPos, cA, handPos, cB, f4);
+                    Vector2 vector19 = Custom.DirVec(vector14, armMidPos);
+                    Vector2 vector20 = Custom.PerpendicularVector(vector19) * ((k == 0) ? (-1f) : 1f);
+                    float num6 = Vector2.Distance(vector14, armMidPos);
+                    (sLeaser.sprites[FootSprite(k, 1)] as TriangleMesh).MoveVertice(n * 4, armMidPos - vector19 * num6 * 0.3f - vector20 * (num5 + armWidth) * 0.5f - camPos);
+                    (sLeaser.sprites[FootSprite(k, 1)] as TriangleMesh).MoveVertice(n * 4 + 1, armMidPos - vector19 * num6 * 0.3f + vector20 * (num5 + armWidth) * 0.5f - camPos);
+                    (sLeaser.sprites[FootSprite(k, 1)] as TriangleMesh).MoveVertice(n * 4 + 2, armMidPos - vector20 * armWidth - camPos);
+                    (sLeaser.sprites[FootSprite(k, 1)] as TriangleMesh).MoveVertice(n * 4 + 3, armMidPos + vector20 * armWidth - camPos);
+                    vector14 = armMidPos;
+                    num5 = armWidth;
+                }
+            }
+
+            if (umbCord != null)
+            {
+                umbCord.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            }
+            else if (discUmbCord != null)
+            {
+                discUmbCord.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            }
+
+            #region base.DrawSprites():
+            if (this.DEBUGLABELS != null && this.DEBUGLABELS.Length != 0)
+            {
+                foreach (DebugLabel debugLabel in this.DEBUGLABELS)
+                {
+                    if (debugLabel.relativePos)
+                    {
+                        debugLabel.label.x = this.owner.bodyChunks[0].pos.x + debugLabel.pos.x - camPos.x;
+                        debugLabel.label.y = this.owner.bodyChunks[0].pos.y + debugLabel.pos.y - camPos.y;
+                    }
+                    else
+                    {
+                        debugLabel.label.x = debugLabel.pos.x;
+                        debugLabel.label.y = debugLabel.pos.y;
+                    }
+                }
+            }
+            if (this.owner.slatedForDeletetion || this.owner.room != rCam.room || this.dispose)
+            {
+                sLeaser.CleanSpritesAndRemove();
+            }
+            if (sLeaser.sprites[0].isVisible == this.culled)
+            {
+                for (int j = 0; j < sLeaser.sprites.Length; j++)
+                {
+                    sLeaser.sprites[j].isVisible = !this.culled;
+                }
+            }
+            #endregion
+        }
+
+        public override void Update()
+        {
+            customCOracleStateViz.Update();
+
+            #region base.Update();
+            lastCulled = culled;
+            culled = ShouldBeCulled;
+            if (!culled && lastCulled)
+            {
+                Reset();
+            }
+            #endregion
+            if (oracle == null || oracle.room == null)
+            {
+                return;
+            }
+            CustomOracleBehaviour oracleBehaviour = oracle.oracleBehavior as CustomOracleBehaviour;
+            if (oracleBehaviour == null) return;
+
+            breathe += 1f / Mathf.Lerp(10f, 60f, oracle.health);
+            lastBreatheFac = breathFac;
+            breathFac = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin(breathe * 3.1415927f * 2f), 1f, Mathf.Pow(oracle.health, 2f));
+
+            if (gown != null)
+                gown.Update();
+
+            if (halo != null)
+                halo.Update();
+
+            if (armBase != null)
+                armBase.Update();
+
+            lastLookDir = lookDir;
+            if (oracle.Consious)
+            {
+                lookDir = Vector2.ClampMagnitude(oracle.oracleBehavior.lookPoint - oracle.firstChunk.pos, 100f) / 100f;
+                lookDir = Vector2.ClampMagnitude(lookDir + randomTalkVector * averageVoice * 0.3f, 1f);
+            }
+            head.Update();
+            head.ConnectToPoint(oracle.firstChunk.pos + Custom.DirVec(oracle.bodyChunks[1].pos, oracle.firstChunk.pos) * 6f, 8f, true, 0f, oracle.firstChunk.vel, 0.5f, 0.01f);
+
+            if (oracle.Consious)
+            {
+                if (oracleBehaviour.CouldCloseEyes && oracle.oracleBehavior.EyesClosed)
+                {
+                    head.vel += Custom.DegToVec(-90f);
+                }
+                else
+                {
+                    head.vel += Custom.DirVec(oracle.bodyChunks[1].pos, oracle.firstChunk.pos) * breathFac;
+                    head.vel += lookDir * 0.5f * breathFac;
+                }
+            }
+            else
+            {
+                head.vel += Custom.DirVec(oracle.bodyChunks[1].pos, oracle.firstChunk.pos) * 0.75f;
+                GenericBodyPart genericBodyPart = head;
+                genericBodyPart.vel.y = genericBodyPart.vel.y - 0.7f;
+            }
+
+            for (int i = 0; i < 2; i++)
+            {
+                feet[i].Update();
+                feet[i].ConnectToPoint(oracle.bodyChunks[1].pos, IsMoon ? 20f : 10f, false, 0f, oracle.bodyChunks[1].vel, 0.3f, 0.01f);
+                if (IsMoon)
+                {
+                    GenericBodyPart genericBodyPart2 = feet[i];
+                    genericBodyPart2.vel.y = genericBodyPart2.vel.y - 0.5f;
+                }
+                feet[i].vel += Custom.DirVec(oracle.firstChunk.pos, oracle.bodyChunks[1].pos) * 0.3f;
+                feet[i].vel += Custom.PerpendicularVector(Custom.DirVec(oracle.firstChunk.pos, oracle.bodyChunks[1].pos)) * 0.15f * ((i == 0) ? -1f : 1f);
+                hands[i].Update();
+                hands[i].ConnectToPoint(oracle.firstChunk.pos, 15f, false, 0f, oracle.firstChunk.vel, 0.3f, 0.01f);
+                GenericBodyPart genericBodyPart3 = hands[i];
+                genericBodyPart3.vel.y = genericBodyPart3.vel.y - 0.5f;
+                hands[i].vel += Custom.DirVec(oracle.firstChunk.pos, oracle.bodyChunks[1].pos) * 0.3f;
+                hands[i].vel += Custom.PerpendicularVector(Custom.DirVec(oracle.firstChunk.pos, oracle.bodyChunks[1].pos)) * 0.3f * ((i == 0) ? -1f : 1f);
+                knees[i, 1] = knees[i, 0];
+
+                CustomOracleUpdateBehaviour(i, oracleBehaviour);
+            }
+
+            for (int j = 0; j < armJointGraphics.Length; j++)
+            {
+                armJointGraphics[j].Update();
+            }
+
+            if (umbCord != null)
+                umbCord.Update();
+            else
+                discUmbCord?.Update();
+
+            if (oracle.oracleBehavior.voice != null && oracle.oracleBehavior.voice.currentSoundObject != null && oracle.oracleBehavior.voice.currentSoundObject.IsPlaying)
+            {
+                if (oracle.oracleBehavior.voice.currentSoundObject.IsLoaded)
+                {
+                    oracle.oracleBehavior.voice.currentSoundObject.GetSpectrumData(voiceFreqSamples, 0, FFTWindow.BlackmanHarris);
+                    averageVoice = 0f;
+                    for (int k = 0; k < voiceFreqSamples.Length; k++)
+                    {
+                        averageVoice += voiceFreqSamples[k];
+                    }
+                    averageVoice /= (float)voiceFreqSamples.Length; 
+                    averageVoice = Mathf.InverseLerp(0f, 0.00014f, averageVoice);
+                    if (averageVoice > 0.7f && Random.value < averageVoice / 14f)
+                    {
+                        randomTalkVector = Custom.RNV();
+                    }
+                }
+            }
+            else
+            {
+                randomTalkVector *= 0.9f;
+                if (averageVoice > 0f)
+                {
+                    for (int l = 0; l < voiceFreqSamples.Length; l++)
+                    {
+                        voiceFreqSamples[l] = 0f;
+                    }
+                    averageVoice = 0f;
+                }
+            }
+            lastEyesOpen = eyesOpen;
+            eyesOpen = (oracle.oracleBehavior.EyesClosed ? 0f : 1f);
+            if (owner.room.game.cameras[0].AboutToSwitchRoom && lightsource != null)
+            {
+                lightsource.RemoveFromRoom();
+                return;
+            }
+            if (IsPebbles)
+            {
+                if (lightsource == null)
+                {
+                    lightsource = new LightSource(oracle.firstChunk.pos, false, Custom.HSL2RGB(0.1f, 1f, 0.5f), oracle);
+                    lightsource.affectedByPaletteDarkness = 0f;
+                    oracle.room.AddObject(lightsource);
+                    return;
+                }
+                if (IsRottedPebbles)
+                {
+                    lightsource.setAlpha = 0.5f;
+                }
+                else
+                {
+                    lightsource.setAlpha = oracleBehaviour.working;
+                }
+                lightsource.setRad = 400f;
+                lightsource.setPos = oracle.firstChunk.pos;
+            }
+        }
+
+        #endregion
 
         #region ArmJoinGraphics Modify
 
@@ -143,10 +488,59 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
         #endregion
 
-        public virtual Color Gown_Color(Gown gown,float f)
+        #region 自定义方法
+
+        /// <summary>
+        /// 针对 CustomOracleBehaviour 的更新方法，如果不需要修改 Update 方法的话，可以重写这个
+        /// </summary>
+        /// <param name="bodySide">代表更新迭代器哪一边的身体，0代表左边，1代表右边</param>
+        /// <param name="oracleBehaviour"></param>
+        public virtual void CustomOracleUpdateBehaviour(int bodySide, CustomOracleBehaviour oracleBehaviour)
+        {
+            hands[bodySide].vel += randomTalkVector * averageVoice * 0.8f;
+            if (oracle.oracleBehavior.player != null && bodySide == 0 && oracleBehaviour.HandTowardsPlayer())
+            {
+                hands[0].vel += Custom.DirVec(hands[0].pos, oracle.oracleBehavior.player.mainBodyChunk.pos) * 3f;
+            }
+            knees[bodySide, 0] = (feet[bodySide].pos + oracle.bodyChunks[1].pos) / 2f + Custom.PerpendicularVector(Custom.DirVec(oracle.firstChunk.pos, oracle.bodyChunks[1].pos)) * 4f * ((bodySide == 0) ? -1f : 1f);
+        }
+
+        /// <summary>
+        /// 针对 CustomOracleBehaviour 的绘制方法。如果你不需要修改 DrawSprites 方法，可以重写这个
+        /// </summary>
+        /// <param name="sLeaser"></param>
+        /// <param name="rCam"></param>
+        /// <param name="timeStacker"></param>
+        /// <param name="camPos"></param>
+        /// <param name="oracleBehaviour"></param>
+        public virtual void CustomOracleDrawBehaviour(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos,CustomOracleBehaviour oracleBehaviour)
+        {
+            if (killSprite > 0)
+            {
+                if (oracleBehaviour.killFac > 0)
+                {
+                    sLeaser.sprites[this.killSprite].isVisible = true;
+
+                    if (oracleBehaviour.player != null)
+                    {
+                        sLeaser.sprites[killSprite].x = Mathf.Lerp(oracleBehaviour.player.mainBodyChunk.lastPos.x, oracleBehaviour.player.mainBodyChunk.pos.x, timeStacker) - camPos.x;
+                        sLeaser.sprites[killSprite].y = Mathf.Lerp(oracleBehaviour.player.mainBodyChunk.lastPos.y, oracleBehaviour.player.mainBodyChunk.pos.y, timeStacker) - camPos.y;
+                    }
+
+                    float num = Mathf.Lerp(oracleBehaviour.lastKillFac, oracleBehaviour.killFac, timeStacker);
+                    sLeaser.sprites[this.killSprite].scale = Mathf.Lerp(200f, 2f, Mathf.Pow(num, 0.5f));
+                    sLeaser.sprites[this.killSprite].alpha = Mathf.Pow(num, 3f);
+                }
+                else
+                    sLeaser.sprites[this.killSprite].isVisible = false;
+            }
+        }
+
+        public virtual Color Gown_Color(Gown gown, float f)
         {
             return Custom.HSL2RGB(Mathf.Lerp(0.08f, 0.02f, Mathf.Pow(f, 2f)), Mathf.Lerp(1f, 0.8f, f), 0.5f);
         }
+        #endregion
     }
 
 
@@ -201,11 +595,43 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public bool playerEnteredWithMark;
 
         public int timeSinceSeenPlayer = -1;
+
+        public override Vector2 BaseGetToPos => baseIdeal;
+        public override Vector2 OracleGetToPos
+        {
+            get
+            {
+                Vector2 v = this.currentGetTo;
+                if (this.floatyMovement && Custom.DistLess(this.oracle.firstChunk.pos, this.nextPos, 50f))
+                {
+                    v = this.nextPos;
+                }
+                return this.ClampVectorInRoom(v);
+            }
+        }
+
+        public override Vector2 GetToDir
+        {
+            get
+            {
+                if (movementBehavior == CustomMovementBehavior.Idle)
+                {
+                    return Custom.DegToVec(this.investigateAngle);
+                }
+                if (this.movementBehavior == CustomMovementBehavior.Investigate)
+                {
+                    return -Custom.DegToVec(this.investigateAngle);
+                }
+                return new Vector2(0f, 1f);
+            }
+        }
         #endregion
 
         #region 自定义字段和属性
         public virtual int NotWorkingPalette => 25;
         public virtual int GetWorkingPalette => 26;
+
+        public virtual bool CouldCloseEyes => false;
 
         #endregion
 
@@ -213,12 +639,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             get
             {
-                if (this.oracle.room.game.cameras[0].hud.dialogBox == null)
+                if (oracle.room.game.cameras[0].hud.dialogBox == null)
                 {
-                    this.oracle.room.game.cameras[0].hud.InitDialogBox();
-                    this.oracle.room.game.cameras[0].hud.dialogBox.defaultYPos = -10f;
+                    oracle.room.game.cameras[0].hud.InitDialogBox();
+                    oracle.room.game.cameras[0].hud.dialogBox.defaultYPos = -10f;
                 }
-                return this.oracle.room.game.cameras[0].hud.dialogBox;
+                return oracle.room.game.cameras[0].hud.dialogBox;
             }
         }
 
@@ -240,10 +666,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             movementBehavior = CustomMovementBehavior.Idle;
             playerEnteredWithMark = oracle.room.game.GetStorySession.saveState.deathPersistentSaveData.theMark;
+
         }
 
         public override void Update(bool eu)
         {
+
+
             if (timeSinceSeenPlayer >= 0)
             {
                 timeSinceSeenPlayer++;
@@ -332,6 +761,35 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             vector.y = Mathf.Clamp(vector.y, this.oracle.arm.cornerPositions[2].y + 10f, this.oracle.arm.cornerPositions[1].y - 10f);
             return vector;
         }
+
+        public virtual float BasePosScore(Vector2 tryPos)
+        {
+            if (player == null)
+            {
+                return Vector2.Distance(tryPos, oracle.room.MiddleOfTile(24, 5));
+            }
+            if (movementBehavior == CustomMovementBehavior.ShowMedia)
+            {
+                return 0f - Vector2.Distance(player.DangerPos, tryPos);
+            }
+            return Mathf.Abs(Vector2.Distance(nextPos, tryPos) - 200f) + Custom.LerpMap(Vector2.Distance(player.DangerPos, tryPos), 40f, 300f, 800f, 0f);
+        }
+
+        public virtual float CommunicatePosScore(Vector2 tryPos)
+        {
+            if (oracle.room.GetTile(tryPos).Solid || player == null)
+            {
+                return float.MaxValue;
+            }
+            float num = Mathf.Abs(Vector2.Distance(tryPos, player.DangerPos) - ((movementBehavior == CustomMovementBehavior.Talk) ? 250f : 400f));
+            num -= (float)Custom.IntClamp(oracle.room.aimap.getAItile(tryPos).terrainProximity, 0, 8) * 10f;
+            if (movementBehavior == CustomMovementBehavior.ShowMedia)
+            {
+                num += (float)(Custom.IntClamp(oracle.room.aimap.getAItile(tryPos).terrainProximity, 8, 16) - 8) * 10f;
+            }
+            return num;
+        }
+
         #endregion
 
         #region 自定义帮助方法
@@ -342,6 +800,15 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         #endregion
 
         #region 默认功能方法
+        public virtual void SetNewDestination(Vector2 dst)
+        {
+            lastPos = currentGetTo;
+            nextPos = dst;
+            lastPosHandle = Custom.RNV() * Mathf.Lerp(0.3f, 0.65f, Random.value) * Vector2.Distance(lastPos, nextPos);
+            nextPosHandle = -GetToDir * Mathf.Lerp(0.3f, 0.65f, Random.value) * Vector2.Distance(lastPos, nextPos);
+            pathProgression = 0f;
+        }
+
         /// <summary>
         /// 见到玩家时的反应，用于加载子行为
         /// </summary>
@@ -369,7 +836,96 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public virtual void Move()
         {
-
+            if (movementBehavior == CustomMovementBehavior.Idle)
+            {
+                //pass
+            }
+            else if (movementBehavior == CustomMovementBehavior.KeepDistance)
+            {
+                if (player == null)
+                {
+                    movementBehavior = CustomMovementBehavior.Idle;
+                }
+                else
+                {
+                    lookPoint = player.DangerPos;
+                    Vector2 vector = new Vector2(Random.value * oracle.room.PixelWidth, Random.value * oracle.room.PixelHeight);
+                    if (!oracle.room.GetTile(vector).Solid && oracle.room.aimap.getAItile(vector).terrainProximity > 2 && Vector2.Distance(vector, player.DangerPos) > Vector2.Distance(nextPos, player.DangerPos) + 100f)
+                    {
+                        SetNewDestination(vector);
+                    }
+                }
+            }
+            else if (movementBehavior == CustomMovementBehavior.Investigate)
+            {
+                if (player == null)
+                {
+                    movementBehavior = CustomMovementBehavior.Idle;
+                }
+                else
+                {
+                    lookPoint = player.DangerPos;
+                    if (investigateAngle < -90f || investigateAngle > 90f || (float)oracle.room.aimap.getAItile(nextPos).terrainProximity < 2f)
+                    {
+                        investigateAngle = Mathf.Lerp(-70f, 70f, Random.value);
+                        invstAngSpeed = Mathf.Lerp(0.4f, 0.8f, Random.value) * ((Random.value < 0.5f) ? (-1f) : 1f);
+                    }
+                    Vector2 vector = player.DangerPos + Custom.DegToVec(investigateAngle) * 150f;
+                    if ((float)oracle.room.aimap.getAItile(vector).terrainProximity >= 2f)
+                    {
+                        if (pathProgression > 0.9f)
+                        {
+                            if (Custom.DistLess(oracle.firstChunk.pos, vector, 30f))
+                            {
+                                floatyMovement = true;
+                            }
+                            else if (!Custom.DistLess(nextPos, vector, 30f))
+                            {
+                                SetNewDestination(vector);
+                            }
+                        }
+                        nextPos = vector;
+                    }
+                }
+            }
+            else if (movementBehavior == CustomMovementBehavior.Talk)
+            {
+                if (player == null)
+                {
+                    movementBehavior = CustomMovementBehavior.Idle;
+                }
+                else
+                {
+                    lookPoint = player.DangerPos;
+                    Vector2 vector = new Vector2(Random.value * oracle.room.PixelWidth, Random.value * oracle.room.PixelHeight);
+                    if (CommunicatePosScore(vector) + 40f < CommunicatePosScore(nextPos) && !Custom.DistLess(vector, nextPos, 30f))
+                    {
+                        SetNewDestination(vector);
+                    }
+                }
+            }
+            else if (movementBehavior == CustomMovementBehavior.ShowMedia)
+            {
+                //pass
+            }
+            if (currSubBehavior != null && currSubBehavior.LookPoint.HasValue)
+            {
+                lookPoint = currSubBehavior.LookPoint.Value;
+            }
+            consistentBasePosCounter++;
+            if (oracle.room.readyForAI)
+            {
+                Vector2 vector = new Vector2(Random.value * oracle.room.PixelWidth, Random.value * oracle.room.PixelHeight);
+                if (!oracle.room.GetTile(vector).Solid && BasePosScore(vector) + 40f < BasePosScore(baseIdeal))
+                {
+                    baseIdeal = vector;
+                    consistentBasePosCounter = 0;
+                }
+            }
+            else
+            {
+                baseIdeal = nextPos;
+            }
         }
 
         public virtual bool HandTowardsPlayer()
@@ -379,7 +935,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public virtual void ReactToHitWeapon()
         {
-
         }
         #endregion
 
@@ -662,5 +1217,50 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             public static readonly CustomMovementBehavior ShowMedia = new CustomMovementBehavior("ShowMedia", true);
         }
         #endregion
+    }
+}
+
+public class CustomCOracleStateViz
+{
+    Oracle oracle;
+
+    public FLabel label;
+    public CustomCOracleStateViz(Oracle oracle)
+    {
+        this.oracle = oracle;
+        InitSprites();
+    }
+
+    public void InitSprites()
+    {
+        label = new FLabel(Custom.GetFont(), "") { anchorX = 0f, anchorY = 1f, scale = 1.1f,isVisible = true,alpha = 1f };
+        Futile.stage.AddChild(label);
+    }
+
+    public void Update()
+    {
+        label.SetPosition(new Vector2(400f,300f));
+        string text = string.Format("Oracle : {0}\n", oracle.ID);
+
+        for(int i = 0;i < oracle.bodyChunks.Length;i++)
+        {
+            text += string.Format("Bodychunk{0} pos : {1}\n", i, oracle.bodyChunks[i].pos);
+        }
+
+        
+        CustomOracleGraphic customOracleGraphic = oracle.graphicsModule as CustomOracleGraphic;
+        CustomOracleBehaviour behaviour = (oracle.oracleBehavior as CustomOracleBehaviour);
+        if (customOracleGraphic != null) 
+        {
+            text += string.Format("getToPos {0}\n", behaviour.OracleGetToPos);
+            text += string.Format("idealPos {0}\n", behaviour.baseIdeal);
+            text += string.Format("progression {0:f2}\n", behaviour.pathProgression);
+        }
+        label.text = text;
+    }
+
+    public void ClearSprites()
+    {
+        label.RemoveFromContainer();
     }
 }

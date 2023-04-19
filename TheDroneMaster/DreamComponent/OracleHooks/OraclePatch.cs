@@ -41,7 +41,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             OracleGraphicsPropertiesPatch.PatchOn();
 
             On.Room.ReadyForAI += Room_ReadyForAI;
-            CustomOracleExtender.RegistryCustomOracle(new TestSSOrcale());
+            CustomOracleExtender.RegistryCustomOracle(new MIFOracle());
         }
 
         public static void OraclePatchs()
@@ -375,20 +375,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             IL.Oracle.OracleArm.Update += OracleArm_Update;
             IL.Oracle.OracleArm.BaseDir += OracleArm_BaseDir;
             IL.Oracle.OracleArm.OnFramePos += OracleArm_OnFramePos;
-
-            IL.Oracle.OracleArm.Update += OracleArm_Update1;
-        }
-
-        private static void OracleArm_Update1(ILContext il)
-        {
-            try
-            {
-                OraclePatch.AddCustomIDJudgement(il);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-            }
         }
 
         private static void OracleArm_OnFramePos(ILContext il)

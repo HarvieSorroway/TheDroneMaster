@@ -9,14 +9,14 @@ using Random = UnityEngine.Random;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
 {
-    public class TestSSOrcale : CustomOracle
+    public class MIFOracle : CustomOracle
     {
         public static Oracle.OracleID DMDOracle = new Oracle.OracleID("DMD", true);
         public override string LoadRoom => "DMD_AI";
-        public override Oracle.OracleID OracleID => Oracle.OracleID.SS;
+        public override Oracle.OracleID OracleID => DMDOracle;
         public override Oracle.OracleID InheritOracleID => Oracle.OracleID.SS;
 
-        public TestSSOrcale()
+        public MIFOracle()
         {
             gravity = 0f;
             startPos = new Vector2(350f, 350f);
@@ -24,11 +24,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
         {
-            oracle.oracleBehavior = new SSOracleBehavior(oracle);
-            oracle.myScreen = new OracleProjectionScreen(room, oracle.oracleBehavior);
-            room.AddObject(oracle.myScreen);
-            oracle.marbles = new List<PebblesPearl>();
-            oracle.SetUpMarbles();
+            oracle.oracleBehavior = new MIFOracleBehaviour(oracle);
+           
             room.gravity = 0f;
             for (int n = 0; n < room.updateList.Count; n++)
             {
@@ -44,15 +41,16 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override OracleGraphics InitCustomOracleGraphic(PhysicalObject ow)
         {
-            return new TestSSOracleGraphics(ow);
+            return new MIFOracleGraphics(ow);
         }
     }
-    public class TestSSOracleGraphics : CustomOracleGraphic
+    public class MIFOracleGraphics : CustomOracleGraphic
     {
         public GownCover cover;
         public int coverSprite;
 
-        public TestSSOracleGraphics(PhysicalObject ow) : base(ow)
+
+        public MIFOracleGraphics(PhysicalObject ow) : base(ow)
         {
             callBaseApplyPalette = false;
             callBaseInitiateSprites = false;
@@ -98,8 +96,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             this.totalSprites++;
 
 
-            this.killSprite = this.totalSprites;
-            this.totalSprites++;
+            //this.killSprite = this.totalSprites;
+            //this.totalSprites++;
 
             this.hands = new GenericBodyPart[2];
 
@@ -461,17 +459,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-    public class MIFOracleBehaviour : OracleBehavior
+    public class MIFOracleBehaviour : CustomOracleBehaviour
     {
-        private Vector2 lastPos;
-
-        private Vector2 nextPos;
-
-        private Vector2 lastPosHandle;
-
-        private Vector2 nextPosHandle;
-
-        private Vector2 currentGetTo;
+        public override Vector2 GetToDir => Vector2.up;
 
         public MIFOracleBehaviour(Oracle oracle) : base(oracle) 
         {
@@ -480,16 +470,18 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public override void Update(bool eu)
         {
             base.Update(eu);
-
-            //this.currentGetTo = Custom.Bezier(this.lastPos, this.ClampVectorInRoom(this.lastPos + this.lastPosHandle), this.nextPos, this.ClampVectorInRoom(this.nextPos + this.nextPosHandle), this.pathProgression);
         }
 
-        public Vector2 ClampVectorInRoom(Vector2 v)
+        public override void Move()
         {
-            Vector2 result = v;
-            result.x = Mathf.Clamp(result.x, this.oracle.arm.cornerPositions[0].x + 10f, this.oracle.arm.cornerPositions[1].x - 10f);
-            result.y = Mathf.Clamp(result.y, this.oracle.arm.cornerPositions[2].y + 10f, this.oracle.arm.cornerPositions[1].y - 10f);
-            return result;
+            if (movementBehavior == CustomMovementBehavior.Idle)
+            {
+                if (Random.value < 0.05f)
+                {
+                    SetNewDestination(new Vector2(oracle.room.Width * 10f, oracle.room.Height * 10f));
+                }
+            }
+            base.Move();
         }
     }
 }

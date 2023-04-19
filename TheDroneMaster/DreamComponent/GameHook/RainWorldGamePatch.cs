@@ -131,7 +131,7 @@ namespace TheDroneMaster.GameHooks
                 modules.Add(self, new RainWorldGameModule(self, manager));
             }
 
-            Plugin.Log(String.Format("SaveState current karma : {0}", self.GetStorySession.saveState.deathPersistentSaveData.karma));
+            //Plugin.Log(String.Format("SaveState current karma : {0}", self.GetStorySession.saveState.deathPersistentSaveData.karma));
         }
     }
 
