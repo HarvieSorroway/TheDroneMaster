@@ -62,8 +62,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-    
-
     public class CustomOracleGraphic : OracleGraphics
     {
         public bool callBaseApplyPalette = false;
@@ -657,6 +655,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             pathProgression = 1f;
             investigateAngle = Random.value * 360f;
 
+            action = CustomAction.General_Idle;
+
             allSubBehaviors = new List<CustomSubBehaviour>();
             currSubBehavior = new NoSubBehavior(this);
             allSubBehaviors.Add(currSubBehavior);
@@ -666,13 +666,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             movementBehavior = CustomMovementBehavior.Idle;
             playerEnteredWithMark = oracle.room.game.GetStorySession.saveState.deathPersistentSaveData.theMark;
-
         }
 
         public override void Update(bool eu)
         {
-
-
             if (timeSinceSeenPlayer >= 0)
             {
                 timeSinceSeenPlayer++;
@@ -739,7 +736,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             {
                 if (oracle.room.game.cameras[i].room == oracle.room && !oracle.room.game.cameras[i].AboutToSwitchRoom && oracle.room.game.cameras[i].paletteBlend != working)
                 {
-                    oracle.room.game.cameras[i].ChangeBothPalettes(25, 26, working);
+                    oracle.room.game.cameras[i].ChangeBothPalettes(NotWorkingPalette, GetWorkingPalette, working);
                 }
             }
 
@@ -793,6 +790,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         #endregion
 
         #region 自定义帮助方法
+        /// <summary>
+        /// 更新迭代器当前的路径百分比
+        /// </summary>
+        /// <returns></returns>
         public virtual float UpdatePathProgression()
         {
             return Mathf.Min(1f, pathProgression + 1f / Mathf.Lerp(40f + pathProgression * 80f, Vector2.Distance(lastPos, nextPos) / 5f, 0.5f));
@@ -800,6 +801,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         #endregion
 
         #region 默认功能方法
+        /// <summary>
+        /// 设定迭代器的新位置，房间坐标
+        /// </summary>
+        /// <param name="dst"></param>
         public virtual void SetNewDestination(Vector2 dst)
         {
             lastPos = currentGetTo;
@@ -810,7 +815,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
 
         /// <summary>
-        /// 见到玩家时的反应，用于加载子行为
+        /// 见到玩家时的反应，用于初始化 CustomAction
         /// </summary>
         public virtual void SeePlayer()
         {
@@ -834,6 +839,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
         }
 
+        /// <summary>
+        /// 根据不同的movementBehaviour来决定迭代器的行为模式
+        /// </summary>
         public virtual void Move()
         {
             if (movementBehavior == CustomMovementBehavior.Idle)
@@ -928,11 +936,18 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
         }
 
+        /// <summary>
+        /// 决定迭代器是否要将手伸向玩家
+        /// </summary>
+        /// <returns></returns>
         public virtual bool HandTowardsPlayer()
         {
             return false;
         }
 
+        /// <summary>
+        /// 当迭代器被武器击中时的反应
+        /// </summary>
         public virtual void ReactToHitWeapon()
         {
         }

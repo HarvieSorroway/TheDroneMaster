@@ -49,7 +49,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public GownCover cover;
         public int coverSprite;
 
-
         public MIFOracleGraphics(PhysicalObject ow) : base(ow)
         {
             callBaseApplyPalette = false;
@@ -57,76 +56,76 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             Random.State state = Random.state;
             Random.InitState(56);
-            this.totalSprites = 0;
-            this.armJointGraphics = new ArmJointGraphics[this.oracle.arm.joints.Length];
+            totalSprites = 0;
+            armJointGraphics = new ArmJointGraphics[oracle.arm.joints.Length];
 
-            for (int i = 0; i < this.oracle.arm.joints.Length; i++)
+            for (int i = 0; i < oracle.arm.joints.Length; i++)
             {
-                this.armJointGraphics[i] = new ArmJointGraphics(this, this.oracle.arm.joints[i], this.totalSprites);
-                this.totalSprites += this.armJointGraphics[i].totalSprites;
+                armJointGraphics[i] = new ArmJointGraphics(this, oracle.arm.joints[i], totalSprites);
+                totalSprites += armJointGraphics[i].totalSprites;
             }
 
 
-            this.firstUmbilicalSprite = this.totalSprites;
-            this.umbCord = new UbilicalCord(this, this.totalSprites);
-            this.totalSprites += this.umbCord.totalSprites;
+            firstUmbilicalSprite = totalSprites;
+            umbCord = new UbilicalCord(this, totalSprites);
+            totalSprites += umbCord.totalSprites;
 
 
-            this.firstBodyChunkSprite = this.totalSprites;
-            this.totalSprites += 2;
-            this.neckSprite = this.totalSprites;
-            this.totalSprites++;
-            this.firstFootSprite = this.totalSprites;
-            this.totalSprites += 4;
+            firstBodyChunkSprite = totalSprites;
+            totalSprites += 2;
+            neckSprite = totalSprites;
+            totalSprites++;
+            firstFootSprite = totalSprites;
+            totalSprites += 4;
 
 
-            this.halo = new Halo(this, this.totalSprites);
-            this.totalSprites += this.halo.totalSprites;
-            this.gown = new Gown(this);
-            this.robeSprite = this.totalSprites;
-            this.totalSprites++;
+            halo = new Halo(this, totalSprites);
+            totalSprites += halo.totalSprites;
+            gown = new Gown(this);
+            robeSprite = totalSprites;
+            totalSprites++;
 
 
-            this.firstHandSprite = this.totalSprites;
-            this.totalSprites += 4;
-            this.head = new GenericBodyPart(this, 5f, 0.5f, 0.995f, this.oracle.firstChunk);
-            this.firstHeadSprite = this.totalSprites;
-            this.totalSprites += 10;
-            this.fadeSprite = this.totalSprites;
-            this.totalSprites++;
+            firstHandSprite = totalSprites;
+            totalSprites += 4;
+            head = new GenericBodyPart(this, 5f, 0.5f, 0.995f, oracle.firstChunk);
+            firstHeadSprite = totalSprites;
+            totalSprites += 10;
+            fadeSprite = totalSprites;
+            totalSprites++;
 
 
-            //this.killSprite = this.totalSprites;
-            //this.totalSprites++;
+            //killSprite = totalSprites;
+            //totalSprites++;
 
-            this.hands = new GenericBodyPart[2];
+            hands = new GenericBodyPart[2];
 
             for (int j = 0; j < 2; j++)
             {
-                this.hands[j] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, this.oracle.firstChunk);
+                hands[j] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, oracle.firstChunk);
             }
-            this.feet = new GenericBodyPart[2];
+            feet = new GenericBodyPart[2];
             for (int k = 0; k < 2; k++)
             {
-                this.feet[k] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, this.oracle.firstChunk);
+                feet[k] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, oracle.firstChunk);
             }
-            this.knees = new Vector2[2, 2];
+            knees = new Vector2[2, 2];
             for (int l = 0; l < 2; l++)
             {
                 for (int m = 0; m < 2; m++)
                 {
-                    this.knees[l, m] = this.oracle.firstChunk.pos;
+                    knees[l, m] = oracle.firstChunk.pos;
                 }
             }
-            this.firstArmBaseSprite = this.totalSprites;
-            this.armBase = new ArmBase(this, this.firstArmBaseSprite);
-            this.totalSprites += this.armBase.totalSprites;
+            firstArmBaseSprite = totalSprites;
+            armBase = new ArmBase(this, firstArmBaseSprite);
+            totalSprites += armBase.totalSprites;
 
             cover = new GownCover(this);
-            coverSprite = this.totalSprites;
+            coverSprite = totalSprites;
             totalSprites++;
 
-            this.voiceFreqSamples = new float[64];
+            voiceFreqSamples = new float[64];
             Random.state = state;
         }
 
@@ -134,143 +133,143 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             base.ApplyPalette(sLeaser, rCam, palette);
 
-            this.SLArmBaseColA = new Color(0.52156866f, 0.52156866f, 0.5137255f);
-            this.SLArmHighLightColA = new Color(0.5686275f, 0.5686275f, 0.54901963f);
-            this.SLArmBaseColB = palette.texture.GetPixel(5, 1);
-            this.SLArmHighLightColB = palette.texture.GetPixel(5, 2);
+            SLArmBaseColA = new Color(0.52156866f, 0.52156866f, 0.5137255f);
+            SLArmHighLightColA = new Color(0.5686275f, 0.5686275f, 0.54901963f);
+            SLArmBaseColB = palette.texture.GetPixel(5, 1);
+            SLArmHighLightColB = palette.texture.GetPixel(5, 2);
 
-            for (int i = 0; i < this.armJointGraphics.Length; i++)
+            for (int i = 0; i < armJointGraphics.Length; i++)
             {
-                this.armJointGraphics[i].ApplyPalette(sLeaser, rCam, palette);
+                armJointGraphics[i].ApplyPalette(sLeaser, rCam, palette);
                 armJointGraphics[i].metalColor = palette.blackColor;
             }
             Color color = new Color(52f / 255f, 61f / 255f, 83f / 255f);
 
             for (int j = 0; j < base.owner.bodyChunks.Length; j++)
             {
-                sLeaser.sprites[this.firstBodyChunkSprite + j].color = color;
+                sLeaser.sprites[firstBodyChunkSprite + j].color = color;
             }
-            sLeaser.sprites[this.neckSprite].color = color;
-            sLeaser.sprites[this.HeadSprite].color = color;
-            sLeaser.sprites[this.ChinSprite].color = color;
+            sLeaser.sprites[neckSprite].color = color;
+            sLeaser.sprites[HeadSprite].color = color;
+            sLeaser.sprites[ChinSprite].color = color;
 
             for (int k = 0; k < 2; k++)
             {
-                sLeaser.sprites[this.EyeSprite(k)].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
+                sLeaser.sprites[EyeSprite(k)].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
             }
 
             for (int k = 0; k < 2; k++)
             {
-                sLeaser.sprites[this.PhoneSprite(k, 0)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
-                sLeaser.sprites[this.PhoneSprite(k, 1)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
-                sLeaser.sprites[this.PhoneSprite(k, 2)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
+                sLeaser.sprites[PhoneSprite(k, 0)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
+                sLeaser.sprites[PhoneSprite(k, 1)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
+                sLeaser.sprites[PhoneSprite(k, 2)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
 
 
-                sLeaser.sprites[this.HandSprite(k, 0)].color = color;
-                if (this.gown != null)
+                sLeaser.sprites[HandSprite(k, 0)].color = color;
+                if (gown != null)
                 {
                     for (int l = 0; l < 7; l++)
                     {
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = this.cover.Color(l + 6);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = this.cover.Color(l + 6);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = this.cover.Color(l + 6);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 3] = this.cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 3] = cover.Color(l + 6);
                     }
                 }
                 else
                 {
-                    sLeaser.sprites[this.HandSprite(k, 1)].color = color;
+                    sLeaser.sprites[HandSprite(k, 1)].color = color;
                 }
-                sLeaser.sprites[this.FootSprite(k, 0)].color = color;
-                sLeaser.sprites[this.FootSprite(k, 1)].color = color;
+                sLeaser.sprites[FootSprite(k, 0)].color = color;
+                sLeaser.sprites[FootSprite(k, 1)].color = color;
             }
-            if (this.umbCord != null)
+            if (umbCord != null)
             {
-                this.umbCord.ApplyPalette(sLeaser, rCam, palette);
-                sLeaser.sprites[this.firstUmbilicalSprite].color = palette.blackColor;
+                umbCord.ApplyPalette(sLeaser, rCam, palette);
+                sLeaser.sprites[firstUmbilicalSprite].color = palette.blackColor;
             }
-            else if (this.discUmbCord != null)
+            else if (discUmbCord != null)
             {
-                this.discUmbCord.ApplyPalette(sLeaser, rCam, palette);
+                discUmbCord.ApplyPalette(sLeaser, rCam, palette);
             }
-            if (this.armBase != null)
+            if (armBase != null)
             {
-                this.armBase.ApplyPalette(sLeaser, rCam, palette);
+                armBase.ApplyPalette(sLeaser, rCam, palette);
             }
         }
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            sLeaser.sprites = new FSprite[this.totalSprites];
+            sLeaser.sprites = new FSprite[totalSprites];
             for (int i = 0; i < base.owner.bodyChunks.Length; i++)
             {
-                sLeaser.sprites[this.firstBodyChunkSprite + i] = new FSprite("Circle20", true);
-                sLeaser.sprites[this.firstBodyChunkSprite + i].scale = base.owner.bodyChunks[i].rad / 10f;
-                sLeaser.sprites[this.firstBodyChunkSprite + i].color = new Color(1f, (i == 0) ? 0.5f : 0f, (i == 0) ? 0.5f : 0f);
+                sLeaser.sprites[firstBodyChunkSprite + i] = new FSprite("Circle20", true);
+                sLeaser.sprites[firstBodyChunkSprite + i].scale = base.owner.bodyChunks[i].rad / 10f;
+                sLeaser.sprites[firstBodyChunkSprite + i].color = new Color(1f, (i == 0) ? 0.5f : 0f, (i == 0) ? 0.5f : 0f);
             }
 
-            for (int j = 0; j < this.armJointGraphics.Length; j++)
+            for (int j = 0; j < armJointGraphics.Length; j++)
             {
-                this.armJointGraphics[j].InitiateSprites(sLeaser, rCam);
+                armJointGraphics[j].InitiateSprites(sLeaser, rCam);
             }
 
-            if (this.gown != null)
+            if (gown != null)
             {
-                this.gown.InitiateSprite(this.robeSprite, sLeaser, rCam);
+                gown.InitiateSprite(robeSprite, sLeaser, rCam);
             }
 
-            if (this.halo != null)
+            if (halo != null)
             {
-                this.halo.InitiateSprites(sLeaser, rCam);
+                halo.InitiateSprites(sLeaser, rCam);
             }
 
-            if (this.armBase != null)
+            if (armBase != null)
             {
-                this.armBase.InitiateSprites(sLeaser, rCam);
+                armBase.InitiateSprites(sLeaser, rCam);
             }
-            sLeaser.sprites[this.neckSprite] = new FSprite("pixel", true);
-            sLeaser.sprites[this.neckSprite].scaleX = 3f;
-            sLeaser.sprites[this.neckSprite].anchorY = 0f;
-            sLeaser.sprites[this.HeadSprite] = new FSprite("Circle20", true);
-            sLeaser.sprites[this.ChinSprite] = new FSprite("Circle20", true);
+            sLeaser.sprites[neckSprite] = new FSprite("pixel", true);
+            sLeaser.sprites[neckSprite].scaleX = 3f;
+            sLeaser.sprites[neckSprite].anchorY = 0f;
+            sLeaser.sprites[HeadSprite] = new FSprite("Circle20", true);
+            sLeaser.sprites[ChinSprite] = new FSprite("Circle20", true);
             for (int k = 0; k < 2; k++)
             {
-                sLeaser.sprites[this.EyeSprite(k)] = new FSprite("pixel", true);
+                sLeaser.sprites[EyeSprite(k)] = new FSprite("pixel", true);
 
-                sLeaser.sprites[this.PhoneSprite(k, 0)] = new FSprite("Circle20", true);
-                sLeaser.sprites[this.PhoneSprite(k, 1)] = new FSprite("Circle20", true);
-                sLeaser.sprites[this.PhoneSprite(k, 2)] = new FSprite("LizardScaleA1", true);
-                sLeaser.sprites[this.PhoneSprite(k, 2)].anchorY = 0f;
-                sLeaser.sprites[this.PhoneSprite(k, 2)].scaleY = 0.8f;
-                sLeaser.sprites[this.PhoneSprite(k, 2)].scaleX = ((k == 0) ? -1f : 1f) * 0.75f;
+                sLeaser.sprites[PhoneSprite(k, 0)] = new FSprite("Circle20", true);
+                sLeaser.sprites[PhoneSprite(k, 1)] = new FSprite("Circle20", true);
+                sLeaser.sprites[PhoneSprite(k, 2)] = new FSprite("LizardScaleA1", true);
+                sLeaser.sprites[PhoneSprite(k, 2)].anchorY = 0f;
+                sLeaser.sprites[PhoneSprite(k, 2)].scaleY = 0.8f;
+                sLeaser.sprites[PhoneSprite(k, 2)].scaleX = ((k == 0) ? -1f : 1f) * 0.75f;
 
-                sLeaser.sprites[this.HandSprite(k, 0)] = new FSprite("haloGlyph-1", true);
-                sLeaser.sprites[this.HandSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
-                sLeaser.sprites[this.FootSprite(k, 0)] = new FSprite("haloGlyph-1", true);
-                sLeaser.sprites[this.FootSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
+                sLeaser.sprites[HandSprite(k, 0)] = new FSprite("haloGlyph-1", true);
+                sLeaser.sprites[HandSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
+                sLeaser.sprites[FootSprite(k, 0)] = new FSprite("haloGlyph-1", true);
+                sLeaser.sprites[FootSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
             }
 
-            if (this.umbCord != null)
+            if (umbCord != null)
             {
-                this.umbCord.InitiateSprites(sLeaser, rCam);
+                umbCord.InitiateSprites(sLeaser, rCam);
             }
-            else if (this.discUmbCord != null)
+            else if (discUmbCord != null)
             {
-                this.discUmbCord.InitiateSprites(sLeaser, rCam);
+                discUmbCord.InitiateSprites(sLeaser, rCam);
             }
 
-            sLeaser.sprites[this.HeadSprite].scaleX = this.head.rad / 9f;
-            sLeaser.sprites[this.HeadSprite].scaleY = this.head.rad / 11f;
-            sLeaser.sprites[this.ChinSprite].scale = this.head.rad / 15f;
-            sLeaser.sprites[this.fadeSprite] = new FSprite("Futile_White", true);
-            sLeaser.sprites[this.fadeSprite].scale = 12.5f;
-            sLeaser.sprites[this.fadeSprite].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
+            sLeaser.sprites[HeadSprite].scaleX = head.rad / 9f;
+            sLeaser.sprites[HeadSprite].scaleY = head.rad / 11f;
+            sLeaser.sprites[ChinSprite].scale = head.rad / 15f;
+            sLeaser.sprites[fadeSprite] = new FSprite("Futile_White", true);
+            sLeaser.sprites[fadeSprite].scale = 12.5f;
+            sLeaser.sprites[fadeSprite].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
 
-            sLeaser.sprites[this.fadeSprite].shader = rCam.game.rainWorld.Shaders["FlatLightBehindTerrain"];
-            sLeaser.sprites[this.fadeSprite].alpha = 0.5f;
+            sLeaser.sprites[fadeSprite].shader = rCam.game.rainWorld.Shaders["FlatLightBehindTerrain"];
+            sLeaser.sprites[fadeSprite].alpha = 0.5f;
 
-            sLeaser.sprites[this.killSprite] = new FSprite("Futile_White", true);
-            sLeaser.sprites[this.killSprite].shader = rCam.game.rainWorld.Shaders["FlatLight"];
+            sLeaser.sprites[killSprite] = new FSprite("Futile_White", true);
+            sLeaser.sprites[killSprite].shader = rCam.game.rainWorld.Shaders["FlatLight"];
 
             cover.InitiateSprites(coverSprite, sLeaser, rCam);
 
@@ -461,6 +460,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
     public class MIFOracleBehaviour : CustomOracleBehaviour
     {
+        public static CustomAction MIFInDreamAction = new CustomAction("MIFInDreamAction", true);
+
+
+        public override int GetWorkingPalette => 79;
+
+
         public override Vector2 GetToDir => Vector2.up;
 
         public MIFOracleBehaviour(Oracle oracle) : base(oracle) 
@@ -470,6 +475,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public override void Update(bool eu)
         {
             base.Update(eu);
+        }
+
+        public override void SeePlayer()
+        {
+            base.SeePlayer();
+            Plugin.Log("Oracle see player");
         }
 
         public override void Move()
