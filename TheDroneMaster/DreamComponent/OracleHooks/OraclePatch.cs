@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MoreSlugcats;
 using RWCustom;
+using SlugBase.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,9 +49,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             IL.Oracle.ctor += Oracle_ctor;
             On.Oracle.InitiateGraphicsModule += Oracle_InitiateGraphicsModule;
+
+            On.Oracle.CreateMarble += Oracle_CreateMarble;
+            On.Oracle.SetUpMarbles += Oracle_SetUpMarbles;
         }
 
-        
         public static void OracleGraphicPatchs()
         {
             IL.OracleGraphics.ctor += OracleGraphics_ctor;
@@ -193,6 +196,28 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
 
         #region Oracle
+
+        private static void Oracle_SetUpMarbles(On.Oracle.orig_SetUpMarbles orig, Oracle self)
+        {
+            if (CustomOracleExtender.idAndOracles.TryGetValue(self.ID, out var module))
+            {
+                module.SetUpMarbles();
+                return;
+            }
+            orig.Invoke(self);
+        }
+
+        private static void Oracle_CreateMarble(On.Oracle.orig_CreateMarble orig, Oracle self, PhysicalObject orbitObj, Vector2 ps, int circle, float dist, int color)
+        {
+            if (CustomOracleExtender.idAndOracles.TryGetValue(self.ID, out var module))
+            {
+                module.CreateMarble(self, orbitObj, ps, circle, dist, color);
+                return;
+            }
+            orig.Invoke(self, orbitObj, ps, circle, dist, color);
+        }
+
+
         private static void Oracle_ctor(ILContext il)
         {
             ILCursor c1 = new ILCursor(il);//用于找到 IL_0301, 跳过默认的ID加载

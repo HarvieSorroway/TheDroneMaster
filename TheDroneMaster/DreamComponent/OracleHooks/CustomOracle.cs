@@ -1,5 +1,6 @@
 ﻿using HUD;
 using RWCustom;
+using SlugBase.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,6 +50,121 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// <param name="room">迭代器所在的房间</param>
         public virtual void LoadBehaviourAndSurroundings(ref Oracle oracle,Room room)
         {
+        }
+
+        /// <summary>
+        /// 生成珍珠阵列，与Oracle的同名方法相同
+        /// </summary>
+        public virtual void SetUpMarbles()
+        {
+            if (!oracleRef.TryGetTarget(out var oracle))
+                return;
+
+            var marbles = oracle.marbles;
+            var room = oracle.room;
+
+            Vector2 vector = new Vector2(200f, 100f);
+            PhysicalObject physicalObject = oracle;
+
+            for (int i = 0; i < 6; i++)
+            {
+                PhysicalObject orbitObj = physicalObject;
+                Vector2 ps = new Vector2(vector.x + 300f, vector.y + 200f) + Custom.RNV() * 20f;
+                int color;
+                switch (i)
+                {
+                    default:
+                        color = 0;
+                        break;
+                    case 5:
+                        color = 2;
+                        break;
+                    case 2:
+                    case 3:
+                        color = 1;
+                        break;
+                }
+                oracle.CreateMarble(orbitObj, ps, 0, 35f, color);
+            }
+            for (int j = 0; j < 2; j++)
+            {
+                oracle.CreateMarble(physicalObject, new Vector2(vector.x + 300f, vector.y + 200f) + Custom.RNV() * 20f, 1, 100f, (j == 1) ? 2 : 0);
+            }
+            oracle.CreateMarble(null, new Vector2(vector.x + 20f, vector.y + 200f), 0, 0f, 1);
+            Vector2 vector2 = new Vector2(vector.x + 80f, vector.y + 30f);
+            Vector2 vector3 = Custom.DegToVec(-32.7346f);
+            Vector2 vector4 = Custom.PerpendicularVector(vector3);
+
+            for (int k = 0; k < 3; k++)
+            {
+                for (int l = 0; l < 5; l++)
+                {
+                    if (k != 2 || l != 2)
+                    {
+                        oracle.CreateMarble(null, vector2 + vector4 * k * 17f + vector3 * l * 17f, 0, 0f, ((k != 2 || l != 0) && (k != 1 || l != 3)) ? 1 : 2);
+                    }
+                }
+            }
+
+            oracle.CreateMarble(null, new Vector2(vector.x + 487f, vector.y + 218f), 0, 0f, 1);
+
+            oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 487f, vector.y + 218f), 0, 18f, 0);
+
+            oracle.CreateMarble(null, new Vector2(vector.x + 450f, vector.y + 467f), 0, 0f, 2);
+            oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 440f, vector.y + 477f), 0, 38f, 1);
+            oracle.CreateMarble(marbles[marbles.Count - 2], new Vector2(vector.x + 440f, vector.y + 477f), 0, 38f, 2);
+            oracle.CreateMarble(null, new Vector2(vector.x + 117f, vector.y), 0, 0f, 2);
+
+            oracle.CreateMarble(null, new Vector2(vector.x + 547f, vector.y + 374f), 0, 0f, 0);
+            oracle.CreateMarble(null, new Vector2(vector.x + 114f, vector.y + 500f), 0, 0f, 2);
+            oracle.CreateMarble(null, new Vector2(vector.x + 108f, vector.y + 511f), 0, 0f, 2);
+            oracle.CreateMarble(null, new Vector2(vector.x + 551f, vector.y + 131f), 0, 0f, 1);
+            oracle.CreateMarble(null, new Vector2(vector.x + 560f, vector.y + 124f), 0, 0f, 1);
+            oracle.CreateMarble(null, new Vector2(vector.x + 520f, vector.y + 134f), 0, 0f, 0);
+
+            oracle.CreateMarble(null, new Vector2(vector.x + 109f, vector.y + 352f), 0, 0f, 0);
+
+            oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 109f, vector.y + 352f), 0, 42f, 1);
+            marbles[marbles.Count - 1].orbitSpeed = 0.8f;
+
+            oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 109f, vector.y + 352f), 0, 12f, 0);
+        }
+
+        /// <summary>
+        /// 从珍珠阵列中创建单科珍珠，与Oracle的同名方法相同
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="orbitObj"></param>
+        /// <param name="ps"></param>
+        /// <param name="circle"></param>
+        /// <param name="dist"></param>
+        /// <param name="color"></param>
+        public virtual void CreateMarble(Oracle self, PhysicalObject orbitObj, Vector2 ps, int circle, float dist, int color)
+        {
+            if (self.pearlCounter == 0)
+            {
+                self.pearlCounter = 1;
+            }
+            AbstractPhysicalObject abstractPhysicalObject = new PebblesPearl.AbstractPebblesPearl(self.room.world, null, self.room.GetWorldCoordinate(ps), self.room.game.GetNewID(), -1, -1, null, color, self.pearlCounter * ((ModManager.MSC && self.room.world.name == "DM") ? -1 : 1));
+            self.pearlCounter++;
+            self.room.abstractRoom.entities.Add(abstractPhysicalObject);
+            PebblesPearl pebblesPearl = new PebblesPearl(abstractPhysicalObject, self.room.world);
+            pebblesPearl.oracle = self;
+            pebblesPearl.firstChunk.HardSetPosition(ps);
+            pebblesPearl.orbitObj = orbitObj;
+            if (orbitObj == null)
+            {
+                pebblesPearl.hoverPos = new Vector2?(ps);
+            }
+            pebblesPearl.orbitCircle = circle;
+            pebblesPearl.orbitDistance = dist;
+            pebblesPearl.marbleColor = (abstractPhysicalObject as PebblesPearl.AbstractPebblesPearl).color;
+            if (ModManager.MSC)
+            {
+                pebblesPearl.marbleIndex = self.marbles.Count;
+            }
+            self.room.AddObject(pebblesPearl);
+            self.marbles.Add(pebblesPearl);
         }
 
         public override string ToString()
@@ -576,6 +692,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public int playerOutOfRoomCounter;
 
+        public PebblesPearl investigateMarble;
+
         public CustomSubBehaviour currSubBehavior;
 
         public List<CustomSubBehaviour> allSubBehaviors;
@@ -866,7 +984,32 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             if (movementBehavior == CustomMovementBehavior.Idle)
             {
-                //pass
+                invstAngSpeed = 1f;
+                if (investigateMarble == null && this.oracle.marbles.Count > 0)
+                {
+                    investigateMarble = oracle.marbles[Random.Range(0, oracle.marbles.Count)];
+                }
+                if (investigateMarble != null && (investigateMarble.orbitObj == oracle || Custom.DistLess(new Vector2(250f, 150f), investigateMarble.firstChunk.pos, 100f)))
+                {
+                    investigateMarble = null;
+                }
+                if (investigateMarble != null)
+                {
+                    lookPoint = investigateMarble.firstChunk.pos;
+                    if (Custom.DistLess(nextPos, investigateMarble.firstChunk.pos, 100f))
+                    {
+                        floatyMovement = true;
+                        nextPos = investigateMarble.firstChunk.pos - Custom.DegToVec(investigateAngle) * 50f;
+                    }
+                    else
+                    {
+                        SetNewDestination(investigateMarble.firstChunk.pos - Custom.DegToVec(investigateAngle) * 50f);
+                    }
+                    if (pathProgression == 1f && Random.value < 0.005f)
+                    {
+                        investigateMarble = null;
+                    }
+                }
             }
             else if (movementBehavior == CustomMovementBehavior.KeepDistance)
             {
@@ -893,13 +1036,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 else
                 {
                     lookPoint = player.DangerPos;
-                    if (investigateAngle < -90f || investigateAngle > 90f || (float)oracle.room.aimap.getAItile(nextPos).terrainProximity < 2f)
+                    if (investigateAngle < -90f || investigateAngle > 90f || oracle.room.aimap.getAItile(nextPos).terrainProximity < 2f)
                     {
                         investigateAngle = Mathf.Lerp(-70f, 70f, Random.value);
                         invstAngSpeed = Mathf.Lerp(0.4f, 0.8f, Random.value) * ((Random.value < 0.5f) ? (-1f) : 1f);
                     }
                     Vector2 vector = player.DangerPos + Custom.DegToVec(investigateAngle) * 150f;
-                    if ((float)oracle.room.aimap.getAItile(vector).terrainProximity >= 2f)
+                    if (oracle.room.aimap.getAItile(vector).terrainProximity >= 2f)
                     {
                         if (pathProgression > 0.9f)
                         {
@@ -962,7 +1105,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// <returns></returns>
         public virtual bool HandTowardsPlayer()
         {
-            return false;
+            return action == CustomAction.General_GiveMark;
         }
 
         /// <summary>

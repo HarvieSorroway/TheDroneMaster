@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.GameHooks;
 using UnityEngine;
 using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour;
+using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour.CustomOracleConversation;
 using Random = UnityEngine.Random;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
@@ -26,7 +28,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public override void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
         {
             oracle.oracleBehavior = new MIFOracleBehaviour(oracle);
-           
+
+            oracle.marbles = new List<PebblesPearl>();
+            oracle.SetUpMarbles();
             room.gravity = 0f;
             for (int n = 0; n < room.updateList.Count; n++)
             {
@@ -497,17 +501,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
         }
 
-        public override void Move()
-        {
-            if (movementBehavior == CustomMovementBehavior.Idle)
-            {
-                if (Random.value < 0.02f)
-                {
-                    SetNewDestination(new Vector2(oracle.room.Width * 20f * Random.value, oracle.room.Height * 20f * Random.value));
-                }
-            }
-            base.Move();
-        }
 
         public override void NewAction(CustomAction nextAction)
         {
@@ -524,9 +517,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             CustomSubBehaviour.CustomSubBehaviourID customSubBehaviourID = null;
 
             if (nextAction == MeetDroneMaster_Init ||
-               nextAction == MeeetDroneMaster_DreamTalk0 ||
-               nextAction == MeeetDroneMaster_DreamTalk1 ||
-               nextAction == MeeetDroneMaster_DreamTalk2)
+                nextAction == MeeetDroneMaster_DreamTalk0 ||
+                nextAction == MeeetDroneMaster_DreamTalk1 ||
+                nextAction == MeeetDroneMaster_DreamTalk2)
             {
                 customSubBehaviourID = MeetDroneMaster;
             }
@@ -566,8 +559,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             if(id == DroneMaster_DreamTalk0)
             {
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "WTF I'm talking", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "WTF I'm really talking", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Great success!", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "The way they say it works really works!", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
+                conv.events.Add(new PauseAndWaitForStillEvent(conv, conv.convBehav, 40));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Oh little one you are awake, how does it feel to be in this world?", 0));
             }
         }
     }
@@ -576,7 +572,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
     {
         public MIFOracleMeetDroneMaster(MIFOracleBehaviour owner) : base(owner, MIFOracleBehaviour.MeetDroneMaster, MIFOracleBehaviour.DroneMaster_DreamTalk0)
         {
-            owner.getToWorking = 0f;
+            owner.getToWorking = 1f;
         }
 
         public override void Update()
@@ -586,26 +582,33 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             if (action == MIFOracleBehaviour.MeetDroneMaster_Init)
             {
-                movementBehavior = CustomMovementBehavior.KeepDistance;
-                if (inActionCounter > 60)
+                movementBehavior = CustomMovementBehavior.Idle;
+                if (inActionCounter > 300)
                 {
-                    if (owner.playerEnteredWithMark)
-                    {
-                        owner.NewAction(MIFOracleBehaviour.MeeetDroneMaster_DreamTalk0);
-                        return;
-                    }
-                    owner.NewAction(CustomAction.General_GiveMark);
-                    owner.afterGiveMarkAction = MIFOracleBehaviour.MeeetDroneMaster_DreamTalk0;
+                    owner.NewAction(MIFOracleBehaviour.MeeetDroneMaster_DreamTalk0);
                     return;
                 }
             }
             else if(action == MIFOracleBehaviour.MeeetDroneMaster_DreamTalk0)
             {
-                if (owner.conversation != null && owner.conversation.id == convoID && owner.conversation.slatedForDeletion)
+                if (owner.conversation != null && owner.conversation.id == convoID)
                 {
-                    owner.conversation = null;
-                    owner.NewAction(CustomAction.General_Idle);
-                    return;
+                    if (owner.conversation.events.Count < 3)//前三句话说完了
+                        movementBehavior = CustomMovementBehavior.Talk;
+                    else
+                        movementBehavior = CustomMovementBehavior.Idle;
+
+                    if (owner.conversation.slatedForDeletion)
+                    {
+                        owner.conversation = null;
+                        //owner.NewAction(CustomAction.General_Idle);
+
+                        if (RainWorldGamePatch.modules.TryGetValue(owner.oracle.room.game, out var module))
+                        {
+                            module.EndDroneMasterDream(owner.oracle.room.game);
+                        }
+                        return;
+                    }
                 }
             }
         }

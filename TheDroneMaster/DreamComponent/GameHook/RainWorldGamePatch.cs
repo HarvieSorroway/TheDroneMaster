@@ -191,6 +191,7 @@ namespace TheDroneMaster.GameHooks
                 Plugin.Log("Manger module lost, stop end dronemaster dream");
                 return;
             }
+            if (DreamFinished) return;
 
             managerModule.droneMasterDreamNumber = -1;
             DreamFinished = true;
