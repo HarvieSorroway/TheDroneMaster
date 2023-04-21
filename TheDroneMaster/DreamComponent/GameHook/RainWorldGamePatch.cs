@@ -179,7 +179,7 @@ namespace TheDroneMaster.GameHooks
                 }
                 else
                 {
-                    Plugin.Log(String.Format("DroneMaster in dream ticks : {0}", session.playerSessionRecords[0].time));
+                    //Plugin.Log(String.Format("DroneMaster in dream ticks : {0}", session.playerSessionRecords[0].time));
                 }
             }
         }

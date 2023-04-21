@@ -563,6 +563,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public float getToWorking;
 
+        public float unconciousTick;
+
         public float killFac;
         public float lastKillFac;
 
@@ -583,6 +585,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public CustomMovementBehavior movementBehavior;
 
         public CustomAction action;
+        public CustomAction afterGiveMarkAction;
 
         public bool pearlPickupReaction = true;
 
@@ -693,6 +696,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             if (!oracle.Consious) return;
             if (oracle.slatedForDeletetion) return;
 
+            unconciousTick = 0f;
+            currSubBehavior.Update();
 
             if (conversation != null)
                 conversation.Update();
@@ -724,7 +729,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             lastKillFac = killFac;
 
-            DecideActionUpdate();
+            GeneralActionUpdate();
 
             Move();
             if (working != getToWorking)
@@ -801,6 +806,21 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         #endregion
 
         #region 默认功能方法
+        public virtual void NewAction(CustomAction newAction)
+        {
+
+        }
+
+        public void InitateConversation(Conversation.ID convoId, CustomConversationBehaviour convBehav)
+        {
+            if (conversation != null)
+            {
+                conversation.Interrupt("...", 0);
+                conversation.Destroy();
+            }
+            conversation = new CustomOracleConversation(this, convBehav, convoId, dialogBox);
+        }
+
         /// <summary>
         /// 设定迭代器的新位置，房间坐标
         /// </summary>
@@ -964,7 +984,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         }
 
-        public virtual void DecideActionUpdate()
+        public virtual void GeneralActionUpdate()
         {
             if (action == CustomAction.General_Idle)
             {
@@ -982,6 +1002,57 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     }
                 }
             }
+            else if (action == CustomAction.General_GiveMark)
+            {
+                movementBehavior = CustomMovementBehavior.KeepDistance;
+                if (inActionCounter > 30 && inActionCounter < 300)
+                {
+                    player.Stun(20);
+                    player.mainBodyChunk.vel += Vector2.ClampMagnitude(oracle.room.MiddleOfTile(24, 14) - player.mainBodyChunk.pos, 40f) / 40f * 2.8f * Mathf.InverseLerp(30f, 160f, (float)inActionCounter);
+                }
+                if (inActionCounter == 30)
+                {
+                    oracle.room.PlaySound(SoundID.SS_AI_Give_The_Mark_Telekenisis, 0f, 1f, 1f);
+                }
+                if (inActionCounter == 300)
+                {
+                    player.mainBodyChunk.vel += Custom.RNV() * 10f;
+                    player.bodyChunks[1].vel += Custom.RNV() * 10f;
+                    player.Stun(40);
+                    (oracle.room.game.session as StoryGameSession).saveState.deathPersistentSaveData.theMark = true;
+                    (oracle.room.game.session as StoryGameSession).saveState.deathPersistentSaveData.karmaCap = 9;
+                    (oracle.room.game.session as StoryGameSession).saveState.deathPersistentSaveData.karma = (oracle.room.game.session as StoryGameSession).saveState.deathPersistentSaveData.karmaCap;
+                    for (int l = 0; l < oracle.room.game.cameras.Length; l++)
+                    {
+                        if (oracle.room.game.cameras[l].hud.karmaMeter != null)
+                        {
+                            oracle.room.game.cameras[l].hud.karmaMeter.UpdateGraphic();
+                        }
+                    }
+                    for (int m = 0; m < 20; m++)
+                    {
+                        oracle.room.AddObject(new Spark(player.mainBodyChunk.pos, Custom.RNV() * Random.value * 40f, new Color(1f, 1f, 1f), null, 30, 120));
+                    }
+                    oracle.room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, 0f, 1f, 1f);
+                }
+                if (inActionCounter > 300 && player.graphicsModule != null)
+                {
+                    (player.graphicsModule as PlayerGraphics).markAlpha = Mathf.Max((player.graphicsModule as PlayerGraphics).markAlpha, Mathf.InverseLerp(500f, 300f, (float)inActionCounter));
+                }
+                if (inActionCounter >= 500)
+                {
+                    NewAction(afterGiveMarkAction);
+                    if (conversation != null)
+                    {
+                        conversation.paused = false;
+                    }
+                }
+            }
+        }
+
+        public virtual void AddConversationEvents(CustomOracleConversation conv,Conversation.ID id)
+        {
+
         }
         #endregion
 
@@ -1148,7 +1219,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             public override void Update()
             {
                 age++;
-                if (this.waitForStill)
+                if (waitForStill)
                 {
                     if (!convBehav.CurrentlyCommunicating && convBehav.communicationPause > 0)
                     {
@@ -1173,19 +1244,19 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             public override void AddEvents()
             {
-                AddEvent.Invoke(id, owner);
+                owner.AddConversationEvents(this, id);
             }
 
             public delegate void AddEventDelegate(ID id, CustomOracleBehaviour owner);
 
-            public class PauseAndWaitForStillEvent : Conversation.DialogueEvent
+            public class PauseAndWaitForStillEvent : DialogueEvent
             {
                 public PauseAndWaitForStillEvent(Conversation owner, CustomConversationBehaviour _convBehav, int pauseFrames) : base(owner, 0)
                 {
-                    this.convBehav = _convBehav;
-                    if (this.convBehav == null && owner is CustomOracleConversation)
+                    convBehav = _convBehav;
+                    if (convBehav == null && owner is CustomOracleConversation)
                     {
-                        this.convBehav = (owner as CustomOracleConversation).convBehav;
+                        convBehav = (owner as CustomOracleConversation).convBehav;
                     }
                     this.pauseFrames = pauseFrames;
                 }
@@ -1193,8 +1264,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 public override void Activate()
                 {
                     base.Activate();
-                    this.convBehav.communicationPause = this.pauseFrames;
-                    (this.owner as CustomOracleConversation).waitForStill = true;
+                    convBehav.communicationPause = pauseFrames;
+                    (owner as CustomOracleConversation).waitForStill = true;
                 }
 
                 public CustomConversationBehaviour convBehav;
@@ -1212,7 +1283,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
 
             public static readonly CustomAction General_Idle = new CustomAction("General_Idle", true);
-
+            public static readonly CustomAction General_GiveMark = new CustomAction("General_GiveMark", true);
         }
 
         public class CustomMovementBehavior : ExtEnum<CustomMovementBehavior>
@@ -1270,6 +1341,8 @@ public class CustomCOracleStateViz
             text += string.Format("getToPos {0}\n", behaviour.OracleGetToPos);
             text += string.Format("idealPos {0}\n", behaviour.baseIdeal);
             text += string.Format("progression {0:f2}\n", behaviour.pathProgression);
+            text += string.Format("Action : {0} inActionCounter {1}\n", behaviour.action, behaviour.inActionCounter);
+            text += string.Format("Conversation : {0}", behaviour.conversation?.id);
         }
         label.text = text;
     }
