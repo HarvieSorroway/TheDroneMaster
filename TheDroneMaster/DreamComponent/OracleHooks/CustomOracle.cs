@@ -1468,6 +1468,7 @@ public class CustomCOracleStateViz
 
     public void Update()
     {
+        return;
         label.SetPosition(new Vector2(400f,300f));
         string text = string.Format("Oracle : {0}\n", oracle.ID);
 
