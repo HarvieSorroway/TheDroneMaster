@@ -3,6 +3,7 @@ using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using MoreSlugcats;
 using RWCustom;
+using SlugBase.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +29,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-
     public class OraclePatch
     {
         public static void PatchOn()
         {
-            try
-            {
+ 
                 OraclePatchs();
                 OracleGraphicPatchs();
                 OracleArmPatch.PatchOn();
@@ -44,168 +43,27 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 OracleGraphicsPropertiesPatch.PatchOn();
 
                 On.Room.ReadyForAI += Room_ReadyForAI;
-                CustomOracleExtender.RegistryCustomOracle(new TestSSOrcale());
-            }
-            catch
-            {
+                CustomOracleExtender.RegistryCustomOracle(new MIFOracle());
+            
 
-            }
+            
         }
 
         public static void OraclePatchs()
         {
             IL.Oracle.ctor += Oracle_ctor;
             On.Oracle.InitiateGraphicsModule += Oracle_InitiateGraphicsModule;
-        }
 
+            On.Oracle.CreateMarble += Oracle_CreateMarble;
+            On.Oracle.SetUpMarbles += Oracle_SetUpMarbles;
+        }
 
         public static void OracleGraphicPatchs()
         {
             IL.OracleGraphics.ctor += OracleGraphics_ctor;
             IL.OracleGraphics.InitiateSprites += OracleGraphics_InitiateSprites;
             IL.OracleGraphics.ApplyPalette += OracleGraphics_ApplyPalette;
-   
-
-
         }
-
-        //private static void ChangeSStoCustom(ILContext il)
-        //{
-        //    ILCursor cAfter = new ILCursor(il);
-        //    ILCursor cBefore = new ILCursor(il);
-        //    ILCursor cSkip = new ILCursor(il);
-
-
-        //    var list1 = new Func<Instruction, bool>[3]{  i => i.MatchCall<OracleGraphics>("get_oracle"),
-        //                                                    i => i.MatchLdfld<Oracle>("oracleBehavior"),
-        //                                                    i => i.MatchIsinst<SSOracleBehavior>() ,
-        //                                                    };
-        //    List<byte> vars = new List<byte>();
-        //    byte customCount = (byte)il.Method.Body.Variables.Count;
-        //    for (byte i = 0; i < il.Method.Body.Variables.Count; i++)
-        //    {
-        //        if (il.Method.Body.Variables[i].VariableType.Name == typeof(SSOracleBehavior).Name)
-        //        {
-        //            Debug.Log("[IL HOOK] SS " + i);
-        //            vars.Add(i);
-        //        }
-        //    }
-        //    il.Method.Body.Variables.Add(new VariableDefinition(il.IL.Body.Method.Module.ImportReference(typeof(CustomOracleBehaviour))));
-
-        //    for (int j = 0; j < vars.Count + 1; j++)
-        //    {
-        //        Debug.Log("[IL HOOK] Page " + j);
-        //        var curList = j == 0 ? list1 : new Func<Instruction, bool>[] { i => i.MatchLdloc(vars[j - 1]) };
-
-
-       
-        //        while (cAfter.TryGotoNext(MoveType.After, curList))
-        //        {
-        //            if (!cSkip.TryGotoNext(MoveType.After, i => i == cAfter.Next))
-        //                throw new Exception("skip Cursor Error");
-
-        //            if (!cBefore.TryGotoNext(MoveType.Before, curList))
-        //                throw new Exception("Before Cursor Error");
-
-        //            var customLabel = cBefore.DefineLabel();
-        //            var ssLabel = cBefore.DefineLabel();
-
-        //            if (cAfter.Next.OpCode != OpCodes.Call && cAfter.Next.OpCode != OpCodes.Callvirt && cAfter.Next.OpCode != OpCodes.Ldfld && cAfter.Next.OpCode != OpCodes.Stloc_S)
-        //            {
-        //                if (!cBefore.TryGotoNext(MoveType.After, i => i == cAfter.Next))
-        //                    throw new Exception("Before Cursor Error 2");
-        //                continue;
-        //            }
-
-
-        //            cBefore.EmitDelegate<Func<OracleGraphics, bool>>((graphic) => graphic.oracle.oracleBehavior is CustomOracleBehaviour);
-        //            cBefore.Emit(OpCodes.Brtrue_S, customLabel);//跳过标准ss获取
-        //            cBefore.Emit(OpCodes.Ldarg_0);
-
-        //            cSkip.Emit(OpCodes.Br_S, ssLabel);//跳过自定义获取
-        //            cSkip.MarkLabel(customLabel);
-        //            if (j == 0)
-        //            {
-        //                cSkip.Emit(OpCodes.Ldarg_0);
-        //                cSkip.EmitDelegate<Func<OracleGraphics, CustomOracleBehaviour>>(Graphics => Graphics.oracle.oracleBehavior as CustomOracleBehaviour);
-        //            }
-        //            else
-        //                cSkip.Emit(OpCodes.Ldloc_S, customCount);
-        //            if (cAfter.Next.MatchCall(out var method))
-        //            {
-        //                Debug.Log("[IL HOOK] Apply Call " + method.Name +
-        //                    " " + (typeof(CustomOracleBehaviour).GetMethod(method.Name) != null).ToString() +
-        //                    " " + (typeof(CustomOracleBehaviour).GetProperty(method.Name) != null).ToString());
-
-        //                if (typeof(CustomOracleBehaviour).GetMethod(method.Name) != null)
-        //                    cSkip.Emit(OpCodes.Call, typeof(CustomOracleBehaviour).GetMethod(method.Name));
-        //                else if (typeof(CustomOracleBehaviour).GetProperty(method.Name) != null)
-        //                    cSkip.Emit(OpCodes.Call, typeof(CustomOracleBehaviour).GetProperty(method.Name));
-        //                else
-        //                    cSkip.EmitDelegate<Func<CustomOracleBehaviour, object>>((a) => null);
-        //            }
-        //            else if (cAfter.Next.MatchCallvirt(out var virtMethod))
-        //            {
-        //                Debug.Log("[IL HOOK] Apply Callvirt " + virtMethod.Name +
-        //                    " " + (typeof(CustomOracleBehaviour).GetMethod(virtMethod.Name) != null).ToString() +
-        //                    " " + (typeof(CustomOracleBehaviour).GetProperty(virtMethod.Name) != null).ToString());
-
-        //                if (typeof(CustomOracleBehaviour).GetMethod(virtMethod.Name) != null)
-        //                    cSkip.Emit(OpCodes.Callvirt, typeof(CustomOracleBehaviour).GetMethod(virtMethod.Name));
-        //                else if (typeof(CustomOracleBehaviour).GetProperty(virtMethod.Name) != null)
-        //                    cSkip.Emit(OpCodes.Callvirt, typeof(CustomOracleBehaviour).GetProperty(virtMethod.Name));
-        //                else
-        //                    cSkip.EmitDelegate<Func<CustomOracleBehaviour, object>>((a) => null);
-        //            }
-        //            else if (cAfter.Next.MatchLdfld(out var field))
-        //            {
-        //                Debug.Log("[IL HOOK] Apply Ldfld " + field.Name +
-        //                    " " + (typeof(CustomOracleBehaviour).GetField(field.Name) != null).ToString());
-
-        //                if (typeof(CustomOracleBehaviour).GetField(field.Name) != null &&
-        //                    typeof(CustomOracleBehaviour).GetField(field.Name).FieldType.Name == field.FieldType.Name)
-        //                    cSkip.Emit(OpCodes.Ldfld, typeof(CustomOracleBehaviour).GetField(field.Name));
-        //                else if (field.FieldType.IsValueType)
-        //                {
-        //                    cSkip.EmitDelegate<Action<CustomOracleBehaviour>>((a) => { });
-        //                    if (field.FieldType.Name == "string")
-        //                        cSkip.Emit(OpCodes.Ldstr, "");
-        //                    else
-        //                        cSkip.Emit(OpCodes.Ldc_I4, 0);
-
-        //                }
-        //                else
-        //                {
-        //                    Debug.Log("[IL HOOK] Add null to Stack");
-        //                    cSkip.EmitDelegate<Func<CustomOracleBehaviour, object>>((a) => null);
-        //                }
-        //            }
-        //            else if (cAfter.Next.MatchStloc(out var a))
-        //            {
-        //                Debug.Log("[IL HOOK] Apply Stloc");
-        //                cSkip.Emit(OpCodes.Stloc_S, customCount);
-        //            }
-        //            if (!cBefore.TryGotoNext(MoveType.After, i => i == cAfter.Next))
-        //                throw new Exception("Before Cursor Error 2");
-
-        //            cSkip.MarkLabel(ssLabel);
-        //        }
-
-        //    }
-        //    Debug.Log("--------------[IL HOOK] End Apply-------------");
-        //    foreach (var a in il.Method.Body.Instructions)
-        //    {
-        //        try
-        //        {
-        //            Debug.Log(a.ToString());
-        //        }
-        //        catch
-        //        {
-        //            Debug.Log(a.OpCode.Name + " ________");
-        //        }
-        //    }
-
-        //}
 
         private static void OracleGraphics_InitiateSprites(ILContext il)
         {
@@ -215,7 +73,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             ILLabel skipLabel = null;
             try
             {
-                if (c1.TryGotoNext(MoveType.After,
+                if(c1.TryGotoNext(MoveType.After,
                     i => i.MatchCall<OracleGraphics>("get_IsPebbles"),
                     i => i.Match(OpCodes.Brtrue_S),
                     i => i.MatchLdarg(0),
@@ -233,7 +91,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
             try
             {
-                c2.Emit(OpCodes.Ldarg, 0);
+                c2.Emit(OpCodes.Ldarg,0);
                 c2.EmitDelegate<Func<OracleGraphics, bool>>((graphic) =>
                 {
                     if (graphic is CustomOracleGraphic)
@@ -245,7 +103,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 });
                 c2.Emit(OpCodes.Brtrue_S, skipLabel);
             }
-            catch (Exception ex2)
+            catch(Exception ex2)
             {
                 Debug.LogException(ex2);
                 return;
@@ -314,17 +172,17 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             try
             {
-                if (c2.TryGotoNext(MoveType.After,
-                    i => i.MatchCall<GraphicsModule>(".ctor"),
-                    i => i.Match(OpCodes.Call),
-                    i => i.MatchStloc(0)
-                ))
-                {
+               if(c2.TryGotoNext(MoveType.After,
+                   i => i.MatchCall<GraphicsModule>(".ctor"),
+                   i => i.Match(OpCodes.Call),
+                   i => i.MatchStloc(0)
+               ))
+               {
                     c2.Emit(OpCodes.Ldarg_0);
                     c2.Emit(OpCodes.Ldarg_1);
                     c2.EmitDelegate<Func<OracleGraphics, PhysicalObject, bool>>((graphic, ow) =>
                     {
-                        if (graphic is CustomOracleGraphic)
+                        if(graphic is CustomOracleGraphic)
                         {
                             Plugin.Log("Skip current OracleGraphic ctor");
                             return true;
@@ -332,9 +190,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         return false;
                     });
                     c2.Emit(OpCodes.Brtrue_S, retLabel);
-                }
+               }
             }
-            catch (Exception ex2)
+            catch(Exception ex2)
             {
                 Debug.LogException(ex2);
                 return;
@@ -342,6 +200,28 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
 
         #region Oracle
+
+        private static void Oracle_SetUpMarbles(On.Oracle.orig_SetUpMarbles orig, Oracle self)
+        {
+            if (CustomOracleExtender.idAndOracles.TryGetValue(self.ID, out var module))
+            {
+                module.SetUpMarbles();
+                return;
+            }
+            orig.Invoke(self);
+        }
+
+        private static void Oracle_CreateMarble(On.Oracle.orig_CreateMarble orig, Oracle self, PhysicalObject orbitObj, Vector2 ps, int circle, float dist, int color)
+        {
+            if (CustomOracleExtender.idAndOracles.TryGetValue(self.ID, out var module))
+            {
+                module.CreateMarble(self, orbitObj, ps, circle, dist, color);
+                return;
+            }
+            orig.Invoke(self, orbitObj, ps, circle, dist, color);
+        }
+
+
         private static void Oracle_ctor(ILContext il)
         {
             ILCursor c1 = new ILCursor(il);//用于找到 IL_0301, 跳过默认的ID加载
@@ -393,7 +273,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         {
                             if (room.abstractRoom.name == customOracle.LoadRoom)
                             {
-                                Plugin.Log(String.Format("Load Custom Oracle\nroom : {0}\nID : {1}", customOracle.LoadRoom, customOracle.OracleID));
+                                Plugin.Log(String.Format("Load Custom Oracle\nroom : {0}\nID : {1}", customOracle.LoadRoom,customOracle.OracleID));
                                 self.ID = customOracle.OracleID;
                                 customOracle.oracleRef.SetTarget(self);
 
@@ -410,7 +290,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     c2.Emit(OpCodes.Brtrue_S, skipLabel);
                 }
             }
-            catch (Exception ex2)
+            catch(Exception ex2)
             {
                 Debug.LogException(ex2);
                 return;
@@ -428,13 +308,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             try
             {
-                if (c5.TryGotoNext(MoveType.After,
+                if(c5.TryGotoNext(MoveType.After,
                     i => i.MatchCall<PhysicalObject>("set_buoyancy")
                 ))
                 {
                     c5.Emit(OpCodes.Ldarg_0);
                     c5.Emit(OpCodes.Ldarg, 2);
-                    c5.EmitDelegate<Func<Oracle, Room, bool>>((self, room) =>
+                    c5.EmitDelegate<Func<Oracle, Room,bool>>((self, room) =>
                     {
                         foreach (var customOracle in CustomOracleExtender.customOracles)
                         {
@@ -443,7 +323,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                                 self.gravity = customOracle.gravity;
                                 Plugin.Log("Load custom oracle baviour and surroundings");
                                 customOracle.LoadBehaviourAndSurroundings(ref self, room);
-
+                               
                                 return true;
                             }
                         }
@@ -475,7 +355,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         private static void Room_ReadyForAI(On.Room.orig_ReadyForAI orig, Room self)
         {
             orig.Invoke(self);
-            if (self.game != null && self.game.IsStorySession)
+            if(self.game != null && self.game.IsStorySession)
             {
                 foreach (var customOracle in CustomOracleExtender.customOracles)
                 {
@@ -524,20 +404,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             IL.Oracle.OracleArm.Update += OracleArm_Update;
             IL.Oracle.OracleArm.BaseDir += OracleArm_BaseDir;
             IL.Oracle.OracleArm.OnFramePos += OracleArm_OnFramePos;
-
-            IL.Oracle.OracleArm.Update += OracleArm_Update1;
-        }
-
-        private static void OracleArm_Update1(ILContext il)
-        {
-            try
-            {
-                OraclePatch.AddCustomIDJudgement(il);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogException(ex);
-            }
         }
 
         private static void OracleArm_OnFramePos(ILContext il)
@@ -570,7 +436,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             {
                 OraclePatch.AddCustomIDJudgement(il);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 Debug.LogException(ex);
             }
@@ -589,10 +455,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             Hook isIsMoonHook = new Hook(typeof(OracleGraphics).GetProperty("IsPebbles", propFlags).GetGetMethod(), typeof(OracleGraphicsPropertiesPatch).GetMethod("get_IsMoon"));
         }
 
-        public static bool get_IsPebbles(Func<OracleGraphics, bool> orig, OracleGraphics self)
+        public static bool get_IsPebbles(Func<OracleGraphics,bool>orig,OracleGraphics self)
         {
             bool result = orig.Invoke(self);
-            if (CustomOracleExtender.idAndOracles.TryGetValue(self.oracle.ID, out var customOracle) && customOracle.InheritOracleID != null)
+            if(CustomOracleExtender.idAndOracles.TryGetValue(self.oracle.ID,out var customOracle) && customOracle.InheritOracleID != null)
             {
                 result |= customOracle.InheritOracleID == Oracle.OracleID.SS;
             }

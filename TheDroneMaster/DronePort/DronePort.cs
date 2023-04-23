@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -28,6 +29,9 @@ namespace TheDroneMaster
         public int spawnDroneCoolDown = 40;
         public int preSpawnWaitCounter = 450;
         public int crashedDroneCount = 0;
+
+        public bool usingOverrideSetting = false;
+
         public int availableDroneCount
         {
             get
@@ -36,6 +40,10 @@ namespace TheDroneMaster
                 if(owner.TryGetTarget(out Player player))
                 {
                     result = Mathf.CeilToInt((player.Karma + 1f) * Plugin.instance.config.CountPerKarma.Value);
+                }
+                if(DronePortOverride.overrides.TryGetValue(this,out var dronePortOverride))
+                {
+                    result = dronePortOverride.availableDroneCount;
                 }
 
                 return result - crashedDroneCount;
@@ -58,6 +66,8 @@ namespace TheDroneMaster
 
         public DronePort (Player player)
         {
+            SetUpOverrides(player);
+
             owner = new WeakReference<Player>(player);
             drones = new List<WeakReference<LaserDrone>>();
             //pearlReader = new PortPearlReader();
@@ -68,6 +78,17 @@ namespace TheDroneMaster
                 states[i] = new DroneState(this);
             }
             Plugin.Log("This cycle player can get " + availableDroneCount.ToString() + " drones");
+        }
+
+        /// <summary>
+        /// 用于在不同的梦境中修改背包的状态
+        /// </summary>
+        public void SetUpOverrides(Player player)
+        {
+            if(player.room.world.name == "DMD")
+            {
+                new DronePortOverride(this, 0, true, Vector2.zero, 0f);
+            }
         }
 
         public void Update()
@@ -289,6 +310,32 @@ namespace TheDroneMaster
             {
                 DroneHUD.instance.TryRequestHUDForDrone(drone);
             }
+        }
+    }
+
+    public class DronePortOverride
+    {
+        public static ConditionalWeakTable<DronePort, DronePortOverride> overrides = new ConditionalWeakTable<DronePort, DronePortOverride>();
+
+        public int availableDroneCount = 0;
+        public bool initDronePortGraphics = false;
+        public Vector2 dronePortGraphicsPos = Vector2.zero;
+        public Vector2 currentPortPos = Vector2.zero;
+        public float dronePortGraphicsRotation = 0f;
+
+        public float connectToDMProggress = 0f;
+
+        public WeakReference<DronePort> portRef;
+
+        public DronePortOverride(DronePort port,int availableDroneCount, bool initDronePortGraphics, Vector2 dronePortGraphicsPos, float dronePortGraphicsRotation)
+        {
+            this.availableDroneCount = availableDroneCount;
+            this.initDronePortGraphics = initDronePortGraphics;
+            this.dronePortGraphicsPos = dronePortGraphicsPos;
+            this.dronePortGraphicsRotation = dronePortGraphicsRotation;
+            portRef = new WeakReference<DronePort>(port);
+
+            overrides.Add(port, this);
         }
     }
 }

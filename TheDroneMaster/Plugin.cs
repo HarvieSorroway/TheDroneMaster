@@ -17,7 +17,7 @@ using System.IO;
 using TheDroneMaster.GameHooks;
 using TheDroneMaster.DreamComponent;
 using TheDroneMaster.DreamComponent.OracleHooks;
-using static TheDroneMaster.DreamComponent.GameHook.DroneMasterEnding;
+using TheDroneMaster.DreamComponent.DreamHook;
 
 
 #pragma warning disable CS0618
@@ -74,6 +74,7 @@ namespace TheDroneMaster
         {
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
             Content.Register(new LaserDroneCritob());
+            //DreamSessionHook.RegisterDream(new DroneMasterDream());
         }
 
         public void Start()
@@ -136,13 +137,15 @@ namespace TheDroneMaster
             {
                 foreach(var i in self.room.drawableObjects)
                 {
-                    if(i is CreatureEndingSender)
+                    if(i is DroneMasterEnding.CreatureEndingSender)
                     {
                         return;
                     }
                 }
-                self.room.AddObject(new CreatureEndingSender(CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
-                Debug.Log("sdsddsdsdsdsdsd" + (self.bodyChunks[0].pos + new Vector2(50, 20)));
+                DroneMasterEnding.CreatureEndingSender a;
+                self.room.AddObject(a = new DroneMasterEnding.CreatureEndingSender(null,CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
+                //if (PlayerPatchs.modules.TryGetValue(self,out var module))
+                //    a.module= module;
             }
         }
 

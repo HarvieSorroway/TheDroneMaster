@@ -106,7 +106,7 @@ namespace TheDroneMaster
 
         private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
         {
-            if(modules.TryGetValue(self,out var module) && module.ownDrones)
+            if (modules.TryGetValue(self,out var module) && module.ownDrones)
             {
                 if (module.port.availableDroneCount != 0) module.port.ClearOutAllDrones();
                 module.playerDeathPreventer.AcceptableDamageCount = -1;
@@ -244,7 +244,7 @@ namespace TheDroneMaster
                     ExtEnumBase extEnumBase;
                     playerDeathPreventer = new PlayerDeathPreventer(this);
                     bool canParse = ExtEnumBase.TryParse(typeof(SlugcatStats.Name), Plugin.ID, true, out extEnumBase);
-                    if (canParse)
+                    if (canParse && name == null)
                     {
                         name = extEnumBase as SlugcatStats.Name;
                         if(DroneMasterName == null)

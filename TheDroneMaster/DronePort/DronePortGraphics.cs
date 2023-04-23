@@ -22,6 +22,8 @@ namespace TheDroneMaster
 
         public PhysicalObject currentCastTarget;
 
+        public WeakReference<DronePortOverride> overrideRef = new WeakReference<DronePortOverride>(null);
+
         public int startIndex;
 
         public int SparkToGen = 0;
@@ -31,6 +33,7 @@ namespace TheDroneMaster
         public int castCounter = 0;
 
         public bool playLightningSounds = true;
+        public bool overrideDisplayDronePort = true;
 
         public float currentCastRad;
 
@@ -42,7 +45,7 @@ namespace TheDroneMaster
         public Color sparkColor => LaserColor;
         public Color RandomSparkColor => Color.Lerp(Color.Lerp(sparkColor, Color.blue, Random.value * 0.5f), Color.white, Random.value);
         public Player Player => pGraphics.player;
-        public int totalSprites => 2 + castLines.Length;
+        public int totalSprites => overrideDisplayDronePort ? 2 + castLines.Length : 0;
         public DronePortGraphics(PlayerGraphics playerGraphics,int startIndex)
         {
             pGraphics = playerGraphics;
@@ -52,10 +55,18 @@ namespace TheDroneMaster
             {
                 LaserColor = module.laserColor;
             }
+
+            if(DronePortOverride.overrides.TryGetValue(module.port, out var overrides))
+            {
+                overrideDisplayDronePort = overrides.initDronePortGraphics;
+                overrideRef = new WeakReference<DronePortOverride>(overrides);
+            }
         }
 
         public void InitSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
+            if (!overrideDisplayDronePort) return;
+
             for (int i = 0; i < castLines.Length; i++)
             {
                 castLines[i] = new CastLine(this, startIndex + 2 + i);
@@ -72,6 +83,8 @@ namespace TheDroneMaster
 
         public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
+            if (!overrideDisplayDronePort) return;
+
             for (int i = startIndex; i < startIndex + totalSprites; i++)
             {
                 newContatiner.AddChild(sLeaser.sprites[i]);
@@ -88,6 +101,8 @@ namespace TheDroneMaster
 
         public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
+            if (!overrideDisplayDronePort) return;
+
             sLeaser.sprites[startIndex].color = palette.blackColor;
 
             if(PlayerPatchs.modules.TryGetValue(Player,out var module) && module.ownDrones)
@@ -108,10 +123,27 @@ namespace TheDroneMaster
 
         public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
+            if (!overrideDisplayDronePort) return;
+
             Vector2 vector = Vector2.Lerp(pGraphics.drawPositions[0, 1], pGraphics.drawPositions[0, 0], timeStacker);
             Vector2 vector2 = Vector2.Lerp(pGraphics.drawPositions[1, 1], pGraphics.drawPositions[1, 0], timeStacker);
+
             float rotation = Custom.AimFromOneVectorToAnother(vector2, vector);
             Vector2 dir = Custom.DirVec(vector2, vector);
+
+            if(overrideRef.TryGetTarget(out var overrides))
+            {
+                float connectProggress = overrides.connectToDMProggress;
+
+                vector = Vector2.Lerp(overrides.dronePortGraphicsPos, vector, connectProggress);
+                rotation = Mathf.Lerp(rotation,Mathf.Lerp(overrides.dronePortGraphicsRotation,rotation,connectProggress),0.05f);
+
+                dir = Custom.DegToVec(rotation);
+
+                overrides.currentPortPos = vector;
+            }
+
+
             Vector2 perDir = Custom.PerpendicularVector(dir) * Custom.LerpMap(Mathf.Abs(Mathf.Abs(rotation) - 90f),90f,60f,0f,1f) * portBiasX * (rotation > 0 ? 1f : -1f);
             Vector2 perDir2 = perDir + Custom.PerpendicularVector(dir) * 3f * (rotation > 0 ? 1f : -1f);
 
@@ -132,6 +164,8 @@ namespace TheDroneMaster
 
         public void Update()
         {
+            if (!overrideDisplayDronePort) return;
+
             PlayerDamageStateUpdate();
 
             if (castCounter > 0)
@@ -222,6 +256,8 @@ namespace TheDroneMaster
 
         public void PlayerDamageStateUpdate()
         {
+            if (!overrideDisplayDronePort) return;
+
             if (pGraphics == null || pGraphics.owner == null) return;
             if(PlayerPatchs.modules.TryGetValue(Player,out var module) && module.ownDrones)
             {
@@ -249,6 +285,8 @@ namespace TheDroneMaster
 
         public void Charge(float size)
         {
+            if (!overrideDisplayDronePort) return;
+
             if (SparkToGen > 0) return;
             SparkToGen = (int)Custom.LerpMap(size, 0f, 2f, 10, 50);
             GenSparkCooler = (int)Mathf.Lerp(10, 40, Random.value);
@@ -257,6 +295,8 @@ namespace TheDroneMaster
 
         public void OverCharge(float size)
         {
+            if (!overrideDisplayDronePort) return;
+
             playLightningSounds = true;
             if (LightningToGen > 0) return;
             LightningToGen = (int)Custom.LerpMap(size, 0, 2f, 10, 25);
@@ -265,6 +305,8 @@ namespace TheDroneMaster
 
         public void DeathShock(string shockfrom)
         {
+            if (!overrideDisplayDronePort) return;
+
             Plugin.Log(shockfrom);
             if (Player == null) return;
             if (Player.room == null) return;
@@ -284,6 +326,8 @@ namespace TheDroneMaster
 
         public void ContinuousCast(Vector2 pos,int time,float rad)
         {
+            if (!overrideDisplayDronePort) return;
+
             castCounter = time;
             currentCastPos = pos;
             currentCastRad = rad;
@@ -291,7 +335,9 @@ namespace TheDroneMaster
 
         public void ContinuousCast(PhysicalObject castObj,int time,float rad)
         {
-            if(castObj.room != null && castObj.room == pGraphics.owner.room)
+            if (!overrideDisplayDronePort) return;
+
+            if (castObj.room != null && castObj.room == pGraphics.owner.room)
             currentCastTarget = castObj;
             castCounter = time;
             currentCastRad = rad;
@@ -299,6 +345,8 @@ namespace TheDroneMaster
 
         public void Cast(Vector2 pos,float rad)
         {
+            if (!overrideDisplayDronePort) return;
+
             if (Random.value > 0.25f) return;
 
             for(int i = 0;i < castLines.Length; i++)

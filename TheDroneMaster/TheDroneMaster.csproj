@@ -77,7 +77,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RW&amp;Modding\references1.9\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -90,8 +92,8 @@
     <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
-    <Compile Include="DreamComponent\DreamHook\CustomDreamBase.cs" />
-    <Compile Include="DreamComponent\DreamHook\DreamHooks.cs" />
+    <Compile Include="DreamComponent\DreamHook\NutilsDreamHooks.cs" />
+    <Compile Include="DreamComponent\GameHook\PlayerProgressionHooks.cs" />
     <Compile Include="DreamComponent\GameHook\SessionHook.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracle.cs" />
     <Compile Include="DreamComponent\OracleHooks\MIFOracle.cs" />

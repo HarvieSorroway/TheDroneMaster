@@ -4,19 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DreamComponent.DreamHook;
+using TheDroneMaster.GameHooks;
 using UnityEngine;
+using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour;
+using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour.CustomOracleConversation;
 using Random = UnityEngine.Random;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
 {
-    public class TestSSOrcale : CustomOracle
+    public class MIFOracle : CustomOracle
     {
         public static Oracle.OracleID DMDOracle = new Oracle.OracleID("DMD", true);
         public override string LoadRoom => "DMD_AI";
-        public override Oracle.OracleID OracleID => Oracle.OracleID.SS;
+        public override Oracle.OracleID OracleID => DMDOracle;
         public override Oracle.OracleID InheritOracleID => Oracle.OracleID.SS;
 
-        public TestSSOrcale()
+        public MIFOracle()
         {
             gravity = 0f;
             startPos = new Vector2(350f, 350f);
@@ -24,9 +28,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
         {
-            oracle.oracleBehavior = new SSOracleBehavior(oracle);
-            oracle.myScreen = new OracleProjectionScreen(room, oracle.oracleBehavior);
-            room.AddObject(oracle.myScreen);
+            oracle.oracleBehavior = new MIFOracleBehaviour(oracle);
+
             oracle.marbles = new List<PebblesPearl>();
             oracle.SetUpMarbles();
             room.gravity = 0f;
@@ -44,91 +47,90 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override OracleGraphics InitCustomOracleGraphic(PhysicalObject ow)
         {
-            return new TestSSOracleGraphics(ow);
+            return new MIFOracleGraphics(ow);
         }
     }
-    public class TestSSOracleGraphics : CustomOracleGraphic
+    public class MIFOracleGraphics : CustomOracleGraphic
     {
         public GownCover cover;
         public int coverSprite;
 
-        public TestSSOracleGraphics(PhysicalObject ow) : base(ow)
+        public MIFOracleGraphics(PhysicalObject ow) : base(ow)
         {
             callBaseApplyPalette = false;
             callBaseInitiateSprites = false;
 
             Random.State state = Random.state;
             Random.InitState(56);
-            this.totalSprites = 0;
-            this.armJointGraphics = new ArmJointGraphics[this.oracle.arm.joints.Length];
+            totalSprites = 0;
+            armJointGraphics = new ArmJointGraphics[oracle.arm.joints.Length];
 
-            for (int i = 0; i < this.oracle.arm.joints.Length; i++)
+            for (int i = 0; i < oracle.arm.joints.Length; i++)
             {
-                this.armJointGraphics[i] = new ArmJointGraphics(this, this.oracle.arm.joints[i], this.totalSprites);
-                this.totalSprites += this.armJointGraphics[i].totalSprites;
+                armJointGraphics[i] = new ArmJointGraphics(this, oracle.arm.joints[i], totalSprites);
+                totalSprites += armJointGraphics[i].totalSprites;
             }
 
 
-            this.firstUmbilicalSprite = this.totalSprites;
-            this.umbCord = new UbilicalCord(this, this.totalSprites);
-            this.totalSprites += this.umbCord.totalSprites;
+            firstUmbilicalSprite = totalSprites;
+            umbCord = new UbilicalCord(this, totalSprites);
+            totalSprites += umbCord.totalSprites;
 
 
-            this.firstBodyChunkSprite = this.totalSprites;
-            this.totalSprites += 2;
-            this.neckSprite = this.totalSprites;
-            this.totalSprites++;
-            this.firstFootSprite = this.totalSprites;
-            this.totalSprites += 4;
+            firstBodyChunkSprite = totalSprites;
+            totalSprites += 2;
+            neckSprite = totalSprites;
+            totalSprites++;
+            firstFootSprite = totalSprites;
+            totalSprites += 4;
 
 
-            this.halo = new Halo(this, this.totalSprites);
-            this.totalSprites += this.halo.totalSprites;
-            this.gown = new Gown(this);
-            this.robeSprite = this.totalSprites;
-            this.totalSprites++;
+            halo = new Halo(this, totalSprites);
+            totalSprites += halo.totalSprites;
+            gown = new Gown(this);
+            robeSprite = totalSprites;
+            totalSprites++;
 
 
-            this.firstHandSprite = this.totalSprites;
-            this.totalSprites += 4;
-            this.head = new GenericBodyPart(this, 5f, 0.5f, 0.995f, this.oracle.firstChunk);
-            this.firstHeadSprite = this.totalSprites;
-            this.totalSprites += 10;
-            this.fadeSprite = this.totalSprites;
-            this.totalSprites++;
+            firstHandSprite = totalSprites;
+            totalSprites += 4;
+            head = new GenericBodyPart(this, 5f, 0.5f, 0.995f, oracle.firstChunk);
+            firstHeadSprite = totalSprites;
+            totalSprites += 10;
+            fadeSprite = totalSprites;
+            totalSprites++;
 
+            //killSprite = totalSprites;
+            //totalSprites++;
 
-            this.killSprite = this.totalSprites;
-            this.totalSprites++;
-
-            this.hands = new GenericBodyPart[2];
+            hands = new GenericBodyPart[2];
 
             for (int j = 0; j < 2; j++)
             {
-                this.hands[j] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, this.oracle.firstChunk);
+                hands[j] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, oracle.firstChunk);
             }
-            this.feet = new GenericBodyPart[2];
+            feet = new GenericBodyPart[2];
             for (int k = 0; k < 2; k++)
             {
-                this.feet[k] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, this.oracle.firstChunk);
+                feet[k] = new GenericBodyPart(this, 2f, 0.5f, 0.98f, oracle.firstChunk);
             }
-            this.knees = new Vector2[2, 2];
+            knees = new Vector2[2, 2];
             for (int l = 0; l < 2; l++)
             {
                 for (int m = 0; m < 2; m++)
                 {
-                    this.knees[l, m] = this.oracle.firstChunk.pos;
+                    knees[l, m] = oracle.firstChunk.pos;
                 }
             }
-            this.firstArmBaseSprite = this.totalSprites;
-            this.armBase = new ArmBase(this, this.firstArmBaseSprite);
-            this.totalSprites += this.armBase.totalSprites;
+            firstArmBaseSprite = totalSprites;
+            armBase = new ArmBase(this, firstArmBaseSprite);
+            totalSprites += armBase.totalSprites;
 
             cover = new GownCover(this);
-            coverSprite = this.totalSprites;
+            coverSprite = totalSprites;
             totalSprites++;
 
-            this.voiceFreqSamples = new float[64];
+            voiceFreqSamples = new float[64];
             Random.state = state;
         }
 
@@ -136,143 +138,143 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             base.ApplyPalette(sLeaser, rCam, palette);
 
-            this.SLArmBaseColA = new Color(0.52156866f, 0.52156866f, 0.5137255f);
-            this.SLArmHighLightColA = new Color(0.5686275f, 0.5686275f, 0.54901963f);
-            this.SLArmBaseColB = palette.texture.GetPixel(5, 1);
-            this.SLArmHighLightColB = palette.texture.GetPixel(5, 2);
+            SLArmBaseColA = new Color(0.52156866f, 0.52156866f, 0.5137255f);
+            SLArmHighLightColA = new Color(0.5686275f, 0.5686275f, 0.54901963f);
+            SLArmBaseColB = palette.texture.GetPixel(5, 1);
+            SLArmHighLightColB = palette.texture.GetPixel(5, 2);
 
-            for (int i = 0; i < this.armJointGraphics.Length; i++)
+            for (int i = 0; i < armJointGraphics.Length; i++)
             {
-                this.armJointGraphics[i].ApplyPalette(sLeaser, rCam, palette);
+                armJointGraphics[i].ApplyPalette(sLeaser, rCam, palette);
                 armJointGraphics[i].metalColor = palette.blackColor;
             }
             Color color = new Color(52f / 255f, 61f / 255f, 83f / 255f);
 
             for (int j = 0; j < base.owner.bodyChunks.Length; j++)
             {
-                sLeaser.sprites[this.firstBodyChunkSprite + j].color = color;
+                sLeaser.sprites[firstBodyChunkSprite + j].color = color;
             }
-            sLeaser.sprites[this.neckSprite].color = color;
-            sLeaser.sprites[this.HeadSprite].color = color;
-            sLeaser.sprites[this.ChinSprite].color = color;
+            sLeaser.sprites[neckSprite].color = color;
+            sLeaser.sprites[HeadSprite].color = color;
+            sLeaser.sprites[ChinSprite].color = color;
 
             for (int k = 0; k < 2; k++)
             {
-                sLeaser.sprites[this.EyeSprite(k)].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
+                sLeaser.sprites[EyeSprite(k)].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
             }
 
             for (int k = 0; k < 2; k++)
             {
-                sLeaser.sprites[this.PhoneSprite(k, 0)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
-                sLeaser.sprites[this.PhoneSprite(k, 1)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
-                sLeaser.sprites[this.PhoneSprite(k, 2)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
+                sLeaser.sprites[PhoneSprite(k, 0)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
+                sLeaser.sprites[PhoneSprite(k, 1)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
+                sLeaser.sprites[PhoneSprite(k, 2)].color = new Color(72f / 255f, 83f / 255f, 107f / 255f);
 
 
-                sLeaser.sprites[this.HandSprite(k, 0)].color = color;
-                if (this.gown != null)
+                sLeaser.sprites[HandSprite(k, 0)].color = color;
+                if (gown != null)
                 {
                     for (int l = 0; l < 7; l++)
                     {
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = this.cover.Color(l + 6);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = this.cover.Color(l + 6);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = this.cover.Color(l + 6);
-                        (sLeaser.sprites[this.HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 3] = this.cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4] = cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 1] = cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 2] = cover.Color(l + 6);
+                        (sLeaser.sprites[HandSprite(k, 1)] as TriangleMesh).verticeColors[l * 4 + 3] = cover.Color(l + 6);
                     }
                 }
                 else
                 {
-                    sLeaser.sprites[this.HandSprite(k, 1)].color = color;
+                    sLeaser.sprites[HandSprite(k, 1)].color = color;
                 }
-                sLeaser.sprites[this.FootSprite(k, 0)].color = color;
-                sLeaser.sprites[this.FootSprite(k, 1)].color = color;
+                sLeaser.sprites[FootSprite(k, 0)].color = color;
+                sLeaser.sprites[FootSprite(k, 1)].color = color;
             }
-            if (this.umbCord != null)
+            if (umbCord != null)
             {
-                this.umbCord.ApplyPalette(sLeaser, rCam, palette);
-                sLeaser.sprites[this.firstUmbilicalSprite].color = palette.blackColor;
+                umbCord.ApplyPalette(sLeaser, rCam, palette);
+                sLeaser.sprites[firstUmbilicalSprite].color = palette.blackColor;
             }
-            else if (this.discUmbCord != null)
+            else if (discUmbCord != null)
             {
-                this.discUmbCord.ApplyPalette(sLeaser, rCam, palette);
+                discUmbCord.ApplyPalette(sLeaser, rCam, palette);
             }
-            if (this.armBase != null)
+            if (armBase != null)
             {
-                this.armBase.ApplyPalette(sLeaser, rCam, palette);
+                armBase.ApplyPalette(sLeaser, rCam, palette);
             }
         }
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            sLeaser.sprites = new FSprite[this.totalSprites];
+            sLeaser.sprites = new FSprite[totalSprites];
             for (int i = 0; i < base.owner.bodyChunks.Length; i++)
             {
-                sLeaser.sprites[this.firstBodyChunkSprite + i] = new FSprite("Circle20", true);
-                sLeaser.sprites[this.firstBodyChunkSprite + i].scale = base.owner.bodyChunks[i].rad / 10f;
-                sLeaser.sprites[this.firstBodyChunkSprite + i].color = new Color(1f, (i == 0) ? 0.5f : 0f, (i == 0) ? 0.5f : 0f);
+                sLeaser.sprites[firstBodyChunkSprite + i] = new FSprite("Circle20", true);
+                sLeaser.sprites[firstBodyChunkSprite + i].scale = base.owner.bodyChunks[i].rad / 10f;
+                sLeaser.sprites[firstBodyChunkSprite + i].color = new Color(1f, (i == 0) ? 0.5f : 0f, (i == 0) ? 0.5f : 0f);
             }
 
-            for (int j = 0; j < this.armJointGraphics.Length; j++)
+            for (int j = 0; j < armJointGraphics.Length; j++)
             {
-                this.armJointGraphics[j].InitiateSprites(sLeaser, rCam);
+                armJointGraphics[j].InitiateSprites(sLeaser, rCam);
             }
 
-            if (this.gown != null)
+            if (gown != null)
             {
-                this.gown.InitiateSprite(this.robeSprite, sLeaser, rCam);
+                gown.InitiateSprite(robeSprite, sLeaser, rCam);
             }
 
-            if (this.halo != null)
+            if (halo != null)
             {
-                this.halo.InitiateSprites(sLeaser, rCam);
+                halo.InitiateSprites(sLeaser, rCam);
             }
 
-            if (this.armBase != null)
+            if (armBase != null)
             {
-                this.armBase.InitiateSprites(sLeaser, rCam);
+                armBase.InitiateSprites(sLeaser, rCam);
             }
-            sLeaser.sprites[this.neckSprite] = new FSprite("pixel", true);
-            sLeaser.sprites[this.neckSprite].scaleX = 3f;
-            sLeaser.sprites[this.neckSprite].anchorY = 0f;
-            sLeaser.sprites[this.HeadSprite] = new FSprite("Circle20", true);
-            sLeaser.sprites[this.ChinSprite] = new FSprite("Circle20", true);
+            sLeaser.sprites[neckSprite] = new FSprite("pixel", true);
+            sLeaser.sprites[neckSprite].scaleX = 3f;
+            sLeaser.sprites[neckSprite].anchorY = 0f;
+            sLeaser.sprites[HeadSprite] = new FSprite("Circle20", true);
+            sLeaser.sprites[ChinSprite] = new FSprite("Circle20", true);
             for (int k = 0; k < 2; k++)
             {
-                sLeaser.sprites[this.EyeSprite(k)] = new FSprite("pixel", true);
+                sLeaser.sprites[EyeSprite(k)] = new FSprite("pixel", true);
 
-                sLeaser.sprites[this.PhoneSprite(k, 0)] = new FSprite("Circle20", true);
-                sLeaser.sprites[this.PhoneSprite(k, 1)] = new FSprite("Circle20", true);
-                sLeaser.sprites[this.PhoneSprite(k, 2)] = new FSprite("LizardScaleA1", true);
-                sLeaser.sprites[this.PhoneSprite(k, 2)].anchorY = 0f;
-                sLeaser.sprites[this.PhoneSprite(k, 2)].scaleY = 0.8f;
-                sLeaser.sprites[this.PhoneSprite(k, 2)].scaleX = ((k == 0) ? -1f : 1f) * 0.75f;
+                sLeaser.sprites[PhoneSprite(k, 0)] = new FSprite("Circle20", true);
+                sLeaser.sprites[PhoneSprite(k, 1)] = new FSprite("Circle20", true);
+                sLeaser.sprites[PhoneSprite(k, 2)] = new FSprite("LizardScaleA1", true);
+                sLeaser.sprites[PhoneSprite(k, 2)].anchorY = 0f;
+                sLeaser.sprites[PhoneSprite(k, 2)].scaleY = 0.8f;
+                sLeaser.sprites[PhoneSprite(k, 2)].scaleX = ((k == 0) ? -1f : 1f) * 0.75f;
 
-                sLeaser.sprites[this.HandSprite(k, 0)] = new FSprite("haloGlyph-1", true);
-                sLeaser.sprites[this.HandSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
-                sLeaser.sprites[this.FootSprite(k, 0)] = new FSprite("haloGlyph-1", true);
-                sLeaser.sprites[this.FootSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
+                sLeaser.sprites[HandSprite(k, 0)] = new FSprite("haloGlyph-1", true);
+                sLeaser.sprites[HandSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
+                sLeaser.sprites[FootSprite(k, 0)] = new FSprite("haloGlyph-1", true);
+                sLeaser.sprites[FootSprite(k, 1)] = TriangleMesh.MakeLongMesh(7, false, true);
             }
 
-            if (this.umbCord != null)
+            if (umbCord != null)
             {
-                this.umbCord.InitiateSprites(sLeaser, rCam);
+                umbCord.InitiateSprites(sLeaser, rCam);
             }
-            else if (this.discUmbCord != null)
+            else if (discUmbCord != null)
             {
-                this.discUmbCord.InitiateSprites(sLeaser, rCam);
+                discUmbCord.InitiateSprites(sLeaser, rCam);
             }
 
-            sLeaser.sprites[this.HeadSprite].scaleX = this.head.rad / 9f;
-            sLeaser.sprites[this.HeadSprite].scaleY = this.head.rad / 11f;
-            sLeaser.sprites[this.ChinSprite].scale = this.head.rad / 15f;
-            sLeaser.sprites[this.fadeSprite] = new FSprite("Futile_White", true);
-            sLeaser.sprites[this.fadeSprite].scale = 12.5f;
-            sLeaser.sprites[this.fadeSprite].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
+            sLeaser.sprites[HeadSprite].scaleX = head.rad / 9f;
+            sLeaser.sprites[HeadSprite].scaleY = head.rad / 11f;
+            sLeaser.sprites[ChinSprite].scale = head.rad / 15f;
+            sLeaser.sprites[fadeSprite] = new FSprite("Futile_White", true);
+            sLeaser.sprites[fadeSprite].scale = 12.5f;
+            sLeaser.sprites[fadeSprite].color = new Color(255f / 255f, 67f / 255f, 115f / 255f);
 
-            sLeaser.sprites[this.fadeSprite].shader = rCam.game.rainWorld.Shaders["FlatLightBehindTerrain"];
-            sLeaser.sprites[this.fadeSprite].alpha = 0.5f;
+            sLeaser.sprites[fadeSprite].shader = rCam.game.rainWorld.Shaders["FlatLightBehindTerrain"];
+            sLeaser.sprites[fadeSprite].alpha = 0.5f;
 
-            sLeaser.sprites[this.killSprite] = new FSprite("Futile_White", true);
-            sLeaser.sprites[this.killSprite].shader = rCam.game.rainWorld.Shaders["FlatLight"];
+            sLeaser.sprites[killSprite] = new FSprite("Futile_White", true);
+            sLeaser.sprites[killSprite].shader = rCam.game.rainWorld.Shaders["FlatLight"];
 
             cover.InitiateSprites(coverSprite, sLeaser, rCam);
 
@@ -461,17 +463,23 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-    public class MIFOracleBehaviour : OracleBehavior
+    public class MIFOracleBehaviour : CustomOracleBehaviour
     {
-        private Vector2 lastPos;
+        public static CustomAction MeetDroneMaster_Init = new CustomAction("MeeetDroneMaster_Init", true);
+        public static CustomAction MeetDroneMaster_DreamTalk0 = new CustomAction("MeeetDroneMaster_DreamTalk0", true);
+        public static CustomAction MeetDroneMaster_DreamTalk1 = new CustomAction("MeeetDroneMaster_DreamTalk1", true);
+        public static CustomAction MeetDroneMaster_DreamTalk2 = new CustomAction("MeeetDroneMaster_DreamTalk2", true);
 
-        private Vector2 nextPos;
+        public static Conversation.ID DroneMaster_DreamTalk0 = new Conversation.ID("DroneMaster_DreamTalk0", true);
+        public static Conversation.ID DroneMaster_DreamTalk1 = new Conversation.ID("DroneMaster_DreamTalk1", true);
+        public static Conversation.ID DroneMaster_DreamTalk2 = new Conversation.ID("DroneMaster_DreamTalk2", true);
 
-        private Vector2 lastPosHandle;
+        public static CustomSubBehaviour.CustomSubBehaviourID MeetDroneMaster = new CustomSubBehaviour.CustomSubBehaviourID("MeetDroneMaster", true);
 
-        private Vector2 nextPosHandle;
+        public int ConversationHad = 0;
 
-        private Vector2 currentGetTo;
+        public override int GetWorkingPalette => 79;
+        public override Vector2 GetToDir => Vector2.up;
 
         public MIFOracleBehaviour(Oracle oracle) : base(oracle) 
         {
@@ -480,16 +488,214 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public override void Update(bool eu)
         {
             base.Update(eu);
-
-            //this.currentGetTo = Custom.Bezier(this.lastPos, this.ClampVectorInRoom(this.lastPos + this.lastPosHandle), this.nextPos, this.ClampVectorInRoom(this.nextPos + this.nextPosHandle), this.pathProgression);
         }
 
-        public Vector2 ClampVectorInRoom(Vector2 v)
+        public override void SeePlayer()
         {
-            Vector2 result = v;
-            result.x = Mathf.Clamp(result.x, this.oracle.arm.cornerPositions[0].x + 10f, this.oracle.arm.cornerPositions[1].x - 10f);
-            result.y = Mathf.Clamp(result.y, this.oracle.arm.cornerPositions[2].y + 10f, this.oracle.arm.cornerPositions[1].y - 10f);
-            return result;
+            base.SeePlayer();
+            Plugin.Log("Oracle see player");
+
+            if(ConversationHad == 0)
+            {
+                ConversationHad++;
+                NewAction(MeetDroneMaster_Init);
+            }
+        }
+
+
+        public override void NewAction(CustomAction nextAction)
+        {
+            Plugin.Log(string.Concat(new string[]
+            {
+                "new action: ",
+                nextAction.ToString(),
+                " (from ",
+                action.ToString(),
+                ")"
+            }));
+
+            if (nextAction == action) return;
+            CustomSubBehaviour.CustomSubBehaviourID customSubBehaviourID = null;
+
+            if (nextAction == MeetDroneMaster_Init ||
+                nextAction == MeetDroneMaster_DreamTalk0 ||
+                nextAction == MeetDroneMaster_DreamTalk1 ||
+                nextAction == MeetDroneMaster_DreamTalk2)
+            {
+                customSubBehaviourID = MeetDroneMaster;
+            }
+            else
+                customSubBehaviourID = CustomSubBehaviour.CustomSubBehaviourID.General;
+
+            currSubBehavior.NewAction(action, nextAction);
+            if (customSubBehaviourID != CustomSubBehaviour.CustomSubBehaviourID.General && customSubBehaviourID != currSubBehavior.ID)
+            {
+                CustomSubBehaviour subBehavior = null;
+                for (int i = 0; i < allSubBehaviors.Count; i++)
+                {
+                    if (allSubBehaviors[i].ID == customSubBehaviourID)
+                    {
+                        subBehavior = allSubBehaviors[i];
+                        break;
+                    }
+                }
+                if (subBehavior == null)
+                {
+                    if(customSubBehaviourID == MeetDroneMaster)
+                    {
+                        subBehavior = new MIFOracleMeetDroneMaster(this);
+                    }
+                    allSubBehaviors.Add(subBehavior);
+                }
+                subBehavior.Activate(action, nextAction);
+                currSubBehavior.Deactivate();
+                Plugin.Log("Switching subbehavior to: " + subBehavior.ID.ToString() + " from: " + this.currSubBehavior.ID.ToString());
+                currSubBehavior = subBehavior;
+            }
+            inActionCounter = 0;
+            action = nextAction;
+        }
+
+        public override void AddConversationEvents(CustomOracleConversation conv, Conversation.ID id)
+        {
+            if(id == DroneMaster_DreamTalk0)
+            {
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Great success!", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "The way they say it works really works!", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
+                conv.events.Add(new PauseAndWaitForStillEvent(conv, conv.convBehav, 40));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Oh little one you are awake, how does it feel to be in this world?", 0));
+            }
+            else if(id == DroneMaster_DreamTalk1)
+            {
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "The current environment outside is too dangerous even for you.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "To keep you safe, I made this for you.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "A drone backpack, although you may not always understand it, but it will protect you to the maximum extent.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Also if you are not too far from my precinct, I can talk to you through it.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "I hope you will like it.", 0));
+            }
+        }
+    }
+
+    public class MIFOracleMeetDroneMaster : CustomConversationBehaviour
+    {
+
+        #region DreamTalk1
+        public LightSource portShowLight;
+        public static readonly int movePortCounter = 400;
+
+        public int currentMovePortCounter = 0;
+        #endregion
+        public MIFOracleMeetDroneMaster(MIFOracleBehaviour owner) : base(owner, MIFOracleBehaviour.MeetDroneMaster, MIFOracleBehaviour.DroneMaster_DreamTalk0)
+        {
+            owner.getToWorking = 1f;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (player == null) return;
+
+
+
+            if (action == MIFOracleBehaviour.MeetDroneMaster_Init)
+            {
+                movementBehavior = CustomMovementBehavior.Idle;
+                if (inActionCounter > 300)
+                {
+                    owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
+                    return;
+                }
+            }
+            else if(action == MIFOracleBehaviour.MeetDroneMaster_DreamTalk0)
+            {
+                if (owner.conversation != null)
+                {
+                    if (owner.conversation.events.Count < 3)//前三句话说完了
+                        movementBehavior = CustomMovementBehavior.Talk;
+                    else
+                        movementBehavior = CustomMovementBehavior.Idle;
+
+                    if (owner.conversation.slatedForDeletion)
+                    {
+                        owner.conversation = null;
+                        //owner.NewAction(CustomAction.General_Idle);
+
+                        if(DroneMasterDream.instance != null)
+                        {
+                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
+                        }
+                        return;
+                    }
+                }
+            }
+            else if(action == MIFOracleBehaviour.MeetDroneMaster_DreamTalk1)
+            {
+                if (owner.conversation != null)
+                {
+                    movementBehavior = CustomMovementBehavior.Talk;
+
+                    if (PlayerPatchs.modules.TryGetValue(player, out var pmodule))
+                    {
+                        if (DronePortOverride.overrides.TryGetValue(pmodule.port, out var overrides) && currentMovePortCounter < movePortCounter)
+                        {
+                            currentMovePortCounter++;
+                            overrides.connectToDMProggress = currentMovePortCounter / (float)movePortCounter;
+
+                            overrides.dronePortGraphicsPos = oracle.firstChunk.pos + Vector2.left * 40f;
+                            overrides.dronePortGraphicsRotation += 10f;
+
+                            
+                            if (portShowLight == null)
+                            {
+                                portShowLight = new LightSource(overrides.currentPortPos, false, new Color(255f / 255f, 67f / 255f, 115f / 255f), oracle) { alpha = 10f,rad = 200f};
+                                oracle.room.AddObject(portShowLight);
+                            }
+                            portShowLight.pos = overrides.currentPortPos;
+                        }
+                        else
+                        {
+                            if(portShowLight != null)
+                            {
+                                oracle.room.PlaySound(SoundID.Gate_Clamp_Lock, player.mainBodyChunk, false, 1f, 2.2f + Random.value);
+                                oracle.room.AddObject(new ExplosionSpikes(oracle.room,player.mainBodyChunk.pos,5,40f,50,10f,20f,Color.white));
+
+                                portShowLight.Destroy();
+                                portShowLight = null;
+                            }
+                        }
+                    }
+
+
+                    if (owner.conversation.slatedForDeletion)
+                    {
+                        owner.conversation = null;
+                        if (DroneMasterDream.instance != null)
+                        {
+                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
+                        }
+                        return;
+                    }
+                } 
+            }
+        }
+
+        public override void NewAction(CustomAction oldAction, CustomAction newAction)
+        {
+            base.NewAction(oldAction, newAction);
+            if (newAction == MIFOracleBehaviour.MeetDroneMaster_DreamTalk0)
+            {
+                owner.InitateConversation(MIFOracleBehaviour.DroneMaster_DreamTalk0, this);
+            }
+            else if(newAction == MIFOracleBehaviour.MeetDroneMaster_DreamTalk1)
+            {
+                owner.InitateConversation(MIFOracleBehaviour.DroneMaster_DreamTalk1, this);
+            }
+            else if (newAction == CustomAction.General_Idle)
+            {
+                owner.getToWorking = 1f;
+            }
         }
     }
 }

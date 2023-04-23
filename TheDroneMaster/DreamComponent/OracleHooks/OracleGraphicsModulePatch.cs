@@ -2,6 +2,8 @@
 using IL;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using On;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +22,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             On.OracleGraphics.ArmJointGraphics.HighLightColor += ArmJointGraphics_HighLightColor;
 
             On.OracleGraphics.UbilicalCord.ApplyPalette += UbilicalCord_ApplyPalette1;
-
             On.OracleGraphics.Gown.Color += Gown_Color;
         }
+
 
         private static Color Gown_Color(On.OracleGraphics.Gown.orig_Color orig, OracleGraphics.Gown self, float f)
         {

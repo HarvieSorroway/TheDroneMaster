@@ -131,7 +131,7 @@ namespace TheDroneMaster.GameHooks
                 modules.Add(self, new RainWorldGameModule(self, manager));
             }
 
-            Plugin.Log(String.Format("SaveState current karma : {0}", self.GetStorySession.saveState.deathPersistentSaveData.karma));
+            //Plugin.Log(String.Format("SaveState current karma : {0}", self.GetStorySession.saveState.deathPersistentSaveData.karma));
         }
     }
 
@@ -179,7 +179,7 @@ namespace TheDroneMaster.GameHooks
                 }
                 else
                 {
-                    Plugin.Log(String.Format("DroneMaster in dream ticks : {0}", session.playerSessionRecords[0].time));
+                    //Plugin.Log(String.Format("DroneMaster in dream ticks : {0}", session.playerSessionRecords[0].time));
                 }
             }
         }
@@ -191,6 +191,7 @@ namespace TheDroneMaster.GameHooks
                 Plugin.Log("Manger module lost, stop end dronemaster dream");
                 return;
             }
+            if (DreamFinished) return;
 
             managerModule.droneMasterDreamNumber = -1;
             DreamFinished = true;

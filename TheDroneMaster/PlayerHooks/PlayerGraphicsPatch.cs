@@ -71,7 +71,7 @@ namespace TheDroneMaster
             orig.Invoke(self, sLeaser, rCam, newContatiner);
             if(PlayerPatchs.modules.TryGetValue(self.player, out var module) && module.ownDrones && module.graphicsInited)
             {
-                FContainer container = newContatiner == null ? rCam.ReturnFContainer("Midground") : newContatiner;
+                FContainer container = rCam.ReturnFContainer("Midground");
 
                 container.AddChild(sLeaser.sprites[module.newEyeIndex]);
                 sLeaser.sprites[module.newEyeIndex].MoveInFrontOfOtherNode(sLeaser.sprites[9]);

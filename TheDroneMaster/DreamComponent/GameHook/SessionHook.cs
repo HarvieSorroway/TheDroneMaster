@@ -1,7 +1,11 @@
 ﻿using Mono.Cecil.Cil;
+using MoreSlugcats;
+using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -9,7 +13,7 @@ using static TheDroneMaster.CreatureScanner;
 using static TheDroneMaster.PlayerPatchs;
 using Random = UnityEngine.Random;
 
-namespace TheDroneMaster.DreamComponent.GameHook
+namespace TheDroneMaster.GameHooks
 {
     static public class SessionHook
     {
@@ -32,9 +36,11 @@ namespace TheDroneMaster.DreamComponent.GameHook
 
     public class DroneMasterEnding : UpdatableAndDeletable
     {
+   
         public DroneMasterEnding(Room room)
         {
             this.room= room;
+            creatureQueue = new Queue<CreatureTemplate.Type>();
             var player = room.game.FirstAlivePlayer;
             if(player.realizedCreature != null 
                 && Plugin.OwnLaserDrone.TryGet(player.realizedCreature as Player, out bool ownLaserDrone) 
@@ -42,7 +48,14 @@ namespace TheDroneMaster.DreamComponent.GameHook
                 && PlayerPatchs.modules.TryGetValue(focusedPlayer, out module))
             {
                 focusedPlayer = player.realizedCreature as Player;
+
                 //TODO : 获取扫描的生物
+                creatureQueue.Enqueue(CreatureTemplate.Type.BigEel);
+                creatureQueue.Enqueue(CreatureTemplate.Type.LizardTemplate);
+                creatureQueue.Enqueue(CreatureTemplate.Type.CicadaA);
+                creatureQueue.Enqueue(CreatureTemplate.Type.MirosBird);
+                creatureQueue.Enqueue(CreatureTemplate.Type.Salamander);
+                creatureQueue.Enqueue(CreatureTemplate.Type.Scavenger);
             }
         }
 
@@ -50,67 +63,129 @@ namespace TheDroneMaster.DreamComponent.GameHook
         {
             base.Update(eu);
             endingCounter++;
-            if(curSender == null || curSender.slatedForDeletetion)
+            if (curSenders < curMaxSenders && (--nextSenderCd) < 0)
             {
-                curSender = new CreatureEndingSender(creatureQueue.Dequeue(),room,Vector2.zero);
-                room.AddObject(curSender);
+                nextSenderCd = Random.Range(40, 80);
+                curMaxSenders = Random.Range(2, 4);
+                curSenders++;
+                room.AddObject(new CreatureEndingSender(this, creatureQueue.Dequeue(), room, Vector2.Lerp(centerPos,room.RandomPos(),0.7f)));
             }
                 
         }
         Player focusedPlayer;
-        PlayerModule module;
+        public PlayerModule module;
         Queue<CreatureTemplate.Type> creatureQueue;
-        CreatureEndingSender curSender = null;
+        public int curSenders = 0;
+        int curMaxSenders = 3;
+        int nextSenderCd = 0;
+        public Vector2 centerPos;
         int endingCounter = 0;
 
         public class CreatureEndingSender : CosmeticSprite, IOwnProjectedCircles
         {
+            //TODO: DEBUG
+            public PlayerModule module;
             //Type也是临时用
-            public CreatureEndingSender(CreatureTemplate.Type type,Room room,Vector2 pos)
+            public CreatureEndingSender(DroneMasterEnding owner, CreatureTemplate.Type type,Room room,Vector2 pos)
             {
                 this.type = type;
                 this.room = room;
                 this.pos = pos;
                 var state = Random.state;
                 Random.InitState(114514 + type.index);
- 
+
+                icon = new FSprite(CreatureSymbol.SpriteNameOfCreature(new CreatureSymbol.IconSymbolData(type, AbstractPhysicalObject.AbstractObjectType.Creature, 0)), true) { isVisible = false, alpha = 1f };
+                icon.color = Color.cyan; //TODO : Delete
+                icon.shader = room.game.rainWorld.Shaders["Hologram"];
+
                 //Just for Test
-                bool[] allBools = new bool[] { Random.value<0.5,  Random.value < 0.5, Random.value < 0.5, Random.value < 0.5, Random.value < 0.5,Random.value < 0.5,false };
-                for(int i=0;i<allBools.Length;i++)
+                bool[] allBools = new bool[] { Random.value<0.5,  Random.value < 0.2, Random.value < 0.9, Random.value < 0.5, Random.value < 0.5,Random.value < 0.5,false };
+                compressed = new TagCompressed(this,type.index,allBools.Length, ref spriteCount);
+                for (int i=0;i<allBools.Length;i++)
                 {
-                    messages[i] = new TagMessage(type, allBools[i],ref spriteCount, i);
-                    compresseds[i] = new TagCompressed(ref spriteCount, i);
-                    overlays[i] = new TagOverlay(messages[i], compresseds[i], ref spriteCount,i);
+                    messages[i] = new TagMessage(room,allBools[i],ref spriteCount, i);
+                    overlays[i] = new TagOverlay(messages[i], compressed, ref spriteCount,i);
                     allParts.Enqueue(messages[i]);
                     allParts.Enqueue(overlays[i]);
-                    allParts.Enqueue(compresseds[i]);
                 }
+                
+
+                room.AddObject(creatureCircle = new ScanProjectedCircle(room, this, 1, 0f, Color.cyan,null /*ownerCircle*/));
+
                 Random.state = state;
             }
 
             public override void Update(bool eu)
             {
                 base.Update(eu);
-                if (allParts.Count != 0)
+
+                count++;
+                if (isMoveState)
                 {
-                    allParts.First().Update();
-                    if (allParts.First().NeedDelete)
-                        allParts.Dequeue();
+                    compressed.Update();
+
+                    creatureCircle.circleThickness = 0.07f;
+                    creatureCircle.getToRad = stdRad * 1.0f;
+
+                    pos = Vector2.Lerp(pos, (pos - new Vector2(50, 20) + new Vector2(0, 100)), 0.005f);
+
+                    if(count == 160)
+                    {
+                        slatedForDeletetion = true;
+                        if (owner != null)
+                            owner.curSenders--;
+                    }
+                }
+                else
+                {
+                    if(module != null)
+                    {
+                        module.portGraphics.Cast(pos, creatureCircle.rad);
+                    }
+                    if (creatureCircle.rad < stdRad - 0.05f && count < 100)
+                    {
+                        creatureCircle.getToRad = stdRad;
+                        creatureCircle.circleThickness = 1f;
+                    }
+                    else if (creatureCircle.rad < stdRad * 1.5f - 0.05f && count < 100)
+                    {
+                        creatureCircle.circleThickness = 0.1f;
+                        creatureCircle.getToRad = stdRad * 1.5f;
+
+                    }
+                    else if (count >= 120)
+                    {
+                        if (allParts.Count != 0)
+                        {
+                            allParts.First().Update();
+                            if (allParts.First().NeedDelete)
+                                allParts.Dequeue();
+                        }
+                        else
+                        {
+                            count = 0;
+                            isMoveState = true;
+                        }
+                        compressed.Update();
+
+                        creatureCircle.circleThickness = 0.1f;
+                        creatureCircle.getToRad = stdRad * 1.5f;
+                    }
                 }
             }
 
             public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
             {
-                sLeaser.sprites = new FSprite[spriteCount];
-                foreach(var i in messages)
+                sLeaser.sprites = new FSprite[spriteCount+1];
+                sLeaser.sprites[spriteCount] = icon;
+                foreach (var i in messages)
                     i.InitiateSprites(sLeaser, rCam);
 
                 foreach (var i in overlays)
                     i.InitiateSprites(sLeaser, rCam);
 
 
-                foreach (var i in compresseds)
-                    i.InitiateSprites(sLeaser, rCam);
+                compressed.InitiateSprites(sLeaser, rCam);
 
                 AddToContainer(sLeaser, rCam, null);
                 
@@ -118,34 +193,54 @@ namespace TheDroneMaster.DreamComponent.GameHook
 
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
             {
-                if (allParts.Count != 0)
-                    allParts.First().DrawSprites(sLeaser, rCam, timeStacker, camPos, pos);
+                if (slatedForDeletetion)
+                    sLeaser.CleanSpritesAndRemove();
+
+                if(count == 30)
+                    icon.isVisible = true;
+                icon.SetPosition(pos - camPos);
+
+                if (count >= 120)
+                {
+                    if (allParts.Count != 0)
+                        allParts.First().DrawSprites(sLeaser, rCam, timeStacker, camPos, pos + Vector2.right * 120);
+                }
+                compressed.DrawSprites(sLeaser, rCam, timeStacker, camPos, pos + Vector2.right * 120);
             }
 
-
-            public Vector2 CircleCenter(int index, float timeStacker)
+            Vector2 IOwnProjectedCircles.CircleCenter(int index, float timeStacker)
             {
-                throw new NotImplementedException();
+                return pos;
             }
 
-            public Room HostingCircleFromRoom()
+            Room IOwnProjectedCircles.HostingCircleFromRoom()
             {
-                throw new NotImplementedException();
+                return room;
             }
 
-            public bool CanHostCircle()
+            bool IOwnProjectedCircles.CanHostCircle()
             {
-                throw new NotImplementedException();
+                return true;
             }
 
- 
-            int curIndex = 0;
+            int count = 0;
             int spriteCount = 0;
+            bool isMoveState = false;
             CreatureTemplate.Type type;
             TagMessage[] messages = new TagMessage[7];
             TagOverlay[] overlays = new TagOverlay[7];
-            TagCompressed[] compresseds = new TagCompressed[7];
+            TagCompressed compressed;
             Queue<SenderPart> allParts = new Queue<SenderPart>();
+            DroneMasterEnding owner;
+
+            ScanProjectedCircle creatureCircle;
+
+            public static readonly float stdRad = 40f;
+            public static readonly float glphyScale = 1.5f;
+
+            public float CurRad { get => creatureCircle.rad; }
+
+            FSprite icon;
         }
 
         public class SenderPart
@@ -156,15 +251,18 @@ namespace TheDroneMaster.DreamComponent.GameHook
             public int filterIndex;
             public readonly int yBias = 17;
 
+            public Room room;
+
             bool isInit = false;
 
-            public SenderPart(int startSprite, int filterIndex, Color? color)
+            public SenderPart(int startSprite, int filterIndex, Color? color, Room room)
             {
                 this.startSprite = startSprite;
                 this.filterIndex = filterIndex;
 
                 if (color.HasValue)
                     this.color = color.Value;
+                this.room = room;
             }
 
             public void SetSpriteOffest(ref int start)
@@ -195,40 +293,86 @@ namespace TheDroneMaster.DreamComponent.GameHook
 
         public class TagCompressed : SenderPart
         {
-            public TagCompressed(ref int startSprite, int filterIndex, Color? color = null) : base(startSprite, filterIndex, color)
+            public int seed = 0;
+            public int[] counts;
+            public float[] toDeg;
+
+            float degVel = 20;
+            float degOffest = 0;
+
+            CreatureEndingSender owner;
+
+
+            public TagCompressed(CreatureEndingSender owner, int seed, int length,ref int startSprite, Color? color = null) : base(startSprite, 0, color, owner.room)
             {
-                totalSprites = 1;
+                this.seed = seed;
+                this.owner = owner;
+                totalSprites = length;
+                counts = new int[totalSprites];
+                toDeg = new float[totalSprites];
+                for (int i=0;i<totalSprites;++i) 
+                { 
+                    counts[i] = -1;
+                    toDeg[i] = i * 360 / totalSprites;
+                }
                 SetSpriteOffest(ref startSprite);
             }
 
             public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
             {
-                sLeaser.sprites[startSprite] = new FSprite("BigGlyph" + Random.Range(0, 12));
-                sLeaser.sprites[startSprite].isVisible = false;
-                sLeaser.sprites[startSprite].color = color;
-                sLeaser.sprites[startSprite].SetAnchor(Vector2.zero);
+                for (int i = 0; i < totalSprites; i++)
+                {
+                    sLeaser.sprites[startSprite + i] = new FSprite("BigGlyph" + (seed + i)%13);
+                    sLeaser.sprites[startSprite + i].scale = CreatureEndingSender.glphyScale;
+                    sLeaser.sprites[startSprite + i].isVisible = false;
+                    sLeaser.sprites[startSprite + i].color = color;
+                    sLeaser.sprites[startSprite + i].shader = rCam.room.game.rainWorld.Shaders["Hologram"];
+                    sLeaser.sprites[startSprite + i].SetAnchor(Vector2.zero);
+                }
+                    
             }
 
-            public void ShowGlyph(RoomCamera.SpriteLeaser sLeaser,Vector2 pos,Vector2 camPos)
+            public void ShowGlyph(RoomCamera.SpriteLeaser sLeaser,int index)
             {
-                sLeaser.sprites[startSprite].isVisible = true;
-               
-                sLeaser.sprites[startSprite].x = pos.x - camPos.x;
-                sLeaser.sprites[startSprite].y = pos.y - filterIndex*yBias - camPos.y;
+
+                sLeaser.sprites[startSprite + index].isVisible = true;
+                counts[index] = 0;
+
             }
 
             public override void Update()
             {
                 base.Update();
+                for(int i=0;i< totalSprites;i++)
+                    if (counts[i] != -1) 
+                        counts[i]++;
+
+                degOffest += degVel / 40;
+
+
             }
 
-            public override bool NeedDelete => counter > 40;
+            public override bool NeedDelete => false;
 
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos, Vector2 pos)
             {
-                
+                for (int i = 0; i < totalSprites; i++)
+                {
+                    //TODO : 改成offest vector
+                    var offestCenter = (pos - (Vector2.right * 120));
+                    var radVec = Custom.DegToVec(toDeg[i] + degOffest) * owner.CurRad * 1.5f;
+                    sLeaser.sprites[startSprite + i].x = Mathf.Lerp(pos.x,offestCenter.x + radVec.x,Timer(i)) - camPos.x;
+                    sLeaser.sprites[startSprite + i].y = Mathf.Lerp(pos.y - i* yBias, offestCenter.y + radVec.y, Timer(i)) - camPos.y;
+                    sLeaser.sprites[startSprite + i].anchorX = Timer(i) * 0.5f;
+                    sLeaser.sprites[startSprite + i].anchorY = Timer(i) * 0.5f;
+                }
+
             }
 
+            float Timer(int index)
+            {
+                return Mathf.SmoothStep(0,1,Mathf.Pow(Mathf.Clamp01((counts[index]-10f) / 30f),0.6f));
+            }
         }
 
         public class TagOverlay : SenderPart
@@ -238,22 +382,22 @@ namespace TheDroneMaster.DreamComponent.GameHook
             public TagCompressed compressed;
             public int pixelPreCounter = 2;
 
-            public float bigWidth=15;
-            public float bigHeight=20;
+            public float bigWidth = 15 * CreatureEndingSender.glphyScale;
+            public float bigHeight= 20 * CreatureEndingSender.glphyScale;
 
             int endCount = 110;
             float width;
             float height;
 
             public override bool NeedDelete { get => counter > endCount; }
-            public TagOverlay(TagMessage message, TagCompressed compressed , ref int startSprite, int filterIndex, Color? color = null) : base(startSprite,filterIndex,  color)
+            public TagOverlay(TagMessage message, TagCompressed compressed , ref int startSprite, int filterIndex, Color? color = null) : base(startSprite,filterIndex, color, compressed.room)
             {
                 this.message = message;
                 this.compressed = compressed;
 
-                totalSprites = 5;
+                totalSprites = 4+2;
 
-                width = (message.glyphs.Length+1) * 10;
+                width = (message.glyphs.Length+2) * 10;
 
                 if (color.HasValue)
                     this.color = color.Value;
@@ -271,10 +415,14 @@ namespace TheDroneMaster.DreamComponent.GameHook
                     sLeaser.sprites[startSprite + i] = new FSprite("pixel");
                     //sLeaser.sprites[startSprite + i].isVisible = false;
                 }
+
                 var sprite = new CustomFSprite("pixel");
                 sLeaser.sprites[startSprite + totalSprites - 1] = sprite;
                 sLeaser.sprites[startSprite + totalSprites - 1].isVisible = false;
+                for (int j = 0; j < 4; j++)
+                    sprite.verticeColors[j] = color;
 
+                sLeaser.sprites[startSprite + totalSprites - 1].shader = rCam.room.game.rainWorld.Shaders["Hologram"];
                 sLeaser.sprites[startSprite].anchorX = 0.5f;
                 sLeaser.sprites[startSprite].anchorY = 0f;
 
@@ -291,8 +439,7 @@ namespace TheDroneMaster.DreamComponent.GameHook
                 {
                     sLeaser.sprites[startSprite + i].color = color;
                 }
-                for(int i=0;i<4;i++)
-                 sprite.verticeColors[i] = color;
+    
             }
 
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos, Vector2 pos)
@@ -322,13 +469,15 @@ namespace TheDroneMaster.DreamComponent.GameHook
                 }
                 else if(counter < 60)
                 {
+                    var lerpTimer = Mathf.SmoothStep(0, 1, (counter - 40) / 20f);
+
                     var sprite = sLeaser.sprites[startSprite + totalSprites - 1] as CustomFSprite;
-                    var lerpTimer = Mathf.SmoothStep(0,1,(counter - 40)/20f);
-       
+
                     sprite.MoveVertice(0, starPos - camPos + new Vector2(width * (1 - lerpTimer), 0));
                     sprite.MoveVertice(1, starPos - camPos + new Vector2(width * (1 - lerpTimer), height));
-                    sprite.MoveVertice(2, starPos - camPos + new Vector2(width,  height));
+                    sprite.MoveVertice(2, starPos - camPos + new Vector2(width, height));
                     sprite.MoveVertice(3, starPos - camPos + new Vector2(width, 0));
+
                 }
                 else if(counter == 60)
                 {
@@ -338,11 +487,14 @@ namespace TheDroneMaster.DreamComponent.GameHook
                 }
                 else if(counter < 90)
                 {
-                    var sprite = sLeaser.sprites[startSprite + totalSprites - 1] as CustomFSprite;
+                   
                     var heightTimer = Mathf.SmoothStep(0, 1, (counter - 60) / 30f);
                     var widthTimer = Mathf.SmoothStep(0, 1, (counter - 70) / 20f);
                     var tmpWidth = Mathf.Lerp(width, bigWidth, widthTimer);
                     var tmpHeight = Mathf.Lerp(height,bigHeight, heightTimer);
+
+                    var sprite = sLeaser.sprites[startSprite + totalSprites - 1] as CustomFSprite;
+
                     sprite.MoveVertice(0, starPos - camPos + new Vector2(0, 0));
                     sprite.MoveVertice(1, starPos - camPos + new Vector2(0, tmpHeight));
                     sprite.MoveVertice(2, starPos - camPos + new Vector2(tmpWidth, tmpHeight));
@@ -351,17 +503,19 @@ namespace TheDroneMaster.DreamComponent.GameHook
                 }
                 else if(counter == 90)
                 {
-                    compressed.ShowGlyph(sLeaser,pos,camPos);
+                    compressed.ShowGlyph(sLeaser, filterIndex);
                 }
                 else if(counter < 100)
                 {
-                    var sprite = sLeaser.sprites[startSprite + totalSprites - 1] as CustomFSprite;
                     var lerpTimer = Mathf.SmoothStep(0, 1, (counter - 90) / 10f);
-        
+
+                    var sprite = sLeaser.sprites[startSprite + totalSprites - 1] as CustomFSprite;
+
                     sprite.MoveVertice(0, starPos - camPos + new Vector2(0, bigHeight * lerpTimer));
                     sprite.MoveVertice(1, starPos - camPos + new Vector2(0, bigHeight));
                     sprite.MoveVertice(2, starPos - camPos + new Vector2(bigWidth, bigHeight));
                     sprite.MoveVertice(3, starPos - camPos + new Vector2(bigWidth, bigHeight * lerpTimer));
+
                 }
                 else if (counter == 100)
                 {
@@ -384,7 +538,7 @@ namespace TheDroneMaster.DreamComponent.GameHook
             public int charTime = 3;
 
             //Type也是临时用
-            public TagMessage(CreatureTemplate.Type type,  bool check,ref int startSprite, int filterIndex,Color? color = null) : base(startSprite, filterIndex, color)
+            public TagMessage(Room room,bool check,ref int startSprite, int filterIndex,Color? color = null) : base(startSprite, filterIndex, color,room)
             {
                 this.check = check;
                 totalSprites = 1;
@@ -393,7 +547,7 @@ namespace TheDroneMaster.DreamComponent.GameHook
                     this.color = color.Value;   
 
                 var state = Random.state;
-                Random.InitState(114514 + type.Index);
+                Random.InitState(10000 + filterIndex);
 
                 glyphs = new GlyphRepresent[Random.Range(5, 15)];
                 int x = 1; //第一个是选择框
@@ -453,16 +607,19 @@ namespace TheDroneMaster.DreamComponent.GameHook
                 {
                     if (represent.isSpaceOrChangeLine) continue;
                     sLeaser.sprites[index].SetPosition(starPos.x + (represent.indexX * 10f) - rCam.pos.x, starPos.y - represent.indexY * 10f - rCam.pos.y);
-                    sLeaser.sprites[index].isVisible = ((index - startSprite) * charTime) - 2 < counter;
-                    if ((index * charTime) - 2 < counter && ((index - startSprite) * charTime) > counter && Random.value<0.2f)
+                    sLeaser.sprites[index].isVisible = ((index - startSprite) * charTime) - 1 < counter;
+                    if ((index * charTime) - 1 < counter && ((index - startSprite) * charTime) >= counter)
                         sLeaser.sprites[index].element = Futile.atlasManager.GetElementWithName("TinyGlyph" + Random.Range(0, 14).ToString());
                     else
                         sLeaser.sprites[index].element = Futile.atlasManager.GetElementWithName(represent.spriteName);
+                    if(((index - startSprite) * charTime)== counter)
+                        room.PlaySound(SoundID.SS_AI_Text, pos);
                     index++;
                 }
 
                 if ((index - startSprite) * charTime < counter && afterShowCounter == -1)
                 {
+                    room.PlaySound(MoreSlugcatsEnums.MSCSoundID.Data_Bit, pos);
                     afterShowCounter = 0;
                 }
             }
