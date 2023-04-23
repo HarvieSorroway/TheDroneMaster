@@ -604,7 +604,21 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 movementBehavior = CustomMovementBehavior.Idle;
                 if (inActionCounter > 300)
                 {
-                    owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
+                    if(CustomDreamHook.currentActivateDream != null)
+                    {
+                        if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
+                        {
+                            owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk0);
+                            return;
+                        }
+                        else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
+                        {
+                            owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
+                            return;
+                        }
+                    }
+
+                    owner.NewAction(CustomAction.General_Idle);
                     return;
                 }
             }
@@ -622,9 +636,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         owner.conversation = null;
                         //owner.NewAction(CustomAction.General_Idle);
 
-                        if(DroneMasterDream.instance != null)
+                        if(CustomDreamHook.currentActivateDream != null)
                         {
-                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
+                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
                         }
                         return;
                     }
@@ -671,9 +685,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     if (owner.conversation.slatedForDeletion)
                     {
                         owner.conversation = null;
-                        if (DroneMasterDream.instance != null)
+                        if (CustomDreamHook.currentActivateDream != null)
                         {
-                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
+                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
                         }
                         return;
                     }

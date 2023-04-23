@@ -22,7 +22,7 @@ namespace TheDroneMaster.GameHook
             ProcessManagerPatch.modules.TryGetValue(self.manager, out var managerModule);
             if (game != null && RainWorldGamePatch.modules.TryGetValue(game, out var module))
             {
-                if(module.IsDroneMasterDream && module.packageFromSleepScreen != null)
+                if (module.IsDroneMasterDream && module.packageFromSleepScreen != null)
                 {
                     package = module.packageFromSleepScreen;
                     package.saveState = managerModule.saveStateBuffer;

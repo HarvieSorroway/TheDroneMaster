@@ -90,7 +90,7 @@
     <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
-    <Compile Include="DreamComponent\DreamHook\NutilsDreamHooks.cs" />
+    <Compile Include="DreamComponent\DreamHook\CustomDreamHook.cs" />
     <Compile Include="DreamComponent\GameHook\PlayerProgressionHooks.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracle.cs" />
     <Compile Include="DreamComponent\OracleHooks\MIFOracle.cs" />

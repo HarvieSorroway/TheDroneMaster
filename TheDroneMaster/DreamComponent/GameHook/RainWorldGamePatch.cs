@@ -30,7 +30,7 @@ namespace TheDroneMaster.GameHooks
 
         private static void StoryGameSession_TimeTick(On.StoryGameSession.orig_TimeTick orig, StoryGameSession self, float dt)
         {
-            if(modules.TryGetValue(self.game,out var module))
+            if (modules.TryGetValue(self.game, out var module))
             {
                 if (module.IsDroneMasterDream && module.DreamFinished)
                 {
@@ -43,7 +43,7 @@ namespace TheDroneMaster.GameHooks
         private static void RainWorldGame_RawUpdate(MonoMod.Cil.ILContext il)
         {
             ILCursor c = new ILCursor(il);
-            if(c.TryGotoNext(MoveType.After,
+            if (c.TryGotoNext(MoveType.After,
                i => i.MatchLdarg(0),
                i => i.Match(OpCodes.Ldfld),
                i => i.MatchLdfld<ProcessManager>("artificerDreamNumber"),
@@ -77,7 +77,7 @@ namespace TheDroneMaster.GameHooks
 
                     c.Emit(OpCodes.Brtrue_S, skipLabel);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Debug.LogException(ex);
                 }
@@ -96,7 +96,7 @@ namespace TheDroneMaster.GameHooks
 
         private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
         {
-            if(modules.TryGetValue(self,out var module))
+            if (modules.TryGetValue(self, out var module))
             {
                 ProcessManagerModule managerModule = null;
                 if (!module.IsDroneMasterDream)
@@ -109,7 +109,7 @@ namespace TheDroneMaster.GameHooks
                 }
                 else return;
 
-                Plugin.Log(String.Format("RainWorldGame win, {0}, {1}, {2}",module.IsDroneMasterDream, managerModule, managerModule.tempProgressionBuffer));
+                Plugin.Log(String.Format("RainWorldGame win, {0}, {1}, {2}", module.IsDroneMasterDream, managerModule, managerModule.tempProgressionBuffer));
             }
             orig.Invoke(self, malnourished);
         }
@@ -117,7 +117,7 @@ namespace TheDroneMaster.GameHooks
         private static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)
         {
             orig.Invoke(self);
-            if(modules.TryGetValue(self,out var module))
+            if (modules.TryGetValue(self, out var module))
             {
                 module.Update(self);
             }
@@ -126,7 +126,7 @@ namespace TheDroneMaster.GameHooks
         private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
         {
             orig.Invoke(self, manager);
-            if(!modules.TryGetValue(self,out var _))
+            if (!modules.TryGetValue(self, out var _))
             {
                 modules.Add(self, new RainWorldGameModule(self, manager));
             }
@@ -146,11 +146,11 @@ namespace TheDroneMaster.GameHooks
 
         public KarmaLadderScreen.SleepDeathScreenDataPackage packageFromSleepScreen;
 
-        public RainWorldGameModule(RainWorldGame game,ProcessManager manager)
+        public RainWorldGameModule(RainWorldGame game, ProcessManager manager)
         {
             gameRef = new WeakReference<RainWorldGame>(game);
 
-            if(ProcessManagerPatch.modules.TryGetValue(manager,out var managerModule))
+            if (ProcessManagerPatch.modules.TryGetValue(manager, out var managerModule))
             {
                 currentDroneMasterDreamNumber = managerModule.droneMasterDreamNumber;
 
@@ -186,7 +186,7 @@ namespace TheDroneMaster.GameHooks
 
         public void EndDroneMasterDream(RainWorldGame self)
         {
-            if(!ProcessManagerPatch.modules.TryGetValue(self.manager, out var managerModule))
+            if (!ProcessManagerPatch.modules.TryGetValue(self.manager, out var managerModule))
             {
                 Plugin.Log("Manger module lost, stop end dronemaster dream");
                 return;
@@ -202,7 +202,7 @@ namespace TheDroneMaster.GameHooks
             self.session.Players = new List<AbstractCreature>(collection);
 
 
-            
+
             if (self.manager.musicPlayer != null)
             {
                 self.manager.musicPlayer.FadeOutAllSongs(20f);

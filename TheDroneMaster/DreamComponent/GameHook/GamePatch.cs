@@ -13,13 +13,15 @@ namespace TheDroneMaster.GameHooks
     {
         public static void Patch(RainWorld rainWorld)
         {
-            DreamSessionHook.RegisterDream(new DroneMasterDream());
+            CustomDreamHook.RegistryDream(new DroneMasterDream());
+            //DreamSessionHook.RegisterDream(new DroneMasterDream());
+            //OverWorldHooks.PatchOn();
             return;
 
-            OverWorldHooks.PatchOn();
-            ProcessManagerPatch.PatchOn(rainWorld);
-            RainWorldGamePatch.PatchOn();
-            SleepDeathScreenPatch.PatchOn();
+
+            //ProcessManagerPatch.PatchOn(rainWorld);
+            //RainWorldGamePatch.PatchOn();
+            //SleepDeathScreenPatch.PatchOn();
         }
     }
 }
