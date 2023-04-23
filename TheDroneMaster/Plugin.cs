@@ -17,6 +17,7 @@ using System.IO;
 using TheDroneMaster.GameHooks;
 using TheDroneMaster.DreamComponent;
 using TheDroneMaster.DreamComponent.OracleHooks;
+using static TheDroneMaster.DreamComponent.GameHook.DroneMasterEnding;
 
 
 #pragma warning disable CS0618
@@ -109,6 +110,10 @@ namespace TheDroneMaster
                 GamePatch.Patch(self);
                 //PearlReaderPatchs.Patch();
 
+
+                //TODO: DEBUG
+                On.Player.Update += Player_Update;
+
                 OraclePatch.PatchOn();
 
                 DroneMasterEnums.RegisterValues();
@@ -121,6 +126,23 @@ namespace TheDroneMaster
             catch(Exception e)
             {
                 Debug.LogException(e);
+            }
+        }
+
+        private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
+        {
+            orig(self,eu);
+            if(Input.GetKey(KeyCode.Y))
+            {
+                foreach(var i in self.room.drawableObjects)
+                {
+                    if(i is CreatureEndingSender)
+                    {
+                        return;
+                    }
+                }
+                self.room.AddObject(new CreatureEndingSender(CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
+                Debug.Log("sdsddsdsdsdsdsd" + (self.bodyChunks[0].pos + new Vector2(50, 20)));
             }
         }
 

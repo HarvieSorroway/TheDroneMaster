@@ -29,7 +29,7 @@ namespace TheDroneMaster
             On.Player.Jump += Player_Jump;
             On.Player.SpearStick += Player_SpearStick;
 
-            //On.Player.ReleaseGrasp += Player_ReleaseGrasp;
+            On.Player.ReleaseGrasp += Player_ReleaseGrasp;
 
             On.Player.Die += Player_Die;
             On.Player.Destroy += Player_Destroy;

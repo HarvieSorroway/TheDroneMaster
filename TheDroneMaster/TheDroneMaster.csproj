@@ -92,6 +92,7 @@
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
     <Compile Include="DreamComponent\DreamHook\CustomDreamBase.cs" />
     <Compile Include="DreamComponent\DreamHook\DreamHooks.cs" />
+    <Compile Include="DreamComponent\GameHook\SessionHook.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracle.cs" />
     <Compile Include="DreamComponent\OracleHooks\MIFOracle.cs" />
     <Compile Include="DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
