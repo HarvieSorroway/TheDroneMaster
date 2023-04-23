@@ -27,7 +27,6 @@ namespace TheDroneMaster.GameHook
                     package = module.packageFromSleepScreen;
                     package.saveState = managerModule.saveStateBuffer;
                     managerModule.tempProgressionBuffer.currentSaveState = package.saveState;
-                    managerModule.tempProgressionBuffer.SaveProgressionAndDeathPersistentDataOfCurrentState(false, false);
 
                     managerModule.saveStateBuffer = null;
                     managerModule.tempProgressionBuffer = null;

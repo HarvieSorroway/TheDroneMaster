@@ -29,7 +29,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-
     public class OraclePatch
     {
         public static void PatchOn()

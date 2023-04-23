@@ -244,7 +244,7 @@ namespace TheDroneMaster
                     ExtEnumBase extEnumBase;
                     playerDeathPreventer = new PlayerDeathPreventer(this);
                     bool canParse = ExtEnumBase.TryParse(typeof(SlugcatStats.Name), Plugin.ID, true, out extEnumBase);
-                    if (canParse)
+                    if (canParse && name == null)
                     {
                         name = extEnumBase as SlugcatStats.Name;
                         if(DroneMasterName == null)

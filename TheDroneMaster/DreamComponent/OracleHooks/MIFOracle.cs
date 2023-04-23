@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DreamComponent.DreamHook;
 using TheDroneMaster.GameHooks;
 using UnityEngine;
 using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour;
@@ -621,9 +622,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         owner.conversation = null;
                         //owner.NewAction(CustomAction.General_Idle);
 
-                        if (RainWorldGamePatch.modules.TryGetValue(owner.oracle.room.game, out var module))
+                        if(DroneMasterDream.instance != null)
                         {
-                            module.EndDroneMasterDream(owner.oracle.room.game);
+                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
                         }
                         return;
                     }
@@ -637,7 +638,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
                     if (PlayerPatchs.modules.TryGetValue(player, out var pmodule))
                     {
-
                         if (DronePortOverride.overrides.TryGetValue(pmodule.port, out var overrides) && currentMovePortCounter < movePortCounter)
                         {
                             currentMovePortCounter++;
@@ -671,9 +671,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     if (owner.conversation.slatedForDeletion)
                     {
                         owner.conversation = null;
-                        if (RainWorldGamePatch.modules.TryGetValue(owner.oracle.room.game, out var module))
+                        if (DroneMasterDream.instance != null)
                         {
-                            module.EndDroneMasterDream(owner.oracle.room.game);
+                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
                         }
                         return;
                     }
