@@ -18,9 +18,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 {
     public class CustomOracleExtender
     {
-        public static List<CustomOracle> customOracles = new List<CustomOracle>();
-        public static Dictionary<Oracle.OracleID, CustomOracle> idAndOracles = new Dictionary<Oracle.OracleID, CustomOracle>();
-        public static void RegistryCustomOracle(CustomOracle customOracle)
+        public static List<CustomOracleRegister> customOracles = new List<CustomOracleRegister>();
+        public static Dictionary<Oracle.OracleID, CustomOracleRegister> idAndOracles = new Dictionary<Oracle.OracleID, CustomOracleRegister>();
+        public static void RegistryCustomOracle(CustomOracleRegister customOracle)
         {
             if (customOracles.Contains(customOracle)) return;
             customOracles.Add(customOracle);
@@ -41,12 +41,14 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             OracleGraphicsPropertiesPatch.PatchOn();
 
             On.Room.ReadyForAI += Room_ReadyForAI;
-            CustomOracleExtender.RegistryCustomOracle(new MIFOracle());
+
+            CustomOracleExtender.RegistryCustomOracle(new MIFOracleRegistry());
         }
 
         public static void OraclePatchs()
         {
             IL.Oracle.ctor += Oracle_ctor;
+
             On.Oracle.InitiateGraphicsModule += Oracle_InitiateGraphicsModule;
 
             On.Oracle.CreateMarble += Oracle_CreateMarble;

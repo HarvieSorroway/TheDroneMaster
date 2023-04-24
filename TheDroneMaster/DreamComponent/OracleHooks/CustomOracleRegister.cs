@@ -3,7 +3,9 @@ using RWCustom;
 using SlugBase.DataTypes;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using TheDroneMaster.DreamComponent.OracleHooks;
@@ -13,7 +15,7 @@ using Random = UnityEngine.Random;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
 {
-    public class CustomOracle
+    public class CustomOracleRegister
     {
         /// <summary>
         /// 迭代器生成的房间
@@ -42,6 +44,14 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// </summary>
         public WeakReference<Oracle> oracleRef = new WeakReference<Oracle>(null);
 
+        /// <summary>
+        /// 拓展类
+        /// </summary>
+        public static ConditionalWeakTable<Oracle, CustomOralceEX> oracleEx = new ConditionalWeakTable<Oracle, CustomOralceEX>();
+        /// <summary>
+        /// 自定义珍珠的注册类，可以选择不使用该类型
+        /// </summary>
+        public CustomOraclePearlRegistry pearlRegistry;
 
         /// <summary>
         /// 加载迭代器的行为和其他模块，比如OracleArm
@@ -50,6 +60,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// <param name="room">迭代器所在的房间</param>
         public virtual void LoadBehaviourAndSurroundings(ref Oracle oracle,Room room)
         {
+            oracleEx.Add(oracle,new CustomOralceEX(oracle));
         }
 
         /// <summary>
@@ -59,8 +70,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             if (!oracleRef.TryGetTarget(out var oracle))
                 return;
+            if (!oracleEx.TryGetValue(oracle, out var customOralceEX))
+                return;
 
-            var marbles = oracle.marbles;
+            var marbles = customOralceEX.customMarbles;
             var room = oracle.room;
 
             Vector2 vector = new Vector2(200f, 100f);
@@ -145,26 +158,31 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             {
                 self.pearlCounter = 1;
             }
-            AbstractPhysicalObject abstractPhysicalObject = new PebblesPearl.AbstractPebblesPearl(self.room.world, null, self.room.GetWorldCoordinate(ps), self.room.game.GetNewID(), -1, -1, null, color, self.pearlCounter * ((ModManager.MSC && self.room.world.name == "DM") ? -1 : 1));
+            if (pearlRegistry == null)
+                return;
+            if (!oracleEx.TryGetValue(self, out var customOracleEX))
+                return;
+
+            AbstractPhysicalObject abstractPhysicalObject = pearlRegistry.GetAbstractCustomOraclePearl(self.room.world, null, self.room.GetWorldCoordinate(ps), self.room.game.GetNewID(), -1, -1, null, color, self.pearlCounter);
+            CustomOrbitableOraclePearl customPearl = pearlRegistry.RealizeDataPearl(abstractPhysicalObject, self.room.world);
+
             self.pearlCounter++;
             self.room.abstractRoom.entities.Add(abstractPhysicalObject);
-            PebblesPearl pebblesPearl = new PebblesPearl(abstractPhysicalObject, self.room.world);
-            pebblesPearl.oracle = self;
-            pebblesPearl.firstChunk.HardSetPosition(ps);
-            pebblesPearl.orbitObj = orbitObj;
+
+            customPearl.oracle = self;
+            customPearl.firstChunk.HardSetPosition(ps);
+            customPearl.orbitObj = orbitObj;
             if (orbitObj == null)
             {
-                pebblesPearl.hoverPos = new Vector2?(ps);
+                customPearl.hoverPos = new Vector2?(ps);
             }
-            pebblesPearl.orbitCircle = circle;
-            pebblesPearl.orbitDistance = dist;
-            pebblesPearl.marbleColor = (abstractPhysicalObject as PebblesPearl.AbstractPebblesPearl).color;
-            if (ModManager.MSC)
-            {
-                pebblesPearl.marbleIndex = self.marbles.Count;
-            }
-            self.room.AddObject(pebblesPearl);
-            self.marbles.Add(pebblesPearl);
+            customPearl.orbitCircle = circle;
+            customPearl.orbitDistance = dist;
+            customPearl.marbleColor = (abstractPhysicalObject as CustomOrbitableOraclePearl.AbstractCustomOraclePearl).color;
+            customPearl.marbleIndex = customOracleEX.customMarbles.Count;
+
+            self.room.AddObject(customPearl);
+            customOracleEX.customMarbles.Add(customPearl);
         }
 
         public override string ToString()
@@ -175,6 +193,17 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public virtual OracleGraphics InitCustomOracleGraphic(PhysicalObject ow)
         {
             return new OracleGraphics(ow);
+        }
+
+        public class CustomOralceEX
+        {
+            public WeakReference<Oracle> oracleRef = new WeakReference<Oracle>(null);
+            public List<CustomOrbitableOraclePearl> customMarbles = new List<CustomOrbitableOraclePearl>();
+
+            public CustomOralceEX(Oracle oracle)
+            {
+                oracleRef = new WeakReference<Oracle>(oracle);
+            }
         }
     }
 
@@ -656,7 +685,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
         #endregion
     }
-
 
     public class CustomOracleBehaviour : OracleBehavior
     {
