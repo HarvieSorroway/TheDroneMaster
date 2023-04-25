@@ -603,7 +603,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             if (player == null) return;
 
 
-
             if (action == MIFOracleBehaviour.MeetDroneMaster_Init)
             {
                 movementBehavior = CustomMovementBehavior.Idle;
@@ -726,16 +725,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
         }
 
-        public override CustomOrbitableOraclePearl.AbstractCustomOraclePearl AbstractPhysicalObjectFromString(AbstractPhysicalObject.AbstractObjectType type, World world, EntityID id, WorldCoordinate pos, string[] dataArray)
-        {
-            return new MIFPearl.MIFAbstractPearl(MIFPearl, DataPearl_MIF, world, null, pos, id, int.Parse(dataArray[3]), int.Parse(dataArray[4]), null, int.Parse(dataArray[6]), int.Parse(dataArray[7]));
-        }
-
-        public override CustomOrbitableOraclePearl.AbstractCustomOraclePearl GetAbstractCustomOraclePearl(World world, PhysicalObject realizedObject, WorldCoordinate pos, EntityID ID, int originRoom, int placedObjectIndex, PlacedObject.ConsumableObjectData consumableData, int color, int number)
-        {
-            return new MIFPearl.MIFAbstractPearl(MIFPearl, DataPearl_MIF, world, realizedObject, pos, ID, originRoom, placedObjectIndex, consumableData, color, number);
-        }
-
         public override CustomOrbitableOraclePearl RealizeDataPearl(AbstractPhysicalObject abstractPhysicalObject, World world)
         {
             return new MIFPearl(abstractPhysicalObject, world);
@@ -753,7 +742,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             int num = Random.Range(0, 3);
             if (rCam.room.world.game.IsStorySession)
             {
-                num = (abstractPhysicalObject as MIFAbstractPearl).color;
+                num = (abstractPhysicalObject as CustomOrbitableOraclePearl.AbstractCustomOraclePearl).color;
             }
 
             Color color = Color.gray;
@@ -775,25 +764,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
             darkness = 0f;
             this.color = color;
-        }
-
-        public class MIFAbstractPearl : AbstractCustomOraclePearl
-        {
-            public MIFAbstractPearl(
-                AbstractObjectType objectType,
-                DataPearlType dataPearlType,
-
-                World world,
-                PhysicalObject realizedObject,
-                WorldCoordinate pos,
-                EntityID ID,
-                int originRoom,
-                int placedObjectIndex,
-                PlacedObject.ConsumableObjectData consumableData,
-                int color,
-                int number) : base(objectType, dataPearlType,world, realizedObject, pos, ID, originRoom, placedObjectIndex, consumableData, color, number)
-            {
-            }
         }
     }
 }

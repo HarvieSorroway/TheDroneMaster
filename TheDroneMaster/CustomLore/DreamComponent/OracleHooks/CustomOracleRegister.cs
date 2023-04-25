@@ -721,6 +721,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public int playerOutOfRoomCounter;
 
         public PebblesPearl investigateMarble;
+        public CustomOrbitableOraclePearl investigateCustomMarble;
 
         public CustomSubBehaviour currSubBehavior;
 
@@ -1013,29 +1014,32 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             if (movementBehavior == CustomMovementBehavior.Idle)
             {
                 invstAngSpeed = 1f;
-                if (investigateMarble == null && this.oracle.marbles.Count > 0)
+                if(CustomOracleRegister.oracleEx.TryGetValue(oracle, out var customOralceEX))
                 {
-                    investigateMarble = oracle.marbles[Random.Range(0, oracle.marbles.Count)];
-                }
-                if (investigateMarble != null && (investigateMarble.orbitObj == oracle || Custom.DistLess(new Vector2(250f, 150f), investigateMarble.firstChunk.pos, 100f)))
-                {
-                    investigateMarble = null;
-                }
-                if (investigateMarble != null)
-                {
-                    lookPoint = investigateMarble.firstChunk.pos;
-                    if (Custom.DistLess(nextPos, investigateMarble.firstChunk.pos, 100f))
+                    if (investigateCustomMarble == null && customOralceEX.customMarbles.Count > 0)
                     {
-                        floatyMovement = true;
-                        nextPos = investigateMarble.firstChunk.pos - Custom.DegToVec(investigateAngle) * 50f;
+                        investigateCustomMarble = customOralceEX.customMarbles[Random.Range(0, customOralceEX.customMarbles.Count)];
                     }
-                    else
+                    if (investigateCustomMarble != null && (investigateCustomMarble.orbitObj == oracle || Custom.DistLess(new Vector2(250f, 150f), investigateCustomMarble.firstChunk.pos, 100f)))
                     {
-                        SetNewDestination(investigateMarble.firstChunk.pos - Custom.DegToVec(investigateAngle) * 50f);
+                        investigateCustomMarble = null;
                     }
-                    if (pathProgression == 1f && Random.value < 0.005f)
+                    if (investigateCustomMarble != null)
                     {
-                        investigateMarble = null;
+                        lookPoint = investigateCustomMarble.firstChunk.pos;
+                        if (Custom.DistLess(nextPos, investigateCustomMarble.firstChunk.pos, 100f))
+                        {
+                            floatyMovement = true;
+                            nextPos = investigateCustomMarble.firstChunk.pos - Custom.DegToVec(investigateAngle) * 50f;
+                        }
+                        else
+                        {
+                            SetNewDestination(investigateCustomMarble.firstChunk.pos - Custom.DegToVec(investigateAngle) * 50f);
+                        }
+                        if (pathProgression == 1f && Random.value < 0.005f)
+                        {
+                            investigateCustomMarble = null;
+                        }
                     }
                 }
             }

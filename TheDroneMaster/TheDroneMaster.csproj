@@ -91,10 +91,9 @@
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
     <Compile Include="DreamComponent\DreamHook\CustomDreamHook.cs" />
-    <Compile Include="DreamComponent\GameHook\PlayerProgressionHooks.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracleObjects.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracleRegister.cs" />
-    <Compile Include="DreamComponent\OracleHooks\MIFOracleRegister.cs" />
+    <Compile Include="DreamComponent\OracleHooks\MIFOracleRegistry.cs" />
     <Compile Include="DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
     <Compile Include="DreamComponent\OracleHooks\OraclePatch.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />
@@ -110,8 +109,6 @@
     <Compile Include="DronePort\CreatureScanner.cs" />
     <Compile Include="Fixer.cs" />
     <Compile Include="DreamComponent\GameHook\GamePatch.cs" />
-    <Compile Include="DreamComponent\GameHook\OverWorldHooks.cs" />
-    <Compile Include="DreamComponent\GameHook\SleepDeathScreenPatch.cs" />
     <Compile Include="LaserDrone\DroneLaserGun.cs" />
     <Compile Include="OracleHooks\InGameTrasnlatorPatch.cs" />
     <Compile Include="PearlReader\PearlReaderPatchs.cs" />
@@ -130,8 +127,6 @@
     <Compile Include="LaserDrone\LaserDroneProperties.cs" />
     <Compile Include="PostEffect.cs" />
     <Compile Include="OracleHooks\SSOracleActionPatch.cs" />
-    <Compile Include="DreamComponent\GameHook\ProcessManagerPatch.cs" />
-    <Compile Include="DreamComponent\GameHook\RainWorldGamePatch.cs" />
     <Compile Include="SaveStateHook\DeathPersistentSaveDataPatch.cs" />
   </ItemGroup>
   <ItemGroup>

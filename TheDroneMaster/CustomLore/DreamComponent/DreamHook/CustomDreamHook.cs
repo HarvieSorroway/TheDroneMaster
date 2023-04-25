@@ -19,6 +19,17 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         public bool dreamFinished = false;
         public bool currentDreamActivate = false;
         public DreamsState.DreamID activateDreamID;
+        public SlugcatStats.Name focusSlugcat;
+
+        /// <summary>
+        /// 当前梦境是演出型梦境，还是cg梦境
+        /// </summary>
+        public virtual bool IsPerformDream => true;
+
+        public CustomDream(SlugcatStats.Name focusSlugcat)
+        {
+            this.focusSlugcat = focusSlugcat;
+        }
 
         public virtual void ActivateThisDream(DreamsState.DreamID dreamID)
         {
@@ -43,7 +54,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         }
 
         /// <summary>
-        /// 结束梦境调用的方法
+        /// 结束梦境调用的方法，仅当作为演出型梦境时被才需要被调用
         /// </summary>
         /// <param name="game"></param>
         public virtual void EndDream(RainWorldGame game)
@@ -65,6 +76,16 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             }
 
             game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.SleepScreen, 5f);
+        }
+
+        /// <summary>
+        /// 根据 DreamID 决定需要展示的 SceneID,仅当作为cg梦境的时候才需要重写该方法
+        /// </summary>
+        /// <param name="dreamID"></param>
+        /// <returns></returns>
+        public virtual MenuScene.SceneID SceneFromDream(DreamsState.DreamID dreamID)
+        {
+            return MenuScene.SceneID.Empty;
         }
 
 
@@ -117,6 +138,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             if (registed) return;
             On.DreamsState.StaticEndOfCycleProgress += DreamsState_StaticEndOfCycleProgress;
             On.Menu.DreamScreen.Update += DreamScreen_Update;
+            On.Menu.DreamScreen.SceneFromDream += DreamScreen_SceneFromDream;
 
             On.OverWorld.LoadFirstWorld += OverWorld_LoadFirstWorld;
             On.WorldLoader.CreatingWorld += WorldLoader_CreatingWorld;
@@ -149,7 +171,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         private static void PlayerProgression_SaveDeathPersistentDataOfCurrentState(On.PlayerProgression.orig_SaveDeathPersistentDataOfCurrentState orig, PlayerProgression self, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
         {
             Plugin.Log(String.Format("Inside PlayerProgression_SaveDeathPersistentDataOfCurrentState, {0}", currentActivateDream));
-            if (currentActivateDream != null)
+            if (currentActivateDream != null && currentActivateDream.IsPerformDream)
             {
                 Plugin.Log(currentActivateDream.dreamStarted.ToString());
                 if (currentActivateDream.dreamStarted)
@@ -193,7 +215,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
         private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
         {
-            if(currentActivateDream != null && currentActivateDream.dreamStarted)
+            if(currentActivateDream != null && currentActivateDream.dreamStarted && currentActivateDream.IsPerformDream)
             {
                 currentActivateDream.EndDream(self);
                 return;
@@ -203,7 +225,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
         private static void RainWorldGame_GameOver(On.RainWorldGame.orig_GameOver orig, RainWorldGame self, Creature.Grasp dependentOnGrasp)
         {
-            if(currentActivateDream != null && currentActivateDream.dreamStarted)
+            if(currentActivateDream != null && currentActivateDream.dreamStarted && currentActivateDream.IsPerformDream)
             {
                 currentActivateDream.EndDream(self);
                 return;
@@ -214,7 +236,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         #region WorldLoader & OverWorld
         private static void OverWorld_LoadFirstWorld(On.OverWorld.orig_LoadFirstWorld orig, OverWorld self)
         {
-            if (currentActivateDream != null)
+            if (currentActivateDream != null && currentActivateDream.IsPerformDream)
             {
                 var param = currentActivateDream.GetBuildDreamWorldParams();
 
@@ -232,7 +254,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         }
         private static void WorldLoader_CreatingWorld(On.WorldLoader.orig_CreatingWorld orig, WorldLoader self)
         {
-            if (self.game != null && self.game.session is StoryGameSession)
+            if (self.game != null && self.game.session is StoryGameSession && currentActivateDream != null && currentActivateDream.IsPerformDream)
             {
                 self.world.spawners = self.spawners.ToArray();
                 List<World.Lineage> list = new List<World.Lineage>();
@@ -273,20 +295,28 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         private static void DreamScreen_Update(On.Menu.DreamScreen.orig_Update orig, Menu.DreamScreen self)
         {
             orig.Invoke(self);
-            if (self.manager.fadeToBlack > 0.9f)
+            if (self.manager.fadeToBlack > 0.9f && currentActivateDream != null && currentActivateDream.IsPerformDream)
             {
                 self.manager.fadeToBlack = 1f;
                 self.scene.RemoveSprites();
 
-                if (currentActivateDream != null)
-                {
-                    currentActivateDream.dreamStarted = true;
-                    dataBridge.sleepDeathScreenDataPackage = self.fromGameDataPackage;
-                    self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
-                    self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
-                }
+                currentActivateDream.dreamStarted = true;
+                dataBridge.sleepDeathScreenDataPackage = self.fromGameDataPackage;
+                self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.New;
+                self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
             }
+        }
 
+        private static MenuScene.SceneID DreamScreen_SceneFromDream(On.Menu.DreamScreen.orig_SceneFromDream orig, DreamScreen self, DreamsState.DreamID dreamID)
+        {
+            MenuScene.SceneID sceneID = orig.Invoke(self, dreamID);
+            if(sceneID == MenuScene.SceneID.Empty && currentActivateDream != null && !currentActivateDream.IsPerformDream)
+            {
+                sceneID = currentActivateDream.SceneFromDream(dreamID);
+                currentActivateDream.dreamStarted = true;
+                currentActivateDream.dreamFinished = true;
+            }
+            return sceneID;
         }
 
         private static void DreamsState_StaticEndOfCycleProgress(On.DreamsState.orig_StaticEndOfCycleProgress orig, SaveState saveState, string currentRegion, string denPosition, ref int cyclesSinceLastDream, ref int cyclesSinceLastFamilyDream, ref int cyclesSinceLastGuideDream, ref int inGWOrSHCounter, ref DreamsState.DreamID upcomingDream, ref DreamsState.DreamID eventDream, ref bool everSleptInSB, ref bool everSleptInSB_S01, ref bool guideHasShownHimselfToPlayer, ref int guideThread, ref bool guideHasShownMoonThisRound, ref int familyThread)
@@ -296,6 +326,12 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             {
                 foreach(var dream in dreams)
                 {
+                    if (dream.focusSlugcat != saveState.saveStateNumber)
+                    {
+                        Plugin.Log(string.Format("{0} not focus on this slugcat : {1}, skip decide dream", dream, saveState.saveStateNumber));
+                        continue;
+                    }
+
                     dream.DecideDreamID(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
                     if(upcomingDream != null)
                     {
@@ -326,6 +362,10 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         public static readonly DreamsState.DreamID DroneMasterDream_0 = new DreamsState.DreamID("DroneMasterDream_0", true);
         public static readonly DreamsState.DreamID DroneMasterDream_1 = new DreamsState.DreamID("DroneMasterDream_1", true);
 
+        public DroneMasterDream() : base(new SlugcatStats.Name(Plugin.ID))
+        {
+        }
+
         public override void DecideDreamID(
             SaveState saveState,
             string currentRegion,
@@ -345,20 +385,25 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         {
             if (dreamFinished) return;
 
+            upcomingDream = null;
+            cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
+
             switch (familyThread)
             {
                 case 0:
-                    upcomingDream = DroneMasterDream_0;
+                    if(saveState.cycleNumber > 2 && cyclesSinceLastDream > 3)
+                        upcomingDream = DroneMasterDream_0;
                     break;
                 case 1:
-                default:
-                    upcomingDream = DroneMasterDream_1;
+                    if (cyclesSinceLastDream > 3)
+                        upcomingDream = DroneMasterDream_1;
                     break;
             }
-            if(upcomingDream != null)
+            if (upcomingDream != null)
+            {
                 familyThread++;
-
-            Plugin.Log(familyThread.ToString());
+                cyclesSinceLastDream = 0;
+            }
         }
 
         public override CustomDreamHook.BuildDreamWorldParams GetBuildDreamWorldParams()
@@ -371,7 +416,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                     firstRoom = "DMD_AI",
                     singleRoomWorld = false,
 
-                    playAs = PlayerPatchs.PlayerModule.DroneMasterName
+                    playAs = PlayerModule.DroneMasterName
                 };
             }
             else
