@@ -37,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
@@ -90,12 +93,13 @@
     <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
-    <Compile Include="DreamComponent\DreamHook\CustomDreamHook.cs" />
-    <Compile Include="DreamComponent\OracleHooks\CustomOracleObjects.cs" />
-    <Compile Include="DreamComponent\OracleHooks\CustomOracleRegister.cs" />
-    <Compile Include="DreamComponent\OracleHooks\MIFOracleRegistry.cs" />
-    <Compile Include="DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
-    <Compile Include="DreamComponent\OracleHooks\OraclePatch.cs" />
+    <Compile Include="CustomLore\DreamComponent\DreamHook\CustomDreamHook.cs" />
+    <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleObjects.cs" />
+    <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleRegister.cs" />
+    <Compile Include="CustomLore\DreamComponent\OracleHooks\MIFOracleRegistry.cs" />
+    <Compile Include="CustomLore\DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
+    <Compile Include="CustomLore\DreamComponent\OracleHooks\OraclePatch.cs" />
+    <Compile Include="CustomLore\SpecificScripts\LC_BossFight.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />
     <Compile Include="DroneHUD\DroneHUD.cs" />
     <Compile Include="DroneHUD\DroneUI.cs" />
@@ -108,9 +112,9 @@
     </Compile>
     <Compile Include="DronePort\CreatureScanner.cs" />
     <Compile Include="Fixer.cs" />
-    <Compile Include="DreamComponent\GameHook\GamePatch.cs" />
+    <Compile Include="CustomLore\DreamComponent\GameHook\GamePatch.cs" />
     <Compile Include="LaserDrone\DroneLaserGun.cs" />
-    <Compile Include="OracleHooks\InGameTrasnlatorPatch.cs" />
+    <Compile Include="CustomLore\OracleHooks\InGameTrasnlatorPatch.cs" />
     <Compile Include="PearlReader\PearlReaderPatchs.cs" />
     <Compile Include="PearlReader\PortPearlReader.cs" />
     <Compile Include="DronePort\DronePortGraphics.cs" />
@@ -126,7 +130,7 @@
     <Compile Include="LaserDrone\LaserDroneGraphics.cs" />
     <Compile Include="LaserDrone\LaserDroneProperties.cs" />
     <Compile Include="PostEffect.cs" />
-    <Compile Include="OracleHooks\SSOracleActionPatch.cs" />
+    <Compile Include="CustomLore\OracleHooks\SSOracleActionPatch.cs" />
     <Compile Include="SaveStateHook\DeathPersistentSaveDataPatch.cs" />
   </ItemGroup>
   <ItemGroup>

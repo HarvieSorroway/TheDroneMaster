@@ -6,6 +6,7 @@ using SlugBase.Features;
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using TheDroneMaster.CustomLore.SpecificScripts;
 using UnityEngine;
 
 namespace TheDroneMaster
@@ -182,7 +183,9 @@ namespace TheDroneMaster
 
             if (Input.GetKeyDown(KeyCode.S))
             {
-                self.room.game.Win(false);
+                //self.room.game.Win(false);
+                if (Small3DObject.instance != null) return;
+                self.room.AddObject(new Small3DObject(self.room, self.DangerPos));
             }
         }
 
