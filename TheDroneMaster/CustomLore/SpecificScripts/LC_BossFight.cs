@@ -32,17 +32,39 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             Mesh3D.TriangleFacet[] facets = new Mesh3D.TriangleFacet[]
             {
                 new Mesh3D.TriangleFacet(0,1,2),
-                new Mesh3D.TriangleFacet(0,2,3),
-                new Mesh3D.TriangleFacet(0,1,3),
-
                 new Mesh3D.TriangleFacet(1,2,3),
+
+                new Mesh3D.TriangleFacet(4,5,6),
+                new Mesh3D.TriangleFacet(5,6,7),
+
+                new Mesh3D.TriangleFacet(8,9,10),
+                new Mesh3D.TriangleFacet(9,10,11),
+
+                new Mesh3D.TriangleFacet(12,13,14),
+                new Mesh3D.TriangleFacet(13,14,15),
             };
             mesh.SetFacet(facets);
 
-            mesh.SetVertice(0, Vector3.up * 10f);
-            mesh.SetVertice(1, Vector3.down * 5f + Vector3.right * 15f);
-            mesh.SetVertice(2, Vector3.down * 5f + Vector3.forward * 10f + Vector3.left * 5f);
-            mesh.SetVertice(3, Vector3.down * 5f + Vector3.forward * -10f + Vector3.left * 5f);
+            mesh.SetVertice(0, Vector3.left * 15f + Vector3.up * 5f + Vector3.forward * 10f);
+            mesh.SetVertice(1, Vector3.left * 15f + Vector3.up * -5f + Vector3.forward * 10f);
+            mesh.SetVertice(2, Vector3.left * 15f + Vector3.up * 5f + Vector3.forward * -10f);
+            mesh.SetVertice(3, Vector3.left * 15f + Vector3.up * -5f + Vector3.forward * -10f);
+
+            mesh.SetVertice(4, Vector3.forward * 15f + Vector3.up * 5f + Vector3.left * 10f);
+            mesh.SetVertice(5, Vector3.forward * 15f + Vector3.up * -5f + Vector3.left * 10f);
+            mesh.SetVertice(6, Vector3.forward * 15f + Vector3.up * 5f + Vector3.left * -10f);
+            mesh.SetVertice(7, Vector3.forward * 15f + Vector3.up * -5f + Vector3.left * -10f);
+
+            mesh.SetVertice(8, Vector3.left * -15f + Vector3.up * 5f + Vector3.forward * 10f);
+            mesh.SetVertice(9, Vector3.left * -15f + Vector3.up * -5f + Vector3.forward * 10f);
+            mesh.SetVertice(10, Vector3.left * -15f + Vector3.up * 5f + Vector3.forward * -10f);
+            mesh.SetVertice(11, Vector3.left * -15f + Vector3.up * -5f + Vector3.forward * -10f);
+
+            mesh.SetVertice(12, Vector3.forward * -15f + Vector3.up * 5f + Vector3.left * 10f);
+            mesh.SetVertice(13, Vector3.forward * -15f + Vector3.up * -5f + Vector3.left * 10f);
+            mesh.SetVertice(14, Vector3.forward * -15f + Vector3.up * 5f + Vector3.left * -10f);
+            mesh.SetVertice(15, Vector3.forward * -15f + Vector3.up * -5f + Vector3.left * -10f);
+
 
             mesh3DRenderer = new Mesh3DRenderer(mesh, 0, Mesh3DRenderer.RenderMode.Wireframe);
         }
@@ -100,13 +122,15 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 {
                     int maxVertice = Mathf.Max(facets[i].a, facets[i].b, facets[i].c);
 
-                    for(int k = 0;k < maxVertice - vertices.Count + 1;k++)
+                    while(vertices.Count < maxVertice + 1)
                     {
                         vertices.Add(Vector3.zero);
                         origVertices.Add(Vector3.zero);
                     }
+
                     this.facets.Add(facets[i]);
                 }
+                Plugin.Log("Total Vertices : " + origVertices.Count.ToString());
             }
 
             public void SetVertice(int index,Vector3 pos)
