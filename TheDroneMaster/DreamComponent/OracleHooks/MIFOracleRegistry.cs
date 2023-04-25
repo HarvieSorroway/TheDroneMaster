@@ -1,6 +1,7 @@
 ﻿using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,24 +14,28 @@ using Random = UnityEngine.Random;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
 {
-    public class MIFOracle : CustomOracle
+    public class MIFOracleRegistry : CustomOracleRegister
     {
         public static Oracle.OracleID DMDOracle = new Oracle.OracleID("DMD", true);
         public override string LoadRoom => "DMD_AI";
         public override Oracle.OracleID OracleID => DMDOracle;
         public override Oracle.OracleID InheritOracleID => Oracle.OracleID.SS;
 
-        public MIFOracle()
+        public MIFOracleRegistry()
         {
             gravity = 0f;
             startPos = new Vector2(350f, 350f);
+
+            pearlRegistry = new MIFPearlRegistry();
+            CustomOraclePearlHook.Registry(pearlRegistry);
         }
 
         public override void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
         {
+            base.LoadBehaviourAndSurroundings(ref oracle, room);
+
             oracle.oracleBehavior = new MIFOracleBehaviour(oracle);
 
-            oracle.marbles = new List<PebblesPearl>();
             oracle.SetUpMarbles();
             room.gravity = 0f;
             for (int n = 0; n < room.updateList.Count; n++)
@@ -296,12 +301,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override Color ArmJoint_HighLightColor(ArmJointGraphics armJointGraphics, Vector2 pos)
         {
-            return new Color(255f / 256f, 213f / 256f, 231f / 256f);
+            return new Color(71f / 256f, 76f / 256f, 86f / 256f);
         }
 
         public override Color ArmJoint_BaseColor(ArmJointGraphics armJointGraphics, Vector2 pos)
         {
-            return new Color(210f / 256f, 139f / 256f, 170f / 256f);
+            return new Color(44f / 256f, 48f / 256f, 57f / 256f);
         }
 
         public override Color UbilicalCord_WireCol_1(UbilicalCord ubilicalCord)
@@ -604,7 +609,21 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 movementBehavior = CustomMovementBehavior.Idle;
                 if (inActionCounter > 300)
                 {
-                    owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
+                    if(CustomDreamHook.currentActivateDream != null)
+                    {
+                        if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
+                        {
+                            owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk0);
+                            return;
+                        }
+                        else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
+                        {
+                            owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
+                            return;
+                        }
+                    }
+
+                    owner.NewAction(CustomAction.General_Idle);
                     return;
                 }
             }
@@ -622,9 +641,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         owner.conversation = null;
                         //owner.NewAction(CustomAction.General_Idle);
 
-                        if(DroneMasterDream.instance != null)
+                        if(CustomDreamHook.currentActivateDream != null)
                         {
-                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
+                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
                         }
                         return;
                     }
@@ -671,9 +690,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     if (owner.conversation.slatedForDeletion)
                     {
                         owner.conversation = null;
-                        if (DroneMasterDream.instance != null)
+                        if (CustomDreamHook.currentActivateDream != null)
                         {
-                            DroneMasterDream.instance.ExitDream_Base(oracle.room.game, false, false, false);
+                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
                         }
                         return;
                     }
@@ -695,6 +714,85 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             else if (newAction == CustomAction.General_Idle)
             {
                 owner.getToWorking = 1f;
+            }
+        }
+    }
+
+    public class MIFPearlRegistry : CustomOraclePearlRegistry
+    {
+        public static AbstractPhysicalObject.AbstractObjectType MIFPearl = new AbstractPhysicalObject.AbstractObjectType("MIFPearl", true);
+        public static DataPearl.AbstractDataPearl.DataPearlType DataPearl_MIF = new DataPearl.AbstractDataPearl.DataPearlType("MIFPearl", true);
+        public MIFPearlRegistry() : base(MIFPearl,DataPearl_MIF)
+        {
+        }
+
+        public override CustomOrbitableOraclePearl.AbstractCustomOraclePearl AbstractPhysicalObjectFromString(AbstractPhysicalObject.AbstractObjectType type, World world, EntityID id, WorldCoordinate pos, string[] dataArray)
+        {
+            return new MIFPearl.MIFAbstractPearl(MIFPearl, DataPearl_MIF, world, null, pos, id, int.Parse(dataArray[3]), int.Parse(dataArray[4]), null, int.Parse(dataArray[6]), int.Parse(dataArray[7]));
+        }
+
+        public override CustomOrbitableOraclePearl.AbstractCustomOraclePearl GetAbstractCustomOraclePearl(World world, PhysicalObject realizedObject, WorldCoordinate pos, EntityID ID, int originRoom, int placedObjectIndex, PlacedObject.ConsumableObjectData consumableData, int color, int number)
+        {
+            return new MIFPearl.MIFAbstractPearl(MIFPearl, DataPearl_MIF, world, realizedObject, pos, ID, originRoom, placedObjectIndex, consumableData, color, number);
+        }
+
+        public override CustomOrbitableOraclePearl RealizeDataPearl(AbstractPhysicalObject abstractPhysicalObject, World world)
+        {
+            return new MIFPearl(abstractPhysicalObject, world);
+        }
+    }
+
+    public class MIFPearl : CustomOrbitableOraclePearl
+    {
+        public MIFPearl(AbstractPhysicalObject abstractPhysicalObject,World world) : base(abstractPhysicalObject, world)
+        {
+        }
+
+        public override void DataPearlApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+            int num = Random.Range(0, 3);
+            if (rCam.room.world.game.IsStorySession)
+            {
+                num = (abstractPhysicalObject as MIFAbstractPearl).color;
+            }
+
+            Color color = Color.gray;
+            switch (num)
+            {
+                default:
+                case 0:
+                    color = new Color(0.01f, 0.01f, 0.01f);
+                    break;
+                case 1:
+                    color = new Color(255f / 255f, 158f / 255f, 178f / 255f);
+                    break;
+                case 2:
+                    color = new Color(109f / 255f, 0f, 67f / 255f);
+                    break;
+                case 3:
+                    color = new Color(152f / 255f, 0f, 32f / 255f);
+                    break;
+            }
+            darkness = 0f;
+            this.color = color;
+        }
+
+        public class MIFAbstractPearl : AbstractCustomOraclePearl
+        {
+            public MIFAbstractPearl(
+                AbstractObjectType objectType,
+                DataPearlType dataPearlType,
+
+                World world,
+                PhysicalObject realizedObject,
+                WorldCoordinate pos,
+                EntityID ID,
+                int originRoom,
+                int placedObjectIndex,
+                PlacedObject.ConsumableObjectData consumableData,
+                int color,
+                int number) : base(objectType, dataPearlType,world, realizedObject, pos, ID, originRoom, placedObjectIndex, consumableData, color, number)
+            {
             }
         }
     }
