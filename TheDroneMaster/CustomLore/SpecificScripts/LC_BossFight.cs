@@ -22,8 +22,9 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         public static Small3DObject instance;
 
         Mesh3D mesh = new Mesh3D();
-        Mesh3DRenderer mesh3DRenderer;
+        List<Mesh3DRenderer> mesh3DRenderers;
         Vector2 startPos;
+        int totalSprites =0;
         public Small3DObject(Room room,Vector2 startPos)
         {
             instance= this;
@@ -65,15 +66,16 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             mesh.SetVertice(14, Vector3.forward * -15f + Vector3.up * 5f + Vector3.left * -10f);
             mesh.SetVertice(15, Vector3.forward * -15f + Vector3.up * -5f + Vector3.left * -10f);
 
-
-            mesh3DRenderer = new Mesh3DRenderer(mesh, 0, Mesh3DRenderer.RenderMode.Wireframe);
+            mesh3DRenderers = mesh.CreateMesh3DRenderers(ref totalSprites, Mesh3DRenderer.RenderMode.Wireframe);
+            //mesh3DRenderer = new Mesh3DRenderer(mesh, 0, Mesh3DRenderer.RenderMode.Wireframe);
         }
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             base.InitiateSprites(sLeaser, rCam);
-            sLeaser.sprites = new FSprite[mesh3DRenderer.totalSprites];
-            mesh3DRenderer.InitSprites(sLeaser, rCam);
+            sLeaser.sprites = new FSprite[totalSprites];
+            
+            mesh3DRenderers.ForEach(i => i.InitSprites(sLeaser, rCam));
 
             AddToContainer(sLeaser, rCam, null);
         }
@@ -92,15 +94,12 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
-            mesh3DRenderer.DrawSprites(sLeaser, rCam, timeStacker, camPos, startPos);
+            mesh3DRenderers.ForEach(i => i.DrawSprites(sLeaser, rCam, timeStacker, camPos, startPos));
         }
 
         public override void Update(bool eu)
         {
             base.Update(eu);
-
-            mesh.rotation = new Vector3(180f * (Mathf.Sin(Time.time) + 1f), 180f * (Mathf.Cos(Time.time)) + 1f, mesh.rotation.z + 2f);
-
             mesh.Update();
         }
 
@@ -110,10 +109,29 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             public List<Vector3> vertices = new List<Vector3>();
             public List<TriangleFacet> facets = new List<TriangleFacet>();
 
-            //分别围绕x轴，y轴，z轴旋转
-            public Vector3 rotation = Vector3.zero;
+            public ActorComponent rootComponent;
+            public List<Component> components = new List<Component>();
+
+            public Mesh3DRenderer renderer; 
+
+
             public Mesh3D()
             {
+                rootComponent = new ActorComponent(this);
+                components.Add(rootComponent);
+                components.Add(new RotatorComponent(rootComponent, Vector3.up*0.1f));
+
+            }
+
+
+            //创建全部render
+            public List<Mesh3DRenderer> CreateMesh3DRenderers(ref int startIndex, Mesh3DRenderer.RenderMode mode)
+            {
+                List<Mesh3DRenderer> list = new List<Mesh3DRenderer>();
+                list.Add(new Mesh3DRenderer(this, ref startIndex, mode));
+                foreach(var com in components.FindAll(i=>i is ActorComponent))
+                     list.AddRange((com as ActorComponent).ownObject.CreateMesh3DRenderers(ref startIndex, mode));
+                return list;
             }
 
             public void SetFacet(TriangleFacet[] facets)
@@ -141,12 +159,23 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
             public void Update()
             {
-                for(int i = 0;i < vertices.Count;i++)
+                components.ForEach(c => c.Update());
+                PendingUpdate();
+            }
+
+            void PendingUpdate()
+            {
+                for (int i = 0; i < vertices.Count; i++)
                 {
                     Vector3 v = origVertices[i];
-                    v = RotateRound(v, Vector3.up, rotation.y);
-                    v = RotateRound(v, Vector3.forward, rotation.z);
-                    v = RotateRound(v, Vector3.right ,rotation.x);
+
+                    Vector3.Scale(v, rootComponent.GetWorldScale());
+
+                    v = RotateRound(v, Vector3.up, rootComponent.GetWorldRotation().x);
+                    v = RotateRound(v, Vector3.forward, rootComponent.GetWorldRotation().y);
+                    v = RotateRound(v, Vector3.right, rootComponent.GetWorldRotation().z);
+
+                    v += rootComponent.GetWorldPosition();
 
                     vertices[i] = v;
                 }
@@ -173,6 +202,13 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 {
                     this.a = a; this.b = b; this.c = c;
                 }
+
+                public TriangleFacet(int[] s)
+                {
+                    a = s[0];
+                    b = s[1];
+                    c = s[2];
+                }
             }
         }
 
@@ -189,7 +225,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             public List<LineRepresent> lineRepresents = new List<LineRepresent>();
 
             public int totalSprites;
-            public Mesh3DRenderer(Mesh3D mesh,int startIndex, RenderMode renderMode) 
+            public Mesh3DRenderer(Mesh3D mesh,ref int startIndex, RenderMode renderMode) 
             {
                 this.mesh = mesh;
                 this.startIndex = startIndex;
@@ -199,6 +235,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 colorInBack = Color.green * 0.5f + Color.black * 0.5f;
 
                 SetUpRenderInfo();
+                startIndex += totalSprites;
             }
 
             public void SetUpRenderInfo()
