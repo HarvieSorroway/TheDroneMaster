@@ -102,6 +102,7 @@
     <Compile Include="CustomLore\DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\OraclePatch.cs" />
     <Compile Include="CustomLore\SpecificScripts\Components.cs" />
+    <Compile Include="CustomLore\SpecificScripts\Cool3DObject.cs" />
     <Compile Include="CustomLore\SpecificScripts\LC_BossFight.cs" />
     <Compile Include="CustomLore\SpecificScripts\MeshLoader.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />

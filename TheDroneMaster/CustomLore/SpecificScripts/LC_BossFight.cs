@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static TheDroneMaster.CustomLore.SpecificScripts.Small3DObject;
 
 namespace TheDroneMaster.CustomLore.SpecificScripts
 {

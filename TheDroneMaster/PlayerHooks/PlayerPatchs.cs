@@ -184,8 +184,8 @@ namespace TheDroneMaster
             if (Input.GetKeyDown(KeyCode.S))
             {
                 //self.room.game.Win(false);
-                if (Small3DObject.instance != null) return;
-                self.room.AddObject(new Small3DObject(self.room, self.DangerPos));
+                if (Cool3DObject.instance != null) return;
+                self.room.AddObject(new Cool3DObject(self.room, self.DangerPos));
             }
         }
 
