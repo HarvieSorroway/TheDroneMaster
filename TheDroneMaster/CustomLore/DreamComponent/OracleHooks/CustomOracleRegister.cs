@@ -734,6 +734,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public CustomAction action;
         public CustomAction afterGiveMarkAction;
 
+        public float lastKillFacOverseer;
+
+        public float killFacOverseer;
+
         public bool pearlPickupReaction = true;
 
         public bool lastPearlPickedUp = true;

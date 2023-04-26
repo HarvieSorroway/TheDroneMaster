@@ -33,12 +33,14 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
     {
         public static void PatchOn()
         {
-            OraclePatchs();
-            OracleArmPatch.PatchOn();
+ 
+                OraclePatchs();
+                OracleGraphicPatchs();
+                OracleArmPatch.PatchOn();
 
-            OracleGraphicPatchs();
-            OracleGraphicsModulePatch.PatchOn();
-            OracleGraphicsPropertiesPatch.PatchOn();
+
+                OracleGraphicsModulePatch.PatchOn();
+                OracleGraphicsPropertiesPatch.PatchOn();
 
             On.Room.ReadyForAI += Room_ReadyForAI;
 
@@ -247,7 +249,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Debug.LogException(ex);
                 return;
@@ -266,7 +268,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     c2.Emit(OpCodes.Ldarg, 2);
                     c2.EmitDelegate<Func<Oracle, Room, bool>>((self, room) =>
                     {
-                        foreach(var customOracle in CustomOracleExtender.customOracles)
+                        foreach (var customOracle in CustomOracleExtender.customOracles)
                         {
                             if (room.abstractRoom.name == customOracle.LoadRoom)
                             {

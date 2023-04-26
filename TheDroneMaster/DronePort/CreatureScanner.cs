@@ -363,7 +363,7 @@ namespace TheDroneMaster
 
             public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
             {
-
+                
             }
 
             public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)

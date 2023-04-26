@@ -30,7 +30,7 @@ namespace TheDroneMaster
             On.Player.Jump += Player_Jump;
             On.Player.SpearStick += Player_SpearStick;
 
-            //On.Player.ReleaseGrasp += Player_ReleaseGrasp;
+            On.Player.ReleaseGrasp += Player_ReleaseGrasp;
 
             On.Player.Die += Player_Die;
             On.Player.Destroy += Player_Destroy;
@@ -107,7 +107,7 @@ namespace TheDroneMaster
 
         private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
         {
-            if(modules.TryGetValue(self,out var module) && module.ownDrones)
+            if (modules.TryGetValue(self,out var module) && module.ownDrones)
             {
                 if (module.port.availableDroneCount != 0) module.port.ClearOutAllDrones();
                 module.playerDeathPreventer.AcceptableDamageCount = -1;

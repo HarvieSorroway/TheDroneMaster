@@ -80,7 +80,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\RW&amp;Modding\references1.9\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>E:\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -99,8 +101,10 @@
     <Compile Include="CustomLore\DreamComponent\OracleHooks\MIFOracleRegistry.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\OraclePatch.cs" />
+    <Compile Include="CustomLore\SpecificScripts\Components.cs" />
     <Compile Include="CustomLore\SpecificScripts\Cool3DObject.cs" />
     <Compile Include="CustomLore\SpecificScripts\LC_BossFight.cs" />
+    <Compile Include="CustomLore\SpecificScripts\MeshLoader.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />
     <Compile Include="DroneHUD\DroneHUD.cs" />
     <Compile Include="DroneHUD\DroneUI.cs" />
