@@ -8,10 +8,8 @@ using System.Threading.Tasks;
 using TheDroneMaster.CustomLore.SpecificScripts;
 using UnityEngine;
 using static Expedition.ExpeditionProgression;
-using static TheDroneMaster.Cool3DObject.Mesh3D;
 using static System.Net.Mime.MediaTypeNames;
 using static TheDroneMaster.Cool3DObject;
-using static TheDroneMaster.Cool3DObject.Mesh3D;
 
 namespace TheDroneMaster
 {
@@ -32,17 +30,17 @@ namespace TheDroneMaster
             this.startPos = startPos;
             Mesh3DAsset.TriangleFacet[] facets = new Mesh3DAsset.TriangleFacet[]
             {
-                new Mesh3D.TriangleFacet(0,1,2),
-                new Mesh3D.TriangleFacet(1,3,2),
+                new Mesh3DAsset.TriangleFacet(0,1,2),
+                new Mesh3DAsset.TriangleFacet(1,3,2),
 
-                new Mesh3D.TriangleFacet(4,5,6),
-                new Mesh3D.TriangleFacet(5,7,6),
+                new Mesh3DAsset.TriangleFacet(4,5,6),
+                new Mesh3DAsset.TriangleFacet(5,7,6),
 
-                new Mesh3D.TriangleFacet(8,9,10),
-                new Mesh3D.TriangleFacet(9,11,10),
+                new Mesh3DAsset.TriangleFacet(8,9,10),
+                new Mesh3DAsset.TriangleFacet(9,11,10),
 
-                new Mesh3D.TriangleFacet(12,13,14),
-                new Mesh3D.TriangleFacet(13,15,14),
+                new Mesh3DAsset.TriangleFacet(12,13,14),
+                new Mesh3DAsset.TriangleFacet(13,15,14),
 
                 new Mesh3DAsset.TriangleFacet(16,17,18),
             };
@@ -86,22 +84,6 @@ namespace TheDroneMaster
                     mesh3DRenderer.SetVerticeColor(i * 4, Color.cyan * 0.3f + Color.black * 0.8f, false);
                 }
             }
-        }
-
-            mesh3DRenderer2 = new Mesh3DDotMatrixRenderer(mesh, mesh3DRenderer1.totalSprites);
-            mesh3DRenderer2.SetVerticeColor(Color.yellow, true);
-            mesh3DRenderer2.SetVerticeColor(Color.yellow * 0.3f + Color.black * 0.8f, false);
-
-            mesh3DRenderer3 = new Mesh3DFrameRenderer(mesh, mesh3DRenderer1.totalSprites + mesh3DRenderer2.totalSprites);
-            mesh3DRenderer3.SetVerticeColor(Color.red, true);
-            mesh3DRenderer3.SetVerticeColor(Color.red * 0.3f + Color.black * 0.8f, false);
-
-
-            //for(int i = 0;i < 4;i++)
-            //{
-            //    mesh3DRenderer.SetVerticeColor(i * 4, Color.blue, true);
-            //    mesh3DRenderer.SetVerticeColor(i * 4, Color.cyan * 0.3f + Color.black * 0.8f, false);
-            //}
         }
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
@@ -283,8 +265,8 @@ namespace TheDroneMaster
                 this.mesh = mesh;
                 this.startIndex = startIndex;
 
-                vertices = new Vector3[mesh.animatedVertice.Count];
-                uvs = new Vector2[mesh.animatedVertice.Count];
+                vertices = new Vector3[mesh.animatedVertices.Count];
+                uvs = new Vector2[mesh.animatedVertices.Count];
 
                 verticeColorInBack = new Color[mesh.animatedVertices.Count];
                 verticeColorInFront = new Color[mesh.animatedVertices.Count];
@@ -546,7 +528,7 @@ namespace TheDroneMaster
             public List<FacetRepresent> facetRepresents;
 
             public Vector3 lightDir;
-            public Mesh3DFacetRenderer(Mesh3D mesh, int startIndex,string element, bool usingLight = false) : base(mesh, startIndex)
+            public Mesh3DFacetRenderer(Mesh3D mesh,ref int startIndex,string element, bool usingLight = false) : base(mesh, ref startIndex)
             {
                 _element = element;
                 this.usingLight = usingLight;
@@ -643,7 +625,7 @@ namespace TheDroneMaster
                     normal = Vector3.zero;
                 }
 
-                public FacetRepresent(TriangleFacet copyFrom) : this(copyFrom.a,copyFrom.b, copyFrom.c)
+                public FacetRepresent(Mesh3DAsset.TriangleFacet copyFrom) : this(copyFrom.a,copyFrom.b, copyFrom.c)
                 {
                 }
 
