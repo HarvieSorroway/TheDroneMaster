@@ -96,10 +96,8 @@
     <Compile Include="DreamComponent\GameHook\PlayerProgressionHooks.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracleObjects.cs" />
     <Compile Include="DreamComponent\OracleHooks\CustomOracleRegister.cs" />
-    <Compile Include="DreamComponent\OracleHooks\MIFOracleRegister.cs" />
     <Compile Include="DreamComponent\GameHook\SessionHook.cs" />
-    <Compile Include="DreamComponent\OracleHooks\CustomOracle.cs" />
-    <Compile Include="DreamComponent\OracleHooks\MIFOracle.cs" />
+    <Compile Include="DreamComponent\OracleHooks\MIFOracleRegistry.cs" />
     <Compile Include="DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
     <Compile Include="DreamComponent\OracleHooks\OraclePatch.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />

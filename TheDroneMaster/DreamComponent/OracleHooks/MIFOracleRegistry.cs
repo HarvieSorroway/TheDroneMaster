@@ -603,7 +603,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             if (player == null) return;
 
 
-
             if (action == MIFOracleBehaviour.MeetDroneMaster_Init)
             {
                 movementBehavior = CustomMovementBehavior.Idle;
