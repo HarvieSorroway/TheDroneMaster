@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static TheDroneMaster.CustomLore.SpecificScripts.Small3DObject;
+using static TheDroneMaster.Cool3DObject;
 
 namespace TheDroneMaster.CustomLore.SpecificScripts
 {
     static class MeshLoader
     {
-        static public Mesh3D LoadMeshFromPath(string path)
+        static public Mesh3DAsset LoadMeshFromPath(string path)
         {
-            Mesh3D mesh = new Mesh3D();
+            Mesh3DAsset mesh = new Mesh3DAsset();
             if (!File.Exists(path))
                 return mesh;
 
@@ -24,7 +24,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 switch(chars[0])
                 {
                     case "v":
-                        mesh.origVertices.Add(new Vector3(float.Parse(chars[1]), float.Parse(chars[2]), float.Parse(chars[3])));
+                        mesh.vertices.Add(new Vector3(float.Parse(chars[1]), float.Parse(chars[2]), float.Parse(chars[3])));
                         break;
                     case "vt":
                         //mesh.uvs.Add(new Vector2(float.Parse(chars[1]), float.Parse(chars[2])));
@@ -42,7 +42,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                             //int.Parse(face[1]) - 1]; 法线
                             //int.Parse(face[2]) - 1]; uv
                         }
-                        mesh.facets.Add(new Mesh3D.TriangleFacet(vec));
+                        mesh.facets.Add(new Mesh3DAsset.TriangleFacet(vec));
                         break;
                 }
             }

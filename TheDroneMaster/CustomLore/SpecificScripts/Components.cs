@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.PlayerLoop;
-using static TheDroneMaster.CustomLore.SpecificScripts.Small3DObject;
+using static TheDroneMaster.Cool3DObject;
+using static UnityEngine.RectTransform;
 
 namespace TheDroneMaster.CustomLore.SpecificScripts
 {
 
-    public class Component
+    public class RWComponent
     {
-        protected Component(SceneComponent root,bool isRoot = false)
+        protected RWComponent(SceneComponent root,bool isRoot = false)
         {
             if(isRoot)
                 IsRoot = true;
@@ -45,7 +46,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         public Mesh3D ownObject;
     }
 
-    public class VeterxComponent : Component
+    public class VeterxComponent : RWComponent
     {
         protected VeterxComponent(SceneComponent root) : base(root)
         {
@@ -55,7 +56,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
     }
 
 
-    public class RotatorComponent : Component
+    public class RotatorComponent : RWComponent
     {
         public RotatorComponent(SceneComponent root, Vector3 rotationVel) : base(root)
         {
@@ -70,7 +71,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
     }
 
 
-    public class SceneComponent : Component
+    public class SceneComponent : RWComponent
     {
         public SceneComponent(SceneComponent root) : base(root)
         {
@@ -82,68 +83,75 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
         public override void Update()
         {
-            base.Update();
+            base.Update();   
         }
 
-        public Vector3 Position;
-        public Vector3 Rotation;
-        public Vector3 Scale;
+        public Vector3 Position { get; set; }
+        public Vector3 Rotation { get; set; }
+        public Vector3 Scale { get; set; }
 
 
-        public Vector3 GetRelativePosition()
+
+        public Vector3 WorldPosition
         {
-            if (IsRoot) return Position;
-            return (TransformType.Relative - Type) * Root.GetWorldPosition() + Position;
-        }
-
-        public Vector3 GetRelativeRotation()
-        {
-            if (IsRoot) return Rotation;
-            return (TransformType.Relative - Type) * Root.GetWorldRotation() + Rotation;
-        }
-
-        public Vector3 GetWorldPosition()
-        {
-            if (IsRoot) return Position;
-
-            return (TransformType.World - Type) * Root.GetWorldPosition() + Position;
+            get
+            {
+                if (IsRoot) return Position;
+                return Root.WorldPosition + WorldOffest;
+            }
         } 
 
-        public Vector3 GetWorldRotation()
+        public Vector3 WorldRotation
         {
-            if (IsRoot) return Rotation;
-
-            return (TransformType.World - Type) * Root.GetWorldRotation() + Rotation;
+            get
+            {
+                if (IsRoot) return Rotation;
+                return Root.WorldRotation + Rotation;
+            }
         }
 
-        public Vector3 GetWorldScale()
+        public Vector3 WorldScale
         {
-            if (IsRoot) return Scale;
+            get
+            {
+                if (IsRoot) return Scale;
 
-            return Vector3.Scale(((TransformType.World - Type) * Root.GetWorldScale()) , Scale);
+                return Vector3.Scale( Root.WorldScale, Scale);
+            }
         }
 
-        public void SetTransformType(TransformType type)
+        public Vector3 WorldOffest
         {
-            var offest = type - Type;
-            Type = type;
-            if (IsRoot || offest == 0)
-                return;
-            Position += offest * Root.GetWorldPosition();
-            Rotation += offest * Root.GetWorldRotation();
-
-            //TODO
-            //Scale *= (offest == 1) ? Root.GetWorldScale() : new Vector3(1,1,1) / Root.GetWorldScale();
-
+            get
+            {
+                var axis = GetAxis().ToArray();
+                return Position.x * axis[0] + Position.y * axis[1] + Position.z * axis[2];
+            }
         }
 
-        public TransformType Type { get; private set; } = TransformType.Relative;
 
-        public enum TransformType
+        public IEnumerable<Vector3> GetAxis()
         {
-            World = 1,
-            Relative = 0,
+            var quaternion = Quaternion.AngleAxis(WorldRotation.z, Vector3.forward) *
+                             Quaternion.AngleAxis(WorldRotation.x, Vector3.left) * 
+                             Quaternion.AngleAxis(WorldRotation.y, Vector3.up);
+            yield return quaternion * Vector3.left;
+            yield return quaternion * Vector3.up;
+            yield return quaternion * Vector3.forward;
         }
+
+
+
+
+        public void AddChild(SceneComponent child)
+        {
+            Children.Add(child);
+        }
+
+
+
+        public List<SceneComponent> Children { get; private set; } = new List<SceneComponent>();
+
     }
 
 }
