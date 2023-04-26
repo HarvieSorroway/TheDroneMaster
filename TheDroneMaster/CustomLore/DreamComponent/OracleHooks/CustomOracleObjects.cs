@@ -18,12 +18,22 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public readonly AbstractPhysicalObject.AbstractObjectType pearlObjectType;
         public readonly DataPearl.AbstractDataPearl.DataPearlType dataPearlType;
 
+        public CustomOraclePearlRegistry(string name) : this(new AbstractPhysicalObject.AbstractObjectType(name,true),new DataPearl.AbstractDataPearl.DataPearlType(name,true))
+        {
+        }
+
         public CustomOraclePearlRegistry(AbstractPhysicalObject.AbstractObjectType pearlObjectType,DataPearl.AbstractDataPearl.DataPearlType dataPearlType)
         {
             this.pearlObjectType = pearlObjectType;
             this.dataPearlType = dataPearlType;
         }
 
+        /// <summary>
+        /// 创建 CustomPearl 的实例
+        /// </summary>
+        /// <param name="abstractPhysicalObject"></param>
+        /// <param name="world"></param>
+        /// <returns></returns>
         public virtual CustomOrbitableOraclePearl RealizeDataPearl(AbstractPhysicalObject abstractPhysicalObject,World world)
         {
             return null;
@@ -31,12 +41,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public virtual CustomOrbitableOraclePearl.AbstractCustomOraclePearl GetAbstractCustomOraclePearl(World world, PhysicalObject realizedObject, WorldCoordinate pos, EntityID ID, int originRoom, int placedObjectIndex, PlacedObject.ConsumableObjectData consumableData, int color, int number)
         {
-            return null;
+            return new CustomOrbitableOraclePearl.AbstractCustomOraclePearl(pearlObjectType, dataPearlType, world, realizedObject, pos, ID, originRoom, placedObjectIndex, consumableData, color, number);
         }
 
         public virtual CustomOrbitableOraclePearl.AbstractCustomOraclePearl AbstractPhysicalObjectFromString(AbstractPhysicalObject.AbstractObjectType type,World world,EntityID id,WorldCoordinate pos, string[] dataArray)
         {
-            return null;
+            return new CustomOrbitableOraclePearl.AbstractCustomOraclePearl(pearlObjectType,dataPearlType,world,null,pos,id, int.Parse(dataArray[3]), int.Parse(dataArray[4]), null, int.Parse(dataArray[6]), int.Parse(dataArray[7]));
         }
 
         /// <summary>
