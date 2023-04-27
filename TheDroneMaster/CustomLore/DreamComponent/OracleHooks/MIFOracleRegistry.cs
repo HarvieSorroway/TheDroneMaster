@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.CustomLore.SpecificScripts;
 using TheDroneMaster.DreamComponent.DreamHook;
 using TheDroneMaster.GameHooks;
 using UnityEngine;
@@ -580,12 +581,22 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
                 conv.events.Add(new Conversation.TextEvent(conv, 0, "I hope you will like it.", 0));
             }
+            else if(id == DroneMaster_DreamTalk2)
+            {
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "What a blessing to have you back!", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "It wasn't a long trip, but it looks like you still had trouble.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Let me check you out.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
+                conv.events.Add(new PauseAndWaitForStillEvent(conv, conv.convBehav, 40));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "Well, I'm glad you didn't have any problems, but your backpack seems to be broken.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, "I need some time to fix it. Please help yourself here.", 0));
+            }
         }
     }
 
     public class MIFOracleMeetDroneMaster : CustomConversationBehaviour
     {
-
+        public Simple3DObject scanned3DEffect;
         #region DreamTalk1
         public LightSource portShowLight;
         public static readonly int movePortCounter = 400;
@@ -618,6 +629,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
+                            return;
+                        }
+                        else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_2)
+                        {
+                            owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk2);
                             return;
                         }
                     }
@@ -697,6 +713,29 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     }
                 } 
             }
+            else if(action == MIFOracleBehaviour.MeetDroneMaster_DreamTalk2)
+            {
+                if (owner.conversation != null)
+                {
+                    movementBehavior = CustomMovementBehavior.Talk;
+
+                    if (owner.conversation.events.Count < 5 && scanned3DEffect == null)//前三句话说完了
+                    {
+                        scanned3DEffect = new Simple3DObject(oracle.room, player);
+                        oracle.room.AddObject(scanned3DEffect);
+                    }
+                    if (owner.conversation.slatedForDeletion)
+                    {
+                        owner.conversation = null;
+
+                        if (CustomDreamHook.currentActivateDream != null)
+                        {
+                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
+                        }
+                        return;
+                    }
+                }
+            }
         }
 
         public override void NewAction(CustomAction oldAction, CustomAction newAction)
@@ -709,6 +748,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             else if(newAction == MIFOracleBehaviour.MeetDroneMaster_DreamTalk1)
             {
                 owner.InitateConversation(MIFOracleBehaviour.DroneMaster_DreamTalk1, this);
+            }
+            else if(newAction == MIFOracleBehaviour.MeetDroneMaster_DreamTalk2)
+            {
+                owner.InitateConversation(MIFOracleBehaviour.DroneMaster_DreamTalk2, this);
             }
             else if (newAction == CustomAction.General_Idle)
             {

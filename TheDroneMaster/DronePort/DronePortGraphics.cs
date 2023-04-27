@@ -42,7 +42,7 @@ namespace TheDroneMaster
         public bool overrideDisplayDronePort = true;
 
         public bool portLightFlashing = false;
-        public bool portLightVisible = true;
+        public bool portLightOff = false;
 
         public float currentCastRad;
 
@@ -166,7 +166,7 @@ namespace TheDroneMaster
             sLeaser.sprites[startIndex].rotation = rotation;
             sLeaser.sprites[startIndex].SetPosition(vector - camPos + perDir - dir * portBiasY);
             sLeaser.sprites[startIndex + 1].SetPosition(vector - camPos + perDir2 - dir * 1.6f * portBiasY);
-            sLeaser.sprites[startIndex + 1].alpha = portLightVisible ? 0f : 1f;
+            sLeaser.sprites[startIndex + 1].alpha = portLightOff ? 0f : 1f;
 
             for (int i = 0;i < castLines.Length; i++)
             {
@@ -203,10 +203,10 @@ namespace TheDroneMaster
                 }
                 else
                 {
-                    switchLightCounter = !portLightVisible ? shortFlashCounter : nextLightFlashCounter;
-                    if (!portLightVisible)
+                    switchLightCounter = !portLightOff ? shortFlashCounter : nextLightFlashCounter;
+                    if (!portLightOff)
                         nextLightFlashCounter = (nextLightFlashCounter == longFlashCounter) ? shortFlashCounter : longFlashCounter;
-                    portLightVisible = !portLightVisible;
+                    portLightOff = !portLightOff;
                 }
             }
 
