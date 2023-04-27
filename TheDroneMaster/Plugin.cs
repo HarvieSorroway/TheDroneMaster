@@ -18,6 +18,7 @@ using TheDroneMaster.GameHooks;
 using TheDroneMaster.DreamComponent;
 using TheDroneMaster.DreamComponent.OracleHooks;
 using TheDroneMaster.DreamComponent.DreamHook;
+using TheDroneMaster.CustomLore.SpecificScripts;
 
 
 #pragma warning disable CS0618
@@ -109,6 +110,7 @@ namespace TheDroneMaster
                 Fixer.Patch();
                 DeathPersistentSaveDataPatch.Patch();
                 GamePatch.Patch(self);
+                RoomSpecificScriptPatch.PatchOn();
                 //PearlReaderPatchs.Patch();
 
 
@@ -133,20 +135,20 @@ namespace TheDroneMaster
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self,eu);
-            if(Input.GetKey(KeyCode.Y))
-            {
-                foreach(var i in self.room.drawableObjects)
-                {
-                    if(i is DroneMasterEnding.CreatureEndingSender)
-                    {
-                        return;
-                    }
-                }
-                DroneMasterEnding.CreatureEndingSender a;
-                self.room.AddObject(a = new DroneMasterEnding.CreatureEndingSender(null,CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
-                //if (PlayerPatchs.modules.TryGetValue(self,out var module))
-                //    a.module= module;
-            }
+            //if(Input.GetKey(KeyCode.Y))
+            //{
+            //    foreach(var i in self.room.drawableObjects)
+            //    {
+            //        if(i is DroneMasterEnding.CreatureEndingSender)
+            //        {
+            //            return;
+            //        }
+            //    }
+            //    DroneMasterEnding.CreatureEndingSender a;
+            //    self.room.AddObject(a = new DroneMasterEnding.CreatureEndingSender(null,CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
+            //    //if (PlayerPatchs.modules.TryGetValue(self,out var module))
+            //    //    a.module= module;
+            //}
         }
 
         public void LoadResources(RainWorld rainWorld)

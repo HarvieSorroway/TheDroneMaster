@@ -10,6 +10,7 @@ using UnityEngine;
 using static Expedition.ExpeditionProgression;
 using static System.Net.Mime.MediaTypeNames;
 using static TheDroneMaster.Cool3DObject;
+using Random = UnityEngine.Random;
 
 namespace TheDroneMaster
 {
@@ -601,6 +602,7 @@ namespace TheDroneMaster
                     if (culled || !usingLight)
                         light = 0f;
 
+
                     Color colA = Color.Lerp(GetLerpedColor(represent.a), Color.white, light);
                     Color colB = Color.Lerp(GetLerpedColor(represent.b), Color.white, light);
                     Color colC = Color.Lerp(GetLerpedColor(represent.c), Color.white, light);
@@ -645,6 +647,74 @@ namespace TheDroneMaster
 
                     sortZ = (vertices[a].z + vertices[b].z + vertices[c].z) / 3f;
                 }
+            }
+        }
+    }
+
+    public class Lightning : CosmeticSprite
+    {
+        Vector2 source;
+        Vector2 stuckPos;
+
+        Vector2 handleA;
+        Vector2 handleB;
+
+        float life = 1f;
+
+        public Lightning(Room room,Vector2 source, Vector2 pos)
+        {
+            base.room = room;
+
+            this.source = source;
+            this.stuckPos = pos;
+
+            handleA = pos + Custom.RNV() * Mathf.Lerp(400f, 700f, Random.value);
+            handleB = pos + Custom.RNV() * Mathf.Lerp(200f, 400f, Random.value);
+        }
+
+        public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            sLeaser.sprites = new FSprite[1];
+            sLeaser.sprites[0] = TriangleMesh.MakeLongMesh(20, false, true);
+            sLeaser.sprites[0].color = Color.yellow;
+
+            room.PlaySound(SoundID.SS_AI_Halo_Connection_Light_Up, 0f, 1f, 1f);
+
+            AddToContainer(sLeaser, rCam, null);
+        }
+
+        public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+        {
+            rCam.ReturnFContainer("Midground").AddChild(sLeaser.sprites[0]);
+        }
+
+        public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            if (slatedForDeletetion) return;
+
+            Vector2 vector = source;
+            Vector2 vector2 = stuckPos;
+            float d = 2f * life;
+
+            for (int m = 0; m < 20; m++)
+            {
+                float f = (float)m / 19f;
+                Vector2 a = Custom.DirVec(vector, vector2);
+                Vector2 vector3 = Custom.Bezier(vector2, handleA, vector, handleB, f);
+                Vector2 vector4 = Custom.DirVec(vector2, vector3);
+                Vector2 a2 = Custom.PerpendicularVector(vector4);
+                float d2 = Vector2.Distance(vector2, vector3);
+                (sLeaser.sprites[0] as TriangleMesh).MoveVertice(m * 4, vector3 - vector4 * d2 * 0.3f - a2 * d - camPos);
+                (sLeaser.sprites[0] as TriangleMesh).MoveVertice(m * 4 + 1, vector3 - vector4 * d2 * 0.3f + a2 * d - camPos);
+                (sLeaser.sprites[0] as TriangleMesh).MoveVertice(m * 4 + 2, vector3 - a2 * d - camPos);
+                (sLeaser.sprites[0] as TriangleMesh).MoveVertice(m * 4 + 3, vector3 + a2 * d - camPos);
+                vector2 = vector3;
+            }
+
+            life = Mathf.Lerp(life, 0f, 0.05f);
+            if(life < 0.001f)
+            {
+                Destroy();
             }
         }
     }
