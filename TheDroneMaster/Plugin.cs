@@ -198,6 +198,8 @@ namespace TheDroneMaster
         public static Conversation.ID Pebbles_DroneMaster_FirstMeet;
         public static Conversation.ID Pebbles_DroneMaster_AfterMet;
 
+        public static Conversation.ID Pebbles_DroneMaster_ExplainPackage;
+
         public static void RegisterValues()
         {
             if (registed) return;
@@ -206,6 +208,8 @@ namespace TheDroneMaster
 
             Pebbles_DroneMaster_FirstMeet = new Conversation.ID("Pebbles_DroneMaster_FirstMeet", true);
             Pebbles_DroneMaster_AfterMet = new Conversation.ID("Pebbles_DroneMaster_AfterMet", true);
+
+            Pebbles_DroneMaster_ExplainPackage = new Conversation.ID("Pebbles_DroneMaster_ExplainPackage", true);
             registed = true;
         }
 
@@ -224,6 +228,9 @@ namespace TheDroneMaster
 
                 Pebbles_DroneMaster_AfterMet.Unregister();
                 Pebbles_DroneMaster_AfterMet = null;
+
+                Pebbles_DroneMaster_ExplainPackage.Unregister();
+                Pebbles_DroneMaster_ExplainPackage = null;
                 registed = false;
             }
         }

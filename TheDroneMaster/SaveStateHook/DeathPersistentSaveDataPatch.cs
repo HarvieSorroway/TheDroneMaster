@@ -38,6 +38,7 @@ namespace TheDroneMaster
             {
                 units.Add(new EnemyCreatorSaveUnit(saveStateNumber));
                 units.Add(new ScannedCreatureSaveUnit(saveStateNumber));
+                units.Add(new SSConversationStateSaveUnit(saveStateNumber));
                 UnitsLoaded = true;
             }
         }
@@ -298,6 +299,34 @@ namespace TheDroneMaster
         public void SpawnEnemyInNewRegion(Region region)
         {
             CreateEnemyOrNot.Add(region.name);
+        }
+    }
+
+    public class SSConversationStateSaveUnit : DeathPersistentSaveDataUnit
+    {
+        public override string header => "SSCONVERSATIONSTATE";
+        public bool explainPackage = false;
+
+        public SSConversationStateSaveUnit(SlugcatStats.Name name) : base(name)
+        {
+        }
+
+        public override void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
+        {
+            base.ClearDataForNewSaveState(newSlugName);
+            explainPackage = false;
+        }
+
+        public override string SaveToString(bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
+        {
+            if (saveAsIfPlayerDied || saveAsIfPlayerQuit) return origSaveData;
+            return explainPackage.ToString();
+        }
+
+        public override void LoadDatas(string data)
+        {
+            base.LoadDatas(data);
+            explainPackage = bool.Parse(data);
         }
     }
 }
