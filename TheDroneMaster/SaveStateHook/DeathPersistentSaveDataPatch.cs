@@ -326,6 +326,8 @@ namespace TheDroneMaster
         public override void LoadDatas(string data)
         {
             base.LoadDatas(data);
+            if (data == string.Empty)
+                return;
             explainPackage = bool.Parse(data);
         }
     }

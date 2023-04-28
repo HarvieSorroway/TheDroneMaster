@@ -85,9 +85,12 @@ namespace TheDroneMaster
         /// </summary>
         public void SetUpOverrides(Player player)
         {
-            if(player.room.world.name == "DMD")
+            if(PlayerPatchs.modules.TryGetValue(player,out var module) && module.ownDrones && module.isStoryGamePlayer)
             {
-                new DronePortOverride(this, 0, true, Vector2.zero, 0f);
+                if (player.room.world.name == "DMD")
+                {
+                    new DronePortOverride(this, 0, true, Vector2.zero, 0f);
+                }
             }
         }
 

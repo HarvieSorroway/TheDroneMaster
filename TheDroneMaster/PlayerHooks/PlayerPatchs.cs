@@ -41,7 +41,7 @@ namespace TheDroneMaster
 
         private static void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
         {
-            if (modules.TryGetValue(self, out var module) && module.ownDrones && self.grasps[grasp] != null && self.room != null)
+            if (modules.TryGetValue(self, out var module) && module.isStoryGamePlayer && module.ownDrones && self.grasps[grasp] != null && self.room != null)
             {
                 Creature creature = self.grasps[grasp].grabbed as Creature;
                 if (creature != null && creature.dead && !DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().IsThisTypeScanned(creature.abstractCreature.creatureTemplate.type))
@@ -221,6 +221,7 @@ namespace TheDroneMaster
 
             public readonly bool ownDrones;
             public readonly bool usingDefaultCol = false;
+            public readonly bool isStoryGamePlayer;
 
             public readonly Color eyeColor;
             public readonly Color bodyColor;
@@ -251,6 +252,7 @@ namespace TheDroneMaster
             {
                 ownDrones = Plugin.OwnLaserDrone.TryGet(player, out bool ownLaserDrone) && ownLaserDrone;
                 playerRef = new WeakReference<Player>(player);
+                isStoryGamePlayer = player.room.game.session is StoryGameSession;
                 
                 //Plugin.Log(DeathPersistentSaveDataPatch.GetUnitOfHeader(EnemyCreator.header).ToString());
 
@@ -324,7 +326,7 @@ namespace TheDroneMaster
                         }
 
                         port = new DronePort(player);
-                        if(Plugin.instance.config.moreEnemies.Value) enemyCreator = new EnemyCreator(this);
+                        if(Plugin.instance.config.moreEnemies.Value && isStoryGamePlayer) enemyCreator = new EnemyCreator(this);
                         if(!Plugin.instance.config.canBackSpear.Value) player.spearOnBack = null;
                     }
                 }

@@ -71,7 +71,11 @@ namespace TheDroneMaster
                 overrideRef = new WeakReference<DronePortOverride>(overrides);
             }
 
-            portLightFlashing = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned;
+            if(pGraphics.player.room.game.session is StoryGameSession)
+            {
+                portLightFlashing = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned;
+            }
+            
         }
 
         public void InitSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)

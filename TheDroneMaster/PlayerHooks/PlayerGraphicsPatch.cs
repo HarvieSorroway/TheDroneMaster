@@ -39,6 +39,7 @@ namespace TheDroneMaster
                 getModule = true;
                 module.graphicsInited = false;
             }
+
             orig.Invoke(self, sLeaser, rCam);
 
             if (getModule)
@@ -105,9 +106,12 @@ namespace TheDroneMaster
         private static void PlayerGraphics_DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, UnityEngine.Vector2 camPos)
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
-            if (PlayerPatchs.modules.TryGetValue(self.player,out var module) && module.ownDrones && DroneHUD.instance != null && module.newEyeIndex != -1)
+            if (PlayerPatchs.modules.TryGetValue(self.player,out var module) && module.ownDrones && module.newEyeIndex != -1)
             {
-                Color color = Color.Lerp(module.eyeColor, module.laserColor, DroneHUD.instance.alpha);
+                Color color = module.eyeColor;
+                if (DroneHUD.instance != null)
+                    color = Color.Lerp(module.eyeColor, module.laserColor, DroneHUD.instance.alpha);
+
                 sLeaser.sprites[module.newEyeIndex].color = color;
 
                 sLeaser.sprites[module.newEyeIndex].element = sLeaser.sprites[9].element;

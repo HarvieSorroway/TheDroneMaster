@@ -94,9 +94,11 @@ namespace TheDroneMaster
 				}
 			}
 			totalSprites = ((!this.colored) ? this.scalesPositions.Length : (this.scalesPositions.Length * 2));
-		}
 
-		public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+            //Plugin.Log("MetalGills Inited");
+        }
+
+        public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
 		{
 			for (int i = this.startSprite + this.scalesPositions.Length - 1; i >= this.startSprite; i--)
 			{
@@ -106,6 +108,8 @@ namespace TheDroneMaster
 					sLeaser.sprites[i + this.scalesPositions.Length] = new CustomFSprite("pixel");
 				}
 			}
+
+			//Plugin.Log("MetalGills Initsprites");
 		}
 
 		public void Update()
@@ -156,7 +160,9 @@ namespace TheDroneMaster
 				return;
 			}
 
-			Vector2 sum = Vector2.zero;
+            //Plugin.Log("MetalGills Initsprites");
+
+            Vector2 sum = Vector2.zero;
 			for (int t = 0; t < 6; t++)
 			{
 				sum += Vector2.Lerp(this.scaleObjects[t].lastPos, this.scaleObjects[t].pos, timeStacker);
@@ -223,9 +229,11 @@ namespace TheDroneMaster
 					{
 						(sLeaser.sprites[i + this.scalesPositions.Length] as CustomFSprite).verticeColors[k] = realIndex <= acceptableDamage ? effectColor : effectColorMidlle;
 					}
+
+					
 				}
-				
-			}
+                //Plugin.Log(string.Format("i{0},root : {1}, color : {2},visible : {3]",i,rootPos, realIndex <= acceptableDamage ? effectColor : effectColorMidlle, (sLeaser.sprites[i + this.scalesPositions.Length] as CustomFSprite).isVisible));
+            }
 		}
 
 		public void SetGillColors(Color baseCol, Color effectCol,Color effectColorMiddle)
@@ -260,6 +268,7 @@ namespace TheDroneMaster
 			{
 				newContatiner.AddChild(sLeaser.sprites[i]);
 			}
-		}
+            //Plugin.Log("MetalGills AddToContainer : " + totalSprites.ToString());
+        }
 	}
 }

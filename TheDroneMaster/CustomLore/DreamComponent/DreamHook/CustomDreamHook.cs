@@ -388,6 +388,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
             upcomingDream = null;
             cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
+
             upcomingDream = DroneMasterDream_2;
             return;
 
@@ -400,6 +401,10 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                 case 1:
                     if (cyclesSinceLastDream > 3)
                         upcomingDream = DroneMasterDream_1;
+                    break;
+                case 2:
+                    if(cyclesSinceLastDream > 4)
+                        upcomingDream =DroneMasterDream_2;
                     break;
             }
             if (upcomingDream != null)

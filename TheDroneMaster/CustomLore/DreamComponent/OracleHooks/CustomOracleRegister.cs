@@ -77,11 +77,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             var room = oracle.room;
 
             Vector2 vector = new Vector2(200f, 100f);
-            PhysicalObject physicalObject = oracle;
 
             for (int i = 0; i < 6; i++)
             {
-                PhysicalObject orbitObj = physicalObject;
                 Vector2 ps = new Vector2(vector.x + 300f, vector.y + 200f) + Custom.RNV() * 20f;
                 int color;
                 switch (i)
@@ -97,11 +95,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         color = 1;
                         break;
                 }
-                oracle.CreateMarble(orbitObj, ps, 0, 35f, color);
+                oracle.CreateMarble(oracle, ps, 0, 35f, color);
             }
             for (int j = 0; j < 2; j++)
             {
-                oracle.CreateMarble(physicalObject, new Vector2(vector.x + 300f, vector.y + 200f) + Custom.RNV() * 20f, 1, 100f, (j == 1) ? 2 : 0);
+                oracle.CreateMarble(oracle, new Vector2(vector.x + 300f, vector.y + 200f) + Custom.RNV() * 20f, 1, 100f, (j == 1) ? 2 : 0);
             }
             oracle.CreateMarble(null, new Vector2(vector.x + 20f, vector.y + 200f), 0, 0f, 1);
             Vector2 vector2 = new Vector2(vector.x + 80f, vector.y + 30f);
@@ -119,9 +117,30 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 }
             }
 
-            oracle.CreateMarble(null, new Vector2(vector.x + 487f, vector.y + 218f), 0, 0f, 1);
+            oracle.CreateMarble(null, new Vector2(vector.x + 287f, vector.y + 218f), 0, 0f, 1);
 
-            oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 487f, vector.y + 218f), 0, 18f, 0);
+            var centerPearl = marbles[marbles.Count - 1];
+
+            for(int i = 0; i < 6; i++)
+            {
+                int color;
+                switch (i)
+                {
+                    default:
+                        color = 1;
+                        break;
+                    case 5:
+                        color = 2;
+                        break;
+                    case 2:
+                    case 3:
+                        color = 0;
+                        break;
+                }
+                oracle.CreateMarble(centerPearl, new Vector2(vector.x + 287f + 14f * i, vector.y + 218f), 0, 14f * i, color);
+            }
+
+            oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 440f, vector.y + 477f), 0, 14f, 0);
 
             oracle.CreateMarble(null, new Vector2(vector.x + 450f, vector.y + 467f), 0, 0f, 2);
             oracle.CreateMarble(marbles[marbles.Count - 1], new Vector2(vector.x + 440f, vector.y + 477f), 0, 38f, 1);
@@ -214,11 +233,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public bool callBaseDrawSprites = false;
         public bool callBaseUpdate = false;
 
-        public CustomCOracleStateViz customCOracleStateViz;
+        public CustomOracleStateViz customCOracleStateViz;
 
         public CustomOracleGraphic(PhysicalObject ow) : base(ow)
         {
-            customCOracleStateViz = new CustomCOracleStateViz(oracle);
+            customCOracleStateViz = new CustomOracleStateViz(oracle);
         }
 
         #region 默认方法
@@ -1485,12 +1504,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
     }
 }
 
-public class CustomCOracleStateViz
+public class CustomOracleStateViz
 {
     Oracle oracle;
 
     public FLabel label;
-    public CustomCOracleStateViz(Oracle oracle)
+    public CustomOracleStateViz(Oracle oracle)
     {
         this.oracle = oracle;
         InitSprites();
