@@ -514,6 +514,9 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                     facetRepresents[i].linkedSpriteIndex = i + startIndex;
                     sLeaser.sprites[i + startIndex] = new TriangleMesh(Element, new TriangleMesh.Triangle[1] { new TriangleMesh.Triangle(0, 1, 2) }, true, true);
 
+                    if (shader != string.Empty)
+                        sLeaser.sprites[i + startIndex].shader = rCam.game.rainWorld.Shaders[shader];
+                    
                     var facet = mesh.facets[i];
                     (sLeaser.sprites[i + startIndex] as TriangleMesh).UVvertices[0] = uvs[facet.a];
                     (sLeaser.sprites[i + startIndex] as TriangleMesh).UVvertices[1] = uvs[facet.b];

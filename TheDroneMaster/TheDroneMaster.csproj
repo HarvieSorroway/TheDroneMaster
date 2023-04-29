@@ -97,6 +97,7 @@
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
     <Compile Include="CustomLore\CustomEnding\CustomEnding.cs" />
     <Compile Include="CustomLore\DreamComponent\DreamHook\CustomDreamHook.cs" />
+    <Compile Include="CustomLore\DreamComponent\DreamHook\SessionHook.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleObjects.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleRegister.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\MIFOracleRegistry.cs" />

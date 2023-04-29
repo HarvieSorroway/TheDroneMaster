@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using BepInEx;
-using System.Security.Permissions;
+﻿using BepInEx;
+using Fisobs.Core;
+using SlugBase.DataTypes;
 using SlugBase.Features;
+using System;
+using System.Collections.Generic;
+using System.Security.Permissions;
+using TheDroneMaster.DreamComponent.OracleHooks;
+using TheDroneMaster.GameHooks;
+using UnityEngine;
 using static SlugBase.Features.FeatureTypes;
 using RWCustom;
 using Fisobs.Core;
@@ -43,6 +44,7 @@ namespace TheDroneMaster
         public static Shader postShade;
         public static Shader bufferShader;
         public static Shader customHoloGridShader;
+        public static Shader lineMaskShader;
         public static PostEffect postEffect;
 
         public static bool inited;
@@ -112,6 +114,7 @@ namespace TheDroneMaster
                 Fixer.Patch();
                 DeathPersistentSaveDataPatch.Patch();
                 GamePatch.Patch(self);
+                SessionHook.Patch();
                 RoomSpecificScriptPatch.PatchOn();
                 CustomEnding.PatchOn();
                 //PearlReaderPatchs.Patch();
@@ -138,20 +141,39 @@ namespace TheDroneMaster
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self,eu);
-            //if(Input.GetKey(KeyCode.Y))
-            //{
-            //    foreach(var i in self.room.drawableObjects)
-            //    {
-            //        if(i is DroneMasterEnding.CreatureEndingSender)
-            //        {
-            //            return;
-            //        }
-            //    }
-            //    DroneMasterEnding.CreatureEndingSender a;
-            //    self.room.AddObject(a = new DroneMasterEnding.CreatureEndingSender(null,CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
-            //    //if (PlayerPatchs.modules.TryGetValue(self,out var module))
-            //    //    a.module= module;
-            //}
+            if (Input.GetKey(KeyCode.Y))
+            {
+                foreach (var i in self.room.drawableObjects)
+                {
+                    if (i is DroneMasterEnding)
+                    {
+                        return;
+                    }
+                }
+                self.room.AddObject(new DroneMasterEnding(self.room));
+                //if (PlayerPatchs.modules.TryGetValue(self,out var module))
+                //    a.module= module;
+            }
+            else if (Input.GetKey(KeyCode.N))
+            {
+                DroneMasterEnding a = null;
+                foreach (var i in self.room.drawableObjects)
+                {
+                    if (i is DroneMasterEnding)
+                    {
+                        a = i as DroneMasterEnding;
+                    }
+                    if (i is DroneMasterEnding.EndingMessageSender)
+                    {
+                        return;
+                    }
+                }
+                if(a!= null)
+                self.room.AddObject(new DroneMasterEnding.EndingMessageSender(a));
+                //if (PlayerPatchs.modules.TryGetValue(self,out var module))
+                //    a.module= module;
+            }
+
         }
 
         public void LoadResources(RainWorld rainWorld)
@@ -177,6 +199,11 @@ namespace TheDroneMaster
             trueRectName = trueRect.name;
 
             ab.Unload(false);
+
+            string path2 = AssetManager.ResolveFilePath("assetbundles/linemaskshader");
+            AssetBundle ab2 = AssetBundle.LoadFromFile(path2);
+            lineMaskShader = ab2.LoadAsset<Shader>("assets/LineMask.shader");
+            rainWorld.Shaders.Add("LineMask", FShader.CreateShader("LineMask", lineMaskShader));
 
         }
 
