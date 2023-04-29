@@ -20,6 +20,8 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 IsRoot = true;
             else
                 Assert.IsNotNull(root);
+
+            root.AddChild(this);
         }
         public virtual void Update()
         {
@@ -81,11 +83,6 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         {
         }
 
-        public override void Update()
-        {
-            base.Update();   
-        }
-
         public Vector3 Position { get; set; }
         public Vector3 Rotation { get; set; }
         public Vector3 Scale { get; set; }
@@ -143,14 +140,14 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
 
 
-        public void AddChild(SceneComponent child)
+        public void AddChild(RWComponent child)
         {
             Children.Add(child);
         }
 
 
 
-        public List<SceneComponent> Children { get; private set; } = new List<SceneComponent>();
+        public List<RWComponent> Children { get; private set; } = new List<RWComponent>();
 
     }
 

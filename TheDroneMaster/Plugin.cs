@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using BepInEx;
-using System.Security.Permissions;
-using SlugBase.Features;
-using static SlugBase.Features.FeatureTypes;
-using RWCustom;
+﻿using BepInEx;
 using Fisobs.Core;
 using SlugBase.DataTypes;
-using System.Reflection;
-using MonoMod.RuntimeDetour;
-using System.IO;
-using TheDroneMaster.GameHooks;
-using TheDroneMaster.DreamComponent;
+using SlugBase.Features;
+using System;
+using System.Collections.Generic;
+using System.Security.Permissions;
 using TheDroneMaster.DreamComponent.OracleHooks;
-using TheDroneMaster.DreamComponent.DreamHook;
+using TheDroneMaster.GameHooks;
+using UnityEngine;
+using static SlugBase.Features.FeatureTypes;
 
 
 #pragma warning disable CS0618
@@ -109,6 +100,7 @@ namespace TheDroneMaster
                 Fixer.Patch();
                 DeathPersistentSaveDataPatch.Patch();
                 GamePatch.Patch(self);
+                SessionHook.Patch();
                 //PearlReaderPatchs.Patch();
 
 
@@ -133,17 +125,16 @@ namespace TheDroneMaster
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self,eu);
-            if(Input.GetKey(KeyCode.Y))
+            if (Input.GetKey(KeyCode.Y))
             {
-                foreach(var i in self.room.drawableObjects)
+                foreach (var i in self.room.drawableObjects)
                 {
-                    if(i is DroneMasterEnding.CreatureEndingSender)
+                    if (i is DroneMasterEnding)
                     {
                         return;
                     }
                 }
-                DroneMasterEnding.CreatureEndingSender a;
-                self.room.AddObject(a = new DroneMasterEnding.CreatureEndingSender(null,CreatureTemplate.Type.BigEel, self.room, self.bodyChunks[0].pos + new Vector2(50,20)));
+                self.room.AddObject(new DroneMasterEnding(self.room));
                 //if (PlayerPatchs.modules.TryGetValue(self,out var module))
                 //    a.module= module;
             }
