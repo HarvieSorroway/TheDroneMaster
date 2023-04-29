@@ -37,6 +37,8 @@ namespace TheDroneMaster
             else//Load DeathPersistentSaveDataUnits here
             {
                 units.Add(new EnemyCreatorSaveUnit(saveStateNumber));
+                units.Add(new ScannedCreatureSaveUnit(saveStateNumber));
+                units.Add(new SSConversationStateSaveUnit(saveStateNumber));
                 UnitsLoaded = true;
             }
         }
@@ -88,6 +90,21 @@ namespace TheDroneMaster
             foreach(var unit in units)
             {
                 if (unit.header == header) return unit;
+            }
+            return null;
+        }
+
+        public static bool TryGetValue(string header, out DeathPersistentSaveDataUnit unit)
+        {
+            unit = GetUnitOfHeader(header);
+            return unit != null;
+        }
+
+        public static T GetUnitOfType<T>() where T : DeathPersistentSaveDataUnit
+        {
+            foreach(var unit in units)
+            {
+                if (unit is T) return (T)unit;
             }
             return null;
         }
@@ -171,6 +188,8 @@ namespace TheDroneMaster
         public override string header => "SCANNEDCREATURETYPES";
 
         public List<CreatureTemplate.Type> scanedTypes = new List<CreatureTemplate.Type>();
+
+        public bool KingScanned => IsThisTypeScanned(MoreSlugcats.MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing);
         public ScannedCreatureSaveUnit(SlugcatStats.Name name) : base(name)
         {
         }
@@ -182,7 +201,9 @@ namespace TheDroneMaster
             string[] allData = Regex.Split(data, "_");
             for(int i = 0;i < allData.Length; i++)
             {
-                scanedTypes.Add(new CreatureTemplate.Type(allData[i]));
+                if (allData[i] == string.Empty)
+                    continue;
+                AddScannedType(new CreatureTemplate.Type(allData[i]));
             }
         }
 
@@ -201,6 +222,12 @@ namespace TheDroneMaster
             return result;
         }
 
+        public override void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
+        {
+            base.ClearDataForNewSaveState(newSlugName);
+            scanedTypes.Clear();
+        }
+
         public bool IsThisTypeScanned(CreatureTemplate.Type type)
         {
             return scanedTypes.Contains(type);
@@ -211,6 +238,7 @@ namespace TheDroneMaster
             if (!IsThisTypeScanned(type))
             {
                 scanedTypes.Add(type);
+                Plugin.Log("Add new creature type : " + type.ToString());
             }
         }
     }
@@ -271,6 +299,34 @@ namespace TheDroneMaster
         public void SpawnEnemyInNewRegion(Region region)
         {
             CreateEnemyOrNot.Add(region.name);
+        }
+    }
+
+    public class SSConversationStateSaveUnit : DeathPersistentSaveDataUnit
+    {
+        public override string header => "SSCONVERSATIONSTATE";
+        public bool explainPackage = false;
+
+        public SSConversationStateSaveUnit(SlugcatStats.Name name) : base(name)
+        {
+        }
+
+        public override void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
+        {
+            base.ClearDataForNewSaveState(newSlugName);
+            explainPackage = false;
+        }
+
+        public override string SaveToString(bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
+        {
+            if (saveAsIfPlayerDied || saveAsIfPlayerQuit) return origSaveData;
+            return explainPackage.ToString();
+        }
+
+        public override void LoadDatas(string data)
+        {
+            base.LoadDatas(data);
+            explainPackage = bool.Parse(data);
         }
     }
 }

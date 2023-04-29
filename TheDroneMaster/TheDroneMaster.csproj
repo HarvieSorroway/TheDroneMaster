@@ -106,6 +106,7 @@
     <Compile Include="CustomLore\SpecificScripts\Cool3DObject.cs" />
     <Compile Include="CustomLore\SpecificScripts\LC_BossFight.cs" />
     <Compile Include="CustomLore\SpecificScripts\MeshLoader.cs" />
+    <Compile Include="CustomLore\SpecificScripts\Simple3DObject.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />
     <Compile Include="DroneHUD\DroneHUD.cs" />
     <Compile Include="DroneHUD\DroneUI.cs" />

@@ -15,3 +15,19 @@ But now I have to keep working.
 Great success!
 The way they say it works really works!
 Oh little one you are awake, how does it feel to be in this world?
+Oh you're back again, little creature.
+Judging by your current state, I think you've found what you were looking for.
+Your pack seems to want to send some data, and given that the only structure<LINE>around that can send data is the communications array, I would recommend you head there.
+Although I won't be able to use it from here, you might be able to take your chances.
+Good luck then, I'll have to get back to my work.
+The current environment outside is too dangerous even for you.
+To keep you safe, I made this for you.
+A drone backpack, although you may not always understand it, but it will protect you to the maximum extent.
+Also if you are not too far from my precinct, I can talk to you through it.
+.  .  .
+I hope you will like it.
+What a blessing to have you back!
+It wasn't a long trip, but it looks like you still had trouble.
+Let me check you out.
+Well, I'm glad you didn't have any problems, but your backpack seems to be broken.
+I need some time to fix it. Please help yourself here.

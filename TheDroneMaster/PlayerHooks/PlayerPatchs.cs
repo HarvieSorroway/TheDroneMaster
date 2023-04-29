@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using TheDroneMaster.CustomLore.SpecificScripts;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace TheDroneMaster
 {
@@ -30,12 +31,26 @@ namespace TheDroneMaster
             On.Player.Jump += Player_Jump;
             On.Player.SpearStick += Player_SpearStick;
 
-            On.Player.ReleaseGrasp += Player_ReleaseGrasp;
+            On.Player.TossObject += Player_TossObject;
 
             On.Player.Die += Player_Die;
             On.Player.Destroy += Player_Destroy;
 
             Hook player_get_CanPutSpearToBack_Hook = new Hook(typeof(Player).GetProperty("CanPutSpearToBack", propFlags).GetGetMethod(), typeof(PlayerPatchs).GetMethod("Player_get_CanPutSpearOnBack", methodFlags));
+        }
+
+        private static void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
+        {
+            if (modules.TryGetValue(self, out var module) && module.ownDrones && self.grasps[grasp] != null && self.room != null)
+            {
+                Creature creature = self.grasps[grasp].grabbed as Creature;
+                if (creature != null && creature.dead && !DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().IsThisTypeScanned(creature.abstractCreature.creatureTemplate.type))
+                {
+                    CreatureScanner scanner = new CreatureScanner(creature, self.DangerPos + new Vector2(0, 60), self.room, module.laserColor, module);
+                    self.room.AddObject(scanner);
+                }
+            }
+            orig.Invoke(self, grasp, eu);
         }
 
         private static bool Player_SpearStick(On.Player.orig_SpearStick orig, Player self, Weapon source, float dmg, BodyChunk chunk, PhysicalObject.Appendage.Pos appPos, Vector2 direction)
@@ -47,20 +62,6 @@ namespace TheDroneMaster
                 if (module.playerDeathPreventer.DeathPreventCounter > 0 && module.playerDeathPreventer.AcceptableDamageCount >= 0) result = false; 
             }
             return result;
-        }
-
-        private static void Player_ReleaseGrasp(On.Player.orig_ReleaseGrasp orig, Player self, int grasp)
-        {
-            if (modules.TryGetValue(self, out var module) && module.ownDrones)
-            {
-                Creature creature = self.grasps[grasp].grabbed as Creature;
-                if (creature != null)
-                {
-                    CreatureScanner scanner = new CreatureScanner(creature, self.DangerPos + new Vector2(0, 60), self.room, module.laserColor,module);
-                    self.room.AddObject(scanner);
-                }
-            }
-            orig.Invoke(self, grasp);
         }
 
         public static bool Player_get_CanPutSpearOnBack(orig_Player_CanPutSpearToBack orig,Player self)
@@ -184,9 +185,20 @@ namespace TheDroneMaster
             if (Input.GetKeyDown(KeyCode.S))
             {
                 //self.room.game.Win(false);
-                if (Cool3DObject.instance != null) return;
-                self.room.AddObject(new Cool3DObject(self.room, self.DangerPos));
+                if (Simple3DObject.instance != null) return;
+                    self.room.AddObject(new Simple3DObject(self.room, self));
             }
+
+            //if(Random.value < 0.3f)
+            //{
+            //    int randomX = (int)Random.Range(0, self.room.TileWidth);
+            //    int randomY = (int)Random.Range(0, self.room.TileHeight);
+
+            //    if(self.room.GetTile(randomX, randomY).Solid)
+            //    {
+            //        self.room.AddObject(new Lightning(self.room, self.DangerPos, self.room.MiddleOfTile(randomX, randomY)));
+            //    }
+            //}
         }
 
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)

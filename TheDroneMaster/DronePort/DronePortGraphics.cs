@@ -16,6 +16,9 @@ namespace TheDroneMaster
         public static readonly float portBiasX = 7f;
         public static readonly float portBiasY = 8f;
 
+        readonly int longFlashCounter = 40;
+        readonly int shortFlashCounter = 5;
+
 
         public PlayerGraphics pGraphics;
         public CastLine[] castLines = new CastLine[25];
@@ -32,8 +35,14 @@ namespace TheDroneMaster
         public int GenLightningCooler = 0;
         public int castCounter = 0;
 
+        public int switchLightCounter;
+        public int nextLightFlashCounter;
+
         public bool playLightningSounds = true;
         public bool overrideDisplayDronePort = true;
+
+        public bool portLightFlashing = false;
+        public bool portLightOff = false;
 
         public float currentCastRad;
 
@@ -61,6 +70,8 @@ namespace TheDroneMaster
                 overrideDisplayDronePort = overrides.initDronePortGraphics;
                 overrideRef = new WeakReference<DronePortOverride>(overrides);
             }
+
+            portLightFlashing = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned;
         }
 
         public void InitSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
@@ -155,8 +166,9 @@ namespace TheDroneMaster
             sLeaser.sprites[startIndex].rotation = rotation;
             sLeaser.sprites[startIndex].SetPosition(vector - camPos + perDir - dir * portBiasY);
             sLeaser.sprites[startIndex + 1].SetPosition(vector - camPos + perDir2 - dir * 1.6f * portBiasY);
+            sLeaser.sprites[startIndex + 1].alpha = portLightOff ? 0f : 1f;
 
-            for(int i = 0;i < castLines.Length; i++)
+            for (int i = 0;i < castLines.Length; i++)
             {
                 castLines[i].DrawSpites(sLeaser, rCam, timeStacker, camPos, vector + perDir - dir * portBiasY);
             }
@@ -183,6 +195,20 @@ namespace TheDroneMaster
             }
             else if (currentCastTarget != null) currentCastTarget = null;
 
+            if (portLightFlashing)
+            {
+                if(switchLightCounter > 0)
+                {
+                    switchLightCounter--;
+                }
+                else
+                {
+                    switchLightCounter = !portLightOff ? shortFlashCounter : nextLightFlashCounter;
+                    if (!portLightOff)
+                        nextLightFlashCounter = (nextLightFlashCounter == longFlashCounter) ? shortFlashCounter : longFlashCounter;
+                    portLightOff = !portLightOff;
+                }
+            }
 
             if (GenSparkCooler > 0) GenSparkCooler--;
             else

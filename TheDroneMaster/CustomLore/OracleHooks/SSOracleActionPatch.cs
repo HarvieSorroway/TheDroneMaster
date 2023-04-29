@@ -46,6 +46,16 @@ namespace TheDroneMaster
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("If you can keep quiet, I may allow you to stop for a little longer."), 0));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("But now I have to keep working."), 0));
             }
+            else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_ExplainPackage)
+            {
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh you're back again, little creature."), 0));
+                self.events.Add(new Conversation.WaitEvent(self, 30));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Judging by your current state, I think you've found what you were looking for."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your pack seems to want to send some data, and given that the only structure<LINE>around that can send data is the communications array, I would recommend you head there."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Although I won't be able to use it from here, you might be able to take your chances."), 0));
+                self.events.Add(new Conversation.WaitEvent(self, 50));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Good luck then, I'll have to get back to my work."), 0));
+            }
         }
 
         private static void SSOracleBehavior_SeePlayer(On.SSOracleBehavior.orig_SeePlayer orig, SSOracleBehavior self)
@@ -70,16 +80,7 @@ namespace TheDroneMaster
                     }
 
                     self.SlugcatEnterRoomReaction();
-
-                    if (self.oracle.room.game.GetStorySession.saveState.deathPersistentSaveData.theMark)
-                    {
-                        self.NewAction(DroneMasterEnums.MeetDroneMaster);
-                    }
-                    else
-                    {
-                        self.afterGiveMarkAction = DroneMasterEnums.MeetDroneMaster;
-                        self.NewAction(SSOracleBehavior.Action.General_GiveMark);
-                    }
+                    self.NewAction(DroneMasterEnums.MeetDroneMaster);
                 }
             }
             else
@@ -143,7 +144,18 @@ namespace TheDroneMaster
                     }
                     else
                     {
-                        owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_AfterMet, this);
+                        var scannedSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>();
+                        var pebbleConvSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<SSConversationStateSaveUnit>();
+
+                        if(scannedSaveUnit.KingScanned && !pebbleConvSaveUnit.explainPackage)
+                        {
+                            pebbleConvSaveUnit.explainPackage = true;
+                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_ExplainPackage, this);
+                        }
+                        else
+                        {
+                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_AfterMet, this);
+                        }
                     }
 
                     oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad++;

@@ -361,6 +361,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
     {
         public static readonly DreamsState.DreamID DroneMasterDream_0 = new DreamsState.DreamID("DroneMasterDream_0", true);
         public static readonly DreamsState.DreamID DroneMasterDream_1 = new DreamsState.DreamID("DroneMasterDream_1", true);
+        public static readonly DreamsState.DreamID DroneMasterDream_2 = new DreamsState.DreamID("DroneMasterDream_2", true);
 
         public DroneMasterDream() : base(new SlugcatStats.Name(Plugin.ID))
         {
@@ -387,6 +388,8 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
             upcomingDream = null;
             cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
+            upcomingDream = DroneMasterDream_2;
+            return;
 
             switch (familyThread)
             {
@@ -409,7 +412,8 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         public override CustomDreamHook.BuildDreamWorldParams GetBuildDreamWorldParams()
         {
             if(activateDreamID == DroneMasterDream_0 ||
-               activateDreamID == DroneMasterDream_1)
+               activateDreamID == DroneMasterDream_1 ||
+               activateDreamID == DroneMasterDream_2)
             {
                 return new CustomDreamHook.BuildDreamWorldParams()
                 {

@@ -68,6 +68,8 @@ namespace TheDroneMaster
             ShowGlyphCounter = ScanCounter + (int)(totalGlyphCount * framesToRevalOne);
             BlinkCounter = ShowGlyphCounter + 200;
             ShowFilterCounter = BlinkCounter + showFilterFrameSpan * filterTags.Count;
+
+            DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().AddScannedType(target.abstractCreature.creatureTemplate.type);
         }
 
         public void SetUpFilter()
@@ -80,7 +82,7 @@ namespace TheDroneMaster
             bool isScavElite = false;
             bool isScavKing = false;
 
-            if(target.abstractCreature.abstractAI.RealAI != null)
+            if(target.abstractCreature.abstractAI != null && target.abstractCreature.abstractAI.RealAI != null)
             {
                 usingAI = true;
                 var ai = target.abstractCreature.abstractAI.RealAI;
@@ -98,6 +100,7 @@ namespace TheDroneMaster
                 if (isScavKing)// force all true
                 {
                     usingfriendTracker = true;
+                    SetUpSideScanProgress();
                 }
             }
 
@@ -112,6 +115,12 @@ namespace TheDroneMaster
                 filterTags.Add(newFilter);
                 filterIndex++;
             }
+        }
+
+        public void SetUpSideScanProgress()
+        {
+            if(playerModule.portGraphics != null)
+                playerModule.portGraphics.portLightFlashing = true;
         }
 
         public void SetUpGlyph()
