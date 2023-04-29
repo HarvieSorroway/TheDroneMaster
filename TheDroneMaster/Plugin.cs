@@ -42,6 +42,7 @@ namespace TheDroneMaster
         public static Shader postShade;
         public static Shader bufferShader;
         public static Shader customHoloGridShader;
+        public static Shader lineMaskShader;
         public static PostEffect postEffect;
 
         public static bool inited;
@@ -150,6 +151,26 @@ namespace TheDroneMaster
                 //if (PlayerPatchs.modules.TryGetValue(self,out var module))
                 //    a.module= module;
             }
+            else if (Input.GetKey(KeyCode.N))
+            {
+                DroneMasterEnding a = null;
+                foreach (var i in self.room.drawableObjects)
+                {
+                    if (i is DroneMasterEnding)
+                    {
+                        a = i as DroneMasterEnding;
+                    }
+                    if (i is DroneMasterEnding.EndingMessageSender)
+                    {
+                        return;
+                    }
+                }
+                if(a!= null)
+                self.room.AddObject(new DroneMasterEnding.EndingMessageSender(a));
+                //if (PlayerPatchs.modules.TryGetValue(self,out var module))
+                //    a.module= module;
+            }
+
         }
 
         public void LoadResources(RainWorld rainWorld)
@@ -175,6 +196,11 @@ namespace TheDroneMaster
             trueRectName = trueRect.name;
 
             ab.Unload(false);
+
+            string path2 = AssetManager.ResolveFilePath("assetbundles/linemaskshader");
+            AssetBundle ab2 = AssetBundle.LoadFromFile(path2);
+            lineMaskShader = ab2.LoadAsset<Shader>("assets/LineMask.shader");
+            rainWorld.Shaders.Add("LineMask", FShader.CreateShader("LineMask", lineMaskShader));
 
         }
 

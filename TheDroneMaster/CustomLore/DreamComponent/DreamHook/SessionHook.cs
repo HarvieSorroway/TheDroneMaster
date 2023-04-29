@@ -1,18 +1,13 @@
-﻿using Mono.Cecil.Cil;
+﻿using JetBrains.Annotations;
+using Mono.Cecil.Cil;
 using MoreSlugcats;
 using RWCustom;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using static TheDroneMaster.CreatureScanner;
-using static TheDroneMaster.DronePortGraphics;
+using static TheDroneMaster.CustomLore.SpecificScripts.Simple3DObject;
 using static TheDroneMaster.PlayerPatchs;
 using Random = UnityEngine.Random;
 
@@ -23,13 +18,29 @@ namespace TheDroneMaster.GameHooks
         static public void Patch()
         {
             On.RoomSpecificScript.AddRoomSpecificScript += RoomSpecificScript_AddRoomSpecificScript;
+            On.RoomCamera.Update += RoomCamera_Update;
+            On.RoomCamera.ApplyPalette += RoomCamera_ApplyPalette;
+        }
+
+        private static void RoomCamera_ApplyPalette(On.RoomCamera.orig_ApplyPalette orig, RoomCamera self)
+        {
+            if (ghost > 0)
+                self.ghostMode = origGhost;
+            orig(self);
+        }
+
+        private static void RoomCamera_Update(On.RoomCamera.orig_Update orig, RoomCamera self)
+        {
+            origGhost = self.ghostMode;
+            if (ghost > 0)
+                self.ghostMode = ghost;
+            orig(self);
         }
 
         private static void RoomSpecificScript_AddRoomSpecificScript(On.RoomSpecificScript.orig_AddRoomSpecificScript orig, Room room)
         {
             orig(room);
             //TODO : 结局判断
-            Plugin.Log("A");
             if (room.abstractRoom.name == "SI_A07" && room.world.game.session.characterStats.name.value == "thedronemaster")
             {
                 Plugin.Log("Try Play Endding");
@@ -37,10 +48,13 @@ namespace TheDroneMaster.GameHooks
             }
 
         }
+        public static float ghost = -1;
+        public static float origGhost = -1;
     }
 
     public class DroneMasterEnding : UpdatableAndDeletable, IDrawable
     {
+        public readonly int RECT_COUNT = 4;
    
         public DroneMasterEnding(Room room)
         {
@@ -50,12 +64,62 @@ namespace TheDroneMaster.GameHooks
             centerPos = new Vector2(470f, 560f);
             senderList = new List<CreatureEndingSender>();
 
+            rects = new Mesh3D[RECT_COUNT];  
+            renderers = new Mesh3DRenderer[RECT_COUNT];
+            rotVels = new Vector3[RECT_COUNT];
+            stdScales = new float[RECT_COUNT];
+            scales = new float[RECT_COUNT];
+
             if (player.realizedCreature != null 
                 && Plugin.OwnLaserDrone.TryGet(player.realizedCreature as Player, out bool ownLaserDrone) 
                 && ownLaserDrone
-                && PlayerPatchs.modules.TryGetValue(player.realizedCreature as Player, out _))
+                && modules.TryGetValue(player.realizedCreature as Player, out _))
             {
+
                 focusedPlayer = player.realizedCreature as Player;
+                totalSprites += glphyCount = Random.Range(10,20);
+                glphys = new GlyphPoint[glphyCount];
+                for (int i = 0; i < glphyCount; i++)
+                {
+                    glphys[i] = new GlyphPoint();
+                    glphys[i].pos = centerPos + Custom.RNV() * Random.value * rad;
+                    glphys[i].vel = Custom.RNV() * Random.Range(0.5f,1.0f) * 30;
+                    glphys[i].life = Random.Range(80, 200);
+
+                }
+
+                Mesh3D.TriangleFacet[] rect = new Mesh3D.TriangleFacet[2]
+                {
+                    new Mesh3D.TriangleFacet(0,1,2),
+                    new Mesh3D.TriangleFacet(0,2,3)
+                };
+
+
+                for (int i = 0; i < RECT_COUNT; i++)
+                {
+                    Mesh3D mesh = rects[i] = new Mesh3D();
+                    mesh.SetFacet(rect);
+                    mesh.rotation = new Vector3(Random.value * 180, Random.value * 180, Random.value * 180);
+                    mesh.SetVertice(0, Vector3.left + Vector3.down);
+                    mesh.SetVertice(1, Vector3.right + Vector3.down);
+                    mesh.SetVertice(2, Vector3.right + Vector3.up);
+                    mesh.SetVertice(3, Vector3.left + Vector3.up);
+                    stdScales[i] = i * 15 + 30;
+                    FoolSetScale(mesh, 0);
+
+                    renderers[i] = new Mesh3DFacetRenderer(mesh, totalSprites, "pixel", false);
+                    renderers[i].shader = "LineMask";
+                    renderers[i].SetUV(0, new Vector2(0, 0));
+                    renderers[i].SetUV(1, new Vector2(1, 0));
+                    renderers[i].SetUV(2, new Vector2(1, 1));
+                    renderers[i].SetUV(3, new Vector2(0, 1));
+                    renderers[i].SetVerticeColor(color, true);
+                    renderers[i].SetVerticeColor(color, false);
+                    totalSprites += renderers[i].totalSprites;
+
+                    rotVels[i] = Custom.RNV() * 180 * Mathf.Lerp(0.4f, 1, Random.value);
+                }
+
 
                 //TODO : 获取扫描的生物
                 creatureQueue.Enqueue(CreatureTemplate.Type.BigEel);
@@ -63,40 +127,95 @@ namespace TheDroneMaster.GameHooks
                 creatureQueue.Enqueue(CreatureTemplate.Type.CicadaA);
                 creatureQueue.Enqueue(CreatureTemplate.Type.MirosBird);
                 creatureQueue.Enqueue(CreatureTemplate.Type.Salamander);
-                creatureQueue.Enqueue(CreatureTemplate.Type.Scavenger);
-                creatureQueue.Enqueue(CreatureTemplate.Type.Slugcat);
-                creatureQueue.Enqueue(CreatureTemplate.Type.BigNeedleWorm);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.Scavenger);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.Slugcat);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.BigNeedleWorm);
+                room.AddObject(light = new LightSource(centerPos, false, color, this));
+                light.rad = 500f;
                 init = true;
             }
         }
 
+        public void FoolSetScale(Mesh3D mesh,float scale)
+        {
+            scales[rects.IndexOf(mesh)] = scale;
+            for(int i=0;i<mesh.origVertices.Count;i++)
+                mesh.animatedVertice[i] = scale * mesh.origVertices[i];
+            
+        }
+
         public override void Update(bool eu)
         {
+
             if (!init && !slatedForDeletetion)
             {
-                Plugin.Log("Create Ending Failed");
+                Plugin.Log("DMEnding : Create Ending Failed");
                 slatedForDeletetion = true;
             }
             if (slatedForDeletetion) return;
 
             base.Update(eu);
             endingCounter++;
+
+            //3d render
+            for(int i = 0; i < rects.Length; i++)
+            {
+                rects[i].rotation += rotVels[i] * 0.01f;
+                renderers[i].Update();
+            }
+
+            //glphy
+            for (int i = 0; i < glphyCount; i++)
+            {
+                glphys[i].pos += glphys[i].vel / 40f;
+                glphys[i].life--;
+                if (!Custom.DistLess(glphys[i].pos, centerPos, rad) || glphys[i].life == 0)
+                {
+                    glphys[i].pos = centerPos + Custom.RNV() * Random.value * rad;
+                    glphys[i].vel = Custom.RNV() * Random.Range(0.5f, 1.0f) * 30;
+                    glphys[i].life = Random.Range(80, 200);
+                }
+            }
+
+            //core init process
             if(endingCounter <= 120)
             {
-                room.game.cameras[0].hardLevelGfxOffset.y = Mathf.SmoothStep(0, 1, endingCounter / 60f) * 100;
+                room.game.cameras[0].hardLevelGfxOffset.y = Mathf.SmoothStep(0, 100, endingCounter / 60f);
+                for (int i = 0; i < rects.Length; i++)
+                    FoolSetScale(rects[i], Custom.LerpBackEaseOut(0, stdScales[i], endingCounter / 100f));
+                SessionHook.ghost = endingCounter / 120f;
             }
-            else if (endingCounter > 120 && CurSenders < curMaxSenders && (--nextSenderCd) < 0)
+            //creature display process
+            else if (endingCounter > 120 && CurSenders < curMaxSenders && (--nextSenderCd) < 0 && creatureQueue.Count !=0)
             {
                 var pos = CalNewPos();
                 if (pos != null)
                 {
                     nextSenderCd = Random.Range(120, 180);
                     curMaxSenders = Random.Range(4, 6);
-                    var a = new CreatureEndingSender(this, creatureQueue.Dequeue(), room,pos.Value , color + new Color(Random.value / 10f, Random.value / 10f, Random.value / 10f));
+                    var a = new CreatureEndingSender(this, creatureQueue.Dequeue(), room, pos.Value, color + new Color(Random.value / 10f, Random.value / 10f, Random.value / 10f));
                     senderList.Add(a);
                     room.AddObject(a);
                 }
+                else
+                    Plugin.Log("DMEnding : Try Find new pos failed");
             }
+            //send process
+            else if(creatureQueue.Count == 0 && CurSenders ==0)
+            {
+                if (sender == null)
+                {
+                    endingCounter = 10000;
+                    room.AddObject(sender = new EndingMessageSender(this));
+                }
+                room.game.cameras[0].hardLevelGfxOffset.y = Mathf.Lerp(room.game.cameras[0].hardLevelGfxOffset.y, 300, 0.02f);
+            }
+            if (endingCounter == 10200)
+            {
+                room.game.manager.rainWorld.progression.SaveProgressionAndDeathPersistentDataOfCurrentState(false,false);
+                room.game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits,5f);
+            }
+
                 
         }
 
@@ -108,9 +227,9 @@ namespace TheDroneMaster.GameHooks
             {
                 float xOffest = Random.value * 0.4f;
                 float yOffest = (0.4f - xOffest) * 0.2f / 0.4f;
-                Pos = new Vector2((((0.1f + xOffest) * Mathf.Sign(Random.value - 0.5f) + 0.5f)) * room.PixelWidth, (0.2f + yOffest + Random.value * (0.8f - yOffest)) * room.PixelHeight);
+                Pos = new Vector2((((0.1f + xOffest) * Mathf.Sign(Random.value - 0.5f) + 0.5f)) * room.PixelWidth, (0.1f + yOffest + Random.value * (0.8f - yOffest)) * room.PixelHeight) + room.game.cameras[0].hardLevelGfxOffset;
                 tryCount++;
-                if (tryCount > 10)
+                if (tryCount > 40)
                     return null;
             }
             while (!senderList.All(i => !Custom.DistLess(i.pos, Pos, i.stdRad * 3.5f)));
@@ -120,12 +239,42 @@ namespace TheDroneMaster.GameHooks
 
         public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            
+            sLeaser.sprites = new FSprite[totalSprites];
+            for(int i=0;i< glphyCount;i++)
+            {
+                sLeaser.sprites[i] = new FSprite("TinyGlyph" + Random.Range(0, 14).ToString());
+                sLeaser.sprites[i].scale = Random.Range(0.7f, 1f) * 2f;
+                sLeaser.sprites[i].color = color;
+                sLeaser.sprites[i].alpha = 0;
+                sLeaser.sprites[i].shader = room.game.rainWorld.Shaders["Hologram"];
+            }
+            foreach(var render in renderers)
+            {
+                render.InitSprites(sLeaser, rCam);
+            }
+            AddToContainer(sLeaser, rCam, null);
         }
 
         public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-           
+            for(int i=0;i<renderers.Length;i++)
+            {
+                var render = renderers[i];
+                render.DrawSprites(sLeaser, rCam, timeStacker, camPos, centerPos);
+                for(int j=0;j<render.totalSprites;j++)
+                {
+                    sLeaser.sprites[j + render.startIndex]._renderLayer?._material?.SetFloat("_Width", Mathf.Lerp(1f,0.05f,scales[i] / stdScales[i]));
+                }
+            }
+            for(int i=0;i<glphyCount;i++)
+            {
+                sLeaser.sprites[i].x = glphys[i].pos.x - camPos.x;
+                sLeaser.sprites[i].y = glphys[i].pos.y - camPos.y;
+                sLeaser.sprites[i].alpha = Mathf.Min(Mathf.Clamp01((endingCounter - 40 - i * 5f) / 20f), (rad - Custom.Dist(glphys[i].pos, centerPos)) / rad * 2.5f, Mathf.Clamp01(glphys[i].life/20f));
+
+                if(Random.value<0.05f)
+                    sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName("TinyGlyph" + Random.Range(0, 14).ToString());
+            }
         }
 
         public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
@@ -135,7 +284,13 @@ namespace TheDroneMaster.GameHooks
 
         public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
-            
+            if(newContatiner == null)
+                newContatiner = rCam.ReturnFContainer("Midground");
+            foreach(var sprite in sLeaser.sprites)
+            {
+                sprite.RemoveFromContainer();
+                newContatiner.AddChild(sprite);
+            }
         }
 
         Player focusedPlayer;
@@ -144,19 +299,157 @@ namespace TheDroneMaster.GameHooks
         int CurSenders { get { return senderList.Count; } }
         int curMaxSenders = 5;
         int nextSenderCd = 0;
-
-        public List<CreatureEndingSender> senderList;
-        Queue<CreatureTemplate.Type> creatureQueue;
-
-        public Vector2 centerPos;
+        int totalSprites = 0;
         int endingCounter = 0;
-        bool init;
+        bool init = false;
+        float rad = 200f;
 
-        public Color color = Color.cyan;
+        int glphyCount;
+        GlyphPoint[] glphys;
+
+        Queue<CreatureTemplate.Type> creatureQueue;
+        public List<CreatureEndingSender> senderList;
+
+        Mesh3D[] rects;
+        Mesh3DRenderer[] renderers;
+        Vector3[] rotVels;
+        float[] stdScales;
+        float[] scales;
+        LightSource light;
+
+        EndingMessageSender sender;
+
+        public Color color = LaserDroneGraphics.defaulLaserColor;
+        public Vector2 centerPos;
+
+        public class GlyphPoint
+        {
+            public Vector2 pos;
+            public Vector2 vel;
+            public int life;
+        }
+
+        public class EndingMessageSender : CosmeticSprite
+        {
+            public const int RECT_COUNT = 4;
+
+            public void FoolSetScale(Mesh3D mesh, float scale)
+            {
+                scales[rects.IndexOf(mesh)] = scale;
+                for (int i = 0; i < mesh.origVertices.Count; i++)
+                    mesh.animatedVertice[i] = scale * mesh.origVertices[i];
+
+            }
+            public EndingMessageSender(DroneMasterEnding owner)
+            {
+                this.owner = owner;
+                rects = new Mesh3D[RECT_COUNT];
+                renderers = new Mesh3DRenderer[RECT_COUNT];
+                stdScales = new float[RECT_COUNT];
+                scales = new float[RECT_COUNT];
+                totalSprites = 1;
+                color = owner.color;
+                origPos = new Vector2[sideSprites];
+                Mesh3D.TriangleFacet[] rect = new Mesh3D.TriangleFacet[2]
+                {
+                    new Mesh3D.TriangleFacet(0,1,2),
+                    new Mesh3D.TriangleFacet(0,2,3)
+                };
+
+
+                for (int i = 0; i < RECT_COUNT; i++)
+                {
+                    Mesh3D mesh = rects[i] = new Mesh3D();
+                    mesh.SetFacet(rect);
+                    mesh.rotation = new Vector3(20, 0, 0);
+                    mesh.SetVertice(0, Vector3.left + Vector3.down);
+                    mesh.SetVertice(1, Vector3.right + Vector3.down);
+                    mesh.SetVertice(2, Vector3.right + Vector3.up);
+                    mesh.SetVertice(3, Vector3.left + Vector3.up);
+                    stdScales[i] = i * -6 + 100;
+                    FoolSetScale(mesh, 0);
+
+                    renderers[i] = new Mesh3DFacetRenderer(mesh, totalSprites, "pixel", false);
+                    renderers[i].shader = "LineMask";
+                    renderers[i].SetUV(0, new Vector2(0, 0));
+                    renderers[i].SetUV(1, new Vector2(1, 0));
+                    renderers[i].SetUV(2, new Vector2(1, 1));
+                    renderers[i].SetUV(3, new Vector2(0, 1));
+                    renderers[i].SetVerticeColor(color, true);
+                    renderers[i].SetVerticeColor(color, false);
+                    totalSprites += renderers[i].totalSprites;
+                }
+            }
+
+            public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+            {
+                sLeaser.sprites = new FSprite[totalSprites];
+                sLeaser.sprites[0] = new FSprite("Futile_White");
+                sLeaser.sprites[0].shader = room.game.rainWorld.Shaders["Hologram"];
+                sLeaser.sprites[0].color = color;
+                sLeaser.sprites[0].anchorY = 0;
+
+
+                foreach (var render in renderers)
+                    render.InitSprites(sLeaser, rCam);
+
+                AddToContainer(sLeaser,rCam,null);
+            }
+
+            public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+            {
+
+                for (int i = 0; i < rects.Length; i++)
+                {
+                    for (int j = 0; j < renderers[i].totalSprites;j++)
+                       sLeaser.sprites[j]._renderLayer?._material?.SetFloat("_Width", Mathf.Lerp(0.6f,0.05f,Timer(i)));
+                    renderers[i].DrawSprites(sLeaser, rCam, timeStacker, camPos,owner.centerPos + Vector2.up * (35 + 25 *i));
+                }
+                sLeaser.sprites[0].SetPosition(owner.centerPos- camPos);
+                sLeaser.sprites[0].height = Mathf.Clamp01(((counter-10)/ 25f))* 700f;
+                sLeaser.sprites[0].width = Mathf.Lerp(40,20,(counter / 20f));
+
+ 
+
+            }
+
+            public override void Update(bool eu)
+            {
+                base.Update(eu);
+                counter++;
+                for(int i=0; i<rects.Length;i++)
+                {
+
+                    rects[i].rotation = Vector3.Lerp(new Vector3(50, 0, 0), new Vector3(60, 90, 0), Mathf.Pow(Timer(i),2));
+                    FoolSetScale(rects[i], Timer(i) * stdScales[i]);
+                    renderers[i].Update();
+                }
+            }
+
+            float Timer(int i)
+            {
+                return Mathf.Clamp01((counter - i * 5) / 15f);
+            }
+            Mesh3D[] rects;
+            Mesh3DRenderer[] renderers;
+            float[] stdScales;
+            float[] scales;
+            Vector2[] origPos;
+
+            DroneMasterEnding owner;
+
+            int totalSprites;
+            Color color;
+            int counter;
+
+            int sideSprites;
+        }
+
+
 
         public class CreatureEndingSender : CosmeticSprite, IOwnProjectedCircles
         {
-            public Color color;
+
             //Type也是临时用
             public CreatureEndingSender(DroneMasterEnding owner, CreatureTemplate.Type type,Room room,Vector2 pos, Color color)
             {
@@ -166,6 +459,7 @@ namespace TheDroneMaster.GameHooks
                 var state = Random.state;
                 this.owner = owner;
                 this.color = color;
+                offestDir = new Vector2(Random.Range(0.3f,1f),Random.Range(-1f,1f)).normalized;
                 Random.InitState(114514 + type.index);
 
                 vel = Custom.RNV() * Random.value *3;
@@ -213,6 +507,14 @@ namespace TheDroneMaster.GameHooks
                     if (creatureCircle.circleThickness >= 0.99f)
                         icon.isVisible = false;
 
+                    if (creatureCircle.rad<0.01f)
+                    {
+                        if (owner != null)
+                            owner.senderList.Remove(this);
+                        Plugin.Log("DM Ending : current sender count" + owner.CurSenders.ToString() + "max sender count" + owner.curMaxSenders);
+                        slatedForDeletetion = true;
+                    }
+
                     if (count < 140)
                     {
                         vel = Vector2.zero;
@@ -227,12 +529,6 @@ namespace TheDroneMaster.GameHooks
                     {
                         creatureCircle.circleThickness = 1f;
                         creatureCircle.getToRad = 0;
-                    }
-                    else if (count == 150)
-                    {
-                        slatedForDeletetion = true;
-                        if (owner != null)
-                            owner.senderList.Remove(this);
                     }
 
                 }
@@ -299,7 +595,11 @@ namespace TheDroneMaster.GameHooks
             {
                 if (slatedForDeletetion)
                 {
-                    sLeaser.CleanSpritesAndRemove();
+                    if (room != null)
+                    {
+                        sLeaser.CleanSpritesAndRemove();
+                        room.RemoveObject(this);
+                    }
                     return;
                 }
 
@@ -310,9 +610,9 @@ namespace TheDroneMaster.GameHooks
                 if (count >= 120)
                 {
                     if (allParts.Count != 0)
-                        allParts.First().DrawSprites(sLeaser, rCam, timeStacker, camPos, pos + Vector2.right * (stdRad * 2.5f));
+                        allParts.First().DrawSprites(sLeaser, rCam, timeStacker, camPos, pos + OffestPos);
                 }
-                compressed.DrawSprites(sLeaser, rCam, timeStacker, camPos, pos + Vector2.right * (stdRad * 2.5f));
+                compressed.DrawSprites(sLeaser, rCam, timeStacker, camPos, pos + OffestPos);
                 castLine.DrawSprites(sLeaser, rCam, timeStacker, camPos, pos);
             }
 
@@ -335,6 +635,7 @@ namespace TheDroneMaster.GameHooks
             int spriteCount = 0;
             bool isMoveState = false;
             CreatureTemplate.Type type;
+            Vector2 offestDir;
 
             TagMessage[] messages = new TagMessage[7];
             TagOverlay[] overlays = new TagOverlay[7];
@@ -347,6 +648,14 @@ namespace TheDroneMaster.GameHooks
 
             ScanProjectedCircle creatureCircle;
 
+            public Vector2 OffestPos { get 
+                    {
+                        if (creatureCircle != null)
+                            return offestDir * (creatureCircle.Rad(0) * 1.5f);
+                        else
+                            return offestDir * stdRad * 1.5f;
+                    } }
+
             public float stdRad = 40f;
             public static readonly float glphyScale = 1.5f;
 
@@ -356,6 +665,7 @@ namespace TheDroneMaster.GameHooks
             }
 
             FSprite icon;
+            public Color color;
         }
 
         public class SenderPart
@@ -364,7 +674,7 @@ namespace TheDroneMaster.GameHooks
             public int startSprite;
             public int counter;
             public int filterIndex;
-            public readonly int yBias = 17;
+            public readonly int yBias = /*17*/0;
 
             public Room room;
 
@@ -412,6 +722,7 @@ namespace TheDroneMaster.GameHooks
             Vector2[] fPos;
             public Vector2 toPos;
             public float rad = 0;
+            public bool HiddenAll;
             public TagCastLine(ref int startSprite, Color? color, Room room, Vector2 fromPos,Vector2 toPos, float rad) : base(startSprite, 0, color, room)
             {
                 this.fromPos = fromPos;
@@ -446,6 +757,12 @@ namespace TheDroneMaster.GameHooks
             public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos, Vector2 pos)
             {
                 base.DrawSprites(sLeaser, rCam, timeStacker, camPos, pos);
+                if (HiddenAll)
+                {
+                    for (int i = 0; i < totalSprites; i++)
+                        sLeaser.sprites[i + startSprite].isVisible = false;
+                    return;
+                }
                 for (int i = 0; i < totalSprites; i++)
                 {
                     if (Random.value < 0.25f)
@@ -530,7 +847,7 @@ namespace TheDroneMaster.GameHooks
                 for (int i = 0; i < totalSprites; i++)
                 {
                     //TODO : 改成offest vector
-                    var offestCenter = (pos- Vector2.right * (owner.stdRad * 2.5f));
+                    var offestCenter = (pos - owner.OffestPos);
                     var radVec = Custom.DegToVec(toDeg[i] + degOffest) * owner.CurRad(timeStacker) * 1.5f;
                     sLeaser.sprites[startSprite + i].x = Mathf.Lerp(pos.x,offestCenter.x + radVec.x,Timer(i)) - camPos.x;
                     sLeaser.sprites[startSprite + i].y = Mathf.Lerp(pos.y - i* yBias, offestCenter.y + radVec.y, Timer(i)) - camPos.y;
