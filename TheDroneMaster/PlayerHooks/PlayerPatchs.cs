@@ -185,8 +185,9 @@ namespace TheDroneMaster
             if (Input.GetKeyDown(KeyCode.S))
             {
                 //self.room.game.Win(false);
-                if (Simple3DObject.instance != null) return;
-                    self.room.AddObject(new Simple3DObject(self.room, self));
+                //if (Simple3DObject.instance != null) return;
+                //    self.room.AddObject(new Simple3DObject(self.room, self));
+                self.room.PlaySound(DroneMasterEnums.DataHumming, self.mainBodyChunk, true, 1f, 1f);
             }
 
             //if(Random.value < 0.3f)
@@ -260,7 +261,7 @@ namespace TheDroneMaster
                 {
                     ExtEnumBase extEnumBase;
                     playerDeathPreventer = new PlayerDeathPreventer(this);
-                    bool canParse = ExtEnumBase.TryParse(typeof(SlugcatStats.Name), Plugin.ID, true, out extEnumBase);
+                    bool canParse = ExtEnumBase.TryParse(typeof(SlugcatStats.Name), Plugin.DroneMasterName, true, out extEnumBase);
                     if (canParse && name == null)
                     {
                         name = extEnumBase as SlugcatStats.Name;

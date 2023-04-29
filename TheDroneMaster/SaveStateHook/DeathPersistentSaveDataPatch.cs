@@ -11,7 +11,7 @@ namespace TheDroneMaster
 {
     public static class DeathPersistentSaveDataPatch
     {
-        public static string TotalHeader => Plugin.ID.ToUpper();
+        public static string TotalHeader => Plugin.DroneMasterName.ToUpper();
 
         public static bool UnitsLoaded = false;
         public static List<DeathPersistentSaveDataUnit> units = new List<DeathPersistentSaveDataUnit>();

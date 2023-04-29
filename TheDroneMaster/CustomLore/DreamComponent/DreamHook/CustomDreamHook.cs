@@ -363,7 +363,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         public static readonly DreamsState.DreamID DroneMasterDream_1 = new DreamsState.DreamID("DroneMasterDream_1", true);
         public static readonly DreamsState.DreamID DroneMasterDream_2 = new DreamsState.DreamID("DroneMasterDream_2", true);
 
-        public DroneMasterDream() : base(new SlugcatStats.Name(Plugin.ID))
+        public DroneMasterDream() : base(new SlugcatStats.Name(Plugin.DroneMasterName))
         {
         }
 

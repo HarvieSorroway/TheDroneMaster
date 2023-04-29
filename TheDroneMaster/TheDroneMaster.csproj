@@ -95,6 +95,7 @@
     <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
     <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
     <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
+    <Compile Include="CustomLore\CustomEnding\CustomEnding.cs" />
     <Compile Include="CustomLore\DreamComponent\DreamHook\CustomDreamHook.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleObjects.cs" />
     <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleRegister.cs" />

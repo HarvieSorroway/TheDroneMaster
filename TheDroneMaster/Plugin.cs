@@ -19,6 +19,8 @@ using TheDroneMaster.DreamComponent;
 using TheDroneMaster.DreamComponent.OracleHooks;
 using TheDroneMaster.DreamComponent.DreamHook;
 using TheDroneMaster.CustomLore.SpecificScripts;
+using Menu;
+using TheDroneMaster.CustomLore.CustomEnding;
 
 
 #pragma warning disable CS0618
@@ -32,7 +34,7 @@ namespace TheDroneMaster
     {
         public static readonly PlayerFeature<bool> OwnLaserDrone = PlayerBool("TheDroneMaster/own_laserdrone");
         public static readonly PlayerFeature<PlayerColor> portColor = PlayerCustomColor("Port");
-        public static readonly string ID = "thedronemaster";
+        public static readonly string DroneMasterName = "thedronemaster";
 
         public static readonly bool LogOutPut = true;
 
@@ -111,6 +113,7 @@ namespace TheDroneMaster
                 DeathPersistentSaveDataPatch.Patch();
                 GamePatch.Patch(self);
                 RoomSpecificScriptPatch.PatchOn();
+                CustomEnding.PatchOn();
                 //PearlReaderPatchs.Patch();
 
 
@@ -186,6 +189,11 @@ namespace TheDroneMaster
             if (!LogOutPut) return;
             Debug.Log("[DroneMaster]" + text);
         }
+
+        public static void LoggerLog(string text)
+        {
+            instance.Logger.LogDebug(text);
+        }
     }
 
     public class DroneMasterEnums
@@ -200,6 +208,12 @@ namespace TheDroneMaster
 
         public static Conversation.ID Pebbles_DroneMaster_ExplainPackage;
 
+        //Ending
+        public static SlideShow.SlideShowID DroneMasterAltEnd;
+        public static SlideShow.SlideShowID DroneMasterIntro;
+
+        //Sound
+        public static SoundID DataHumming;
         public static void RegisterValues()
         {
             if (registed) return;
@@ -210,6 +224,11 @@ namespace TheDroneMaster
             Pebbles_DroneMaster_AfterMet = new Conversation.ID("Pebbles_DroneMaster_AfterMet", true);
 
             Pebbles_DroneMaster_ExplainPackage = new Conversation.ID("Pebbles_DroneMaster_ExplainPackage", true);
+
+            DroneMasterAltEnd = new SlideShow.SlideShowID("DroneMasterAltEnd", true);
+            DroneMasterIntro = new SlideShow.SlideShowID("DroneMasterIntro", true);
+
+            DataHumming = new SoundID("Data_Humming", true);
             registed = true;
         }
 
@@ -231,6 +250,12 @@ namespace TheDroneMaster
 
                 Pebbles_DroneMaster_ExplainPackage.Unregister();
                 Pebbles_DroneMaster_ExplainPackage = null;
+
+                DroneMasterAltEnd.Unregister();
+                DroneMasterAltEnd = null;
+
+                DroneMasterIntro.Unregister();
+                DroneMasterIntro = null;
                 registed = false;
             }
         }

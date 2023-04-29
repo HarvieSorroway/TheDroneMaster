@@ -94,8 +94,6 @@ namespace TheDroneMaster
 				}
 			}
 			totalSprites = ((!this.colored) ? this.scalesPositions.Length : (this.scalesPositions.Length * 2));
-
-            //Plugin.Log("MetalGills Inited");
         }
 
         public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
@@ -268,7 +266,6 @@ namespace TheDroneMaster
 			{
 				newContatiner.AddChild(sLeaser.sprites[i]);
 			}
-            //Plugin.Log("MetalGills AddToContainer : " + totalSprites.ToString());
         }
 	}
 }

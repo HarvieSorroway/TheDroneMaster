@@ -19,7 +19,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         private static void RoomSpecificScript_AddRoomSpecificScript(On.RoomSpecificScript.orig_AddRoomSpecificScript orig, Room room)
         {
             orig.Invoke(room);
-            if(room.abstractRoom.name == "LC_FINAL" && room.game.IsStorySession && room.game.GetStorySession.saveState.saveStateNumber == new SlugcatStats.Name(Plugin.ID))
+            if(room.abstractRoom.name == "LC_FINAL" && room.game.IsStorySession && room.game.GetStorySession.saveState.saveStateNumber == new SlugcatStats.Name(Plugin.DroneMasterName))
             {
                 room.AddObject(new LC_BossFight(room));
             }

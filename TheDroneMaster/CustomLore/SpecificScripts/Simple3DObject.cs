@@ -81,8 +81,8 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             mesh3Drenderer = new SpecialMesh3DFrameRenderer(mesh, 0);
             mesh3Drenderer.shader = "Hologram";
 
-            mesh3Drenderer.SetVerticeColor(LaserDroneGraphics.defaulLaserColor, true);
-            mesh3Drenderer.SetVerticeColor(LaserDroneGraphics.defaulLaserColor, false);
+            mesh3Drenderer.SetVerticeColor(LaserDroneGraphics.defaultLaserColor, true);
+            mesh3Drenderer.SetVerticeColor(LaserDroneGraphics.defaultLaserColor, false);
         }
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)

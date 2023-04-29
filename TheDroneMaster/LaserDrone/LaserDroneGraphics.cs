@@ -12,7 +12,7 @@ namespace TheDroneMaster
 {
     public class LaserDroneGraphics : GraphicsModule
     {
-        public static Color defaulLaserColor = new Color(1f, 0.26f, 0.45f);
+        public static Color defaultLaserColor = new Color(1f, 0.26f, 0.45f);
 
         public  Color droneFlameColor = new Color(0f, 0.62f, 1f);
         public  Color laserColor = new Color(1f, 0.26f, 0.45f);
@@ -487,7 +487,7 @@ namespace TheDroneMaster
         {
             get
             {
-                Color laserCol = LaserDroneGraphics.defaulLaserColor;
+                Color laserCol = LaserDroneGraphics.defaultLaserColor;
                 if(PlayerPatchs.modules.TryGetValue(drone.owner,out var module) && module.ownDrones)
                 {
                     laserCol = module.laserColor;

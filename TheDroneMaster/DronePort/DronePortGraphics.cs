@@ -48,7 +48,7 @@ namespace TheDroneMaster
 
         public Vector2 currentCastPos;
 
-        public Color LaserColor = LaserDroneGraphics.defaulLaserColor;
+        public Color LaserColor = LaserDroneGraphics.defaultLaserColor;
 
 
         public Color sparkColor => LaserColor;
@@ -126,7 +126,7 @@ namespace TheDroneMaster
             }
             else
             {
-                sLeaser.sprites[startIndex + 1].color = LaserDroneGraphics.defaulLaserColor;
+                sLeaser.sprites[startIndex + 1].color = LaserDroneGraphics.defaultLaserColor;
             }
             
 

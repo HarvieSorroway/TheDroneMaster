@@ -15,7 +15,7 @@ namespace TheDroneMaster
     {
         public static string header = "ENEMYCREATOR";
 
-        public static readonly int creatureLimit = 300;
+        public static readonly int creatureLimit = 200;
 
         public bool created = true;
         public PlayerPatchs.PlayerModule module;
@@ -48,7 +48,7 @@ namespace TheDroneMaster
             else if (origType == CreatureTemplate.Type.PinkLizard || origType == CreatureTemplate.Type.BlueLizard) result = CreatureTemplate.Type.CyanLizard;
             else if (origType == CreatureTemplate.Type.CyanLizard) result = CreatureTemplate.Type.CyanLizard;
             else if (origType == CreatureTemplate.Type.WhiteLizard) result = CreatureTemplate.Type.WhiteLizard;
-            else if(origType == CreatureTemplate.Type.Salamander)
+            else if (origType == CreatureTemplate.Type.Salamander)
             {
                 if (Random.value < 0.5f) result = origType;
                 else result = MoreSlugcatsEnums.CreatureTemplateType.EelLizard;

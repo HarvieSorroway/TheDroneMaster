@@ -17,9 +17,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 {
     public class MIFOracleRegistry : CustomOracleRegister
     {
-        public static Oracle.OracleID DMDOracle = new Oracle.OracleID("DMD", true);
+        public static Oracle.OracleID MIFOracle = new Oracle.OracleID("MIF", true);
         public override string LoadRoom => "DMD_AI";
-        public override Oracle.OracleID OracleID => DMDOracle;
+        public override Oracle.OracleID OracleID => MIFOracle;
         public override Oracle.OracleID InheritOracleID => Oracle.OracleID.SS;
 
         public MIFOracleRegistry()
