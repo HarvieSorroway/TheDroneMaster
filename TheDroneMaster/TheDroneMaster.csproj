@@ -105,7 +105,9 @@
     <Compile Include="CustomLore\DreamComponent\OracleHooks\OraclePatch.cs" />
     <Compile Include="CustomLore\SpecificScripts\Components.cs" />
     <Compile Include="CustomLore\SpecificScripts\Cool3DObject.cs" />
-    <Compile Include="CustomLore\SpecificScripts\LC_BossFight.cs" />
+    <Compile Include="CustomLore\SpecificScripts\DataWave.cs" />
+    <Compile Include="CustomLore\SpecificScripts\MeshTest.cs" />
+    <Compile Include="CustomLore\SpecificScripts\RoomSpecificScripts.cs" />
     <Compile Include="CustomLore\SpecificScripts\MeshLoader.cs" />
     <Compile Include="CustomLore\SpecificScripts\Simple3DObject.cs" />
     <Compile Include="DroneHUD\DroneCursor.cs" />

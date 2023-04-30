@@ -114,7 +114,6 @@ namespace TheDroneMaster
             if (dontRecieveDamageCount > 0) dontRecieveDamageCount--;
             if (shortcutDelay > 0) shortcutDelay--;
 
-
             CallBackUpdate();
 
             if (room == null)

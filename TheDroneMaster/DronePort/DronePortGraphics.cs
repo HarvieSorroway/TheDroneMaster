@@ -25,7 +25,7 @@ namespace TheDroneMaster
 
         public PhysicalObject currentCastTarget;
 
-        public WeakReference<DronePortOverride> overrideRef = new WeakReference<DronePortOverride>(null);
+        public WeakReference<DreamStateOverride> overrideRef = new WeakReference<DreamStateOverride>(null);
 
         public int startIndex;
 
@@ -63,12 +63,11 @@ namespace TheDroneMaster
             if (PlayerPatchs.modules.TryGetValue(Player, out var module) && module.ownDrones)
             {
                 LaserColor = module.laserColor;
-            }
-
-            if(DronePortOverride.overrides.TryGetValue(module.port, out var overrides))
-            {
-                overrideDisplayDronePort = overrides.initDronePortGraphics;
-                overrideRef = new WeakReference<DronePortOverride>(overrides);
+                if(module.stateOverride != null)
+                {
+                    overrideDisplayDronePort = module.stateOverride.initDronePortGraphics;
+                    overrideRef = new WeakReference<DreamStateOverride>(module.stateOverride);
+                }
             }
 
             if(pGraphics.player.room.game.session is StoryGameSession)

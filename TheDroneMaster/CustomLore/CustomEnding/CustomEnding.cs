@@ -13,9 +13,9 @@ namespace TheDroneMaster.CustomLore.CustomEnding
         public static void PatchOn()
         {
             //On.RainWorldGame.GoToRedsGameOver += RainWorldGame_GoToRedsGameOver;
-            On.Menu.SlideShow.ctor += SlideShow_ctor;
+            //On.Menu.SlideShow.ctor += SlideShow_ctor;
 
-            On.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
+            //On.Menu.SlugcatSelectMenu.StartGame += SlugcatSelectMenu_StartGame;
         }
 
         private static void SlugcatSelectMenu_StartGame(On.Menu.SlugcatSelectMenu.orig_StartGame orig, SlugcatSelectMenu self, SlugcatStats.Name storyGameCharacter)

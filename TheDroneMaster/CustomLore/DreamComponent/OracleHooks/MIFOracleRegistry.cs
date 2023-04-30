@@ -18,6 +18,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
     public class MIFOracleRegistry : CustomOracleRegister
     {
         public static Oracle.OracleID MIFOracle = new Oracle.OracleID("MIF", true);
+        public static float MIFTalkPitch = 0.75f;
+
         public override string LoadRoom => "DMD_AI";
         public override Oracle.OracleID OracleID => MIFOracle;
         public override Oracle.OracleID InheritOracleID => Oracle.OracleID.SS;
@@ -597,6 +599,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
     public class MIFOracleMeetDroneMaster : CustomConversationBehaviour
     {
         public Simple3DObject scanned3DEffect;
+        public int lastConvCount = 0;
+
+
         #region DreamTalk1
         public LightSource portShowLight;
         public static readonly int movePortCounter = 400;
@@ -612,6 +617,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         {
             base.Update();
             if (player == null) return;
+            if(PlayerPatchs.modules.TryGetValue(player,out var module) && module.stateOverride != null)
+            {
+                module.stateOverride.dronePortGraphicsPos = oracle.firstChunk.pos + Vector2.left * 40f;
+                module.stateOverride.dronePortGraphicsRotation += 10f;
+            }
 
 
             if (action == MIFOracleBehaviour.MeetDroneMaster_Init)
@@ -621,17 +631,17 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 {
                     if(CustomDreamHook.currentActivateDream != null)
                     {
-                        if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
+                        if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk0);
                             return;
                         }
-                        else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
+                        else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
                             return;
                         }
-                        else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_2)
+                        else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_3)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk2);
                             return;
@@ -672,13 +682,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
                     if (PlayerPatchs.modules.TryGetValue(player, out var pmodule))
                     {
-                        if (DronePortOverride.overrides.TryGetValue(pmodule.port, out var overrides) && currentMovePortCounter < movePortCounter)
+                        var overrides = pmodule.stateOverride;
+                        if (currentMovePortCounter < movePortCounter)
                         {
                             currentMovePortCounter++;
                             overrides.connectToDMProggress = currentMovePortCounter / (float)movePortCounter;
-
-                            overrides.dronePortGraphicsPos = oracle.firstChunk.pos + Vector2.left * 40f;
-                            overrides.dronePortGraphicsRotation += 10f;
 
                             
                             if (portShowLight == null)

@@ -22,6 +22,7 @@ using TheDroneMaster.DreamComponent.DreamHook;
 using TheDroneMaster.CustomLore.SpecificScripts;
 using Menu;
 using TheDroneMaster.CustomLore.CustomEnding;
+using TheDroneMaster.CreatureAndObjectHooks;
 
 
 #pragma warning disable CS0618
@@ -45,6 +46,7 @@ namespace TheDroneMaster
         public static Shader bufferShader;
         public static Shader customHoloGridShader;
         public static Shader lineMaskShader;
+        public static Shader dataWaveShader;
         public static PostEffect postEffect;
 
         public static bool inited;
@@ -117,6 +119,7 @@ namespace TheDroneMaster
                 SessionHook.Patch();
                 RoomSpecificScriptPatch.PatchOn();
                 CustomEnding.PatchOn();
+                ObjectPatch.PatchOn();
                 //PearlReaderPatchs.Patch();
 
 
@@ -137,6 +140,7 @@ namespace TheDroneMaster
                 Debug.LogException(e);
             }
         }
+
 
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
@@ -186,11 +190,13 @@ namespace TheDroneMaster
             postShade = ab.LoadAsset<Shader>("assets/posttestshader.shader");
             bufferShader = ab.LoadAsset<Shader>("assets/buffershader.shader");
             customHoloGridShader = ab.LoadAsset<Shader>("assets/customhologrid.shader");
+            dataWaveShader = ab.LoadAsset<Shader>("assets/myshader/datawave.shader");
 
             Camera cam = GameObject.FindObjectOfType<Camera>();
             postEffect = cam.gameObject.AddComponent<PostEffect>();
 
             rainWorld.Shaders.Add("CustomHoloGrid", FShader.CreateShader("CustomHoloGrid", customHoloGridShader));
+            rainWorld.Shaders.Add("DataWave", FShader.CreateShader("DataWave", dataWaveShader));
 
             FAtlas falseRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectFalse");
             falseRectName = falseRect.name;
@@ -220,6 +226,12 @@ namespace TheDroneMaster
         public static void LoggerLog(string text)
         {
             instance.Logger.LogDebug(text);
+        }
+
+        public static void Log(string pattern, params object[] objects)
+        {
+            if(!LogOutPut) return;
+            Debug.Log("[DroneMaster]" + string.Format(pattern, objects));
         }
     }
 

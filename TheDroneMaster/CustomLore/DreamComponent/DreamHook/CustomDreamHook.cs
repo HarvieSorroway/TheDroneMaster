@@ -166,6 +166,10 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             {
                 currentActivateDream.CleanUpThisDream();
             }
+            if (currentActivateDream != null && currentActivateDream.dreamStarted && ID != ProcessManager.ProcessID.SleepScreen && currentActivateDream.dreamStarted && ID != ProcessManager.ProcessID.Game)
+            {
+                currentActivateDream.CleanUpThisDream();
+            }
         }
 
         private static void PlayerProgression_SaveDeathPersistentDataOfCurrentState(On.PlayerProgression.orig_SaveDeathPersistentDataOfCurrentState orig, PlayerProgression self, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
@@ -362,6 +366,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         public static readonly DreamsState.DreamID DroneMasterDream_0 = new DreamsState.DreamID("DroneMasterDream_0", true);
         public static readonly DreamsState.DreamID DroneMasterDream_1 = new DreamsState.DreamID("DroneMasterDream_1", true);
         public static readonly DreamsState.DreamID DroneMasterDream_2 = new DreamsState.DreamID("DroneMasterDream_2", true);
+        public static readonly DreamsState.DreamID DroneMasterDream_3 = new DreamsState.DreamID("DroneMasterDream_3", true);
 
         public DroneMasterDream() : base(new SlugcatStats.Name(Plugin.DroneMasterName))
         {
@@ -389,13 +394,13 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             upcomingDream = null;
             cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
 
-            upcomingDream = DroneMasterDream_2;
-            return;
+            //upcomingDream = DroneMasterDream_3;
+            //return;
 
             switch (familyThread)
             {
                 case 0:
-                    if(saveState.cycleNumber > 2 && cyclesSinceLastDream > 3)
+                    if(saveState.cycleNumber > 0 && cyclesSinceLastDream > 0)
                         upcomingDream = DroneMasterDream_0;
                     break;
                 case 1:
@@ -406,11 +411,15 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                     if(cyclesSinceLastDream > 4)
                         upcomingDream =DroneMasterDream_2;
                     break;
+                case 3:
+                    if (cyclesSinceLastDream > 4)
+                        upcomingDream = DroneMasterDream_3;
+                    break;
             }
             if (upcomingDream != null)
             {
                 familyThread++;
-                cyclesSinceLastDream = 0;
+                cyclesSinceLastDream = 10;
             }
         }
 
@@ -418,11 +427,21 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         {
             if(activateDreamID == DroneMasterDream_0 ||
                activateDreamID == DroneMasterDream_1 ||
-               activateDreamID == DroneMasterDream_2)
+               activateDreamID == DroneMasterDream_3)
             {
                 return new CustomDreamHook.BuildDreamWorldParams()
                 {
                     firstRoom = "DMD_AI",
+                    singleRoomWorld = false,
+
+                    playAs = PlayerModule.DroneMasterName
+                };
+            }
+            else if(activateDreamID == DroneMasterDream_2)
+            {
+                return new CustomDreamHook.BuildDreamWorldParams()
+                {
+                    firstRoom = "DMD_LAB01",
                     singleRoomWorld = false,
 
                     playAs = PlayerModule.DroneMasterName

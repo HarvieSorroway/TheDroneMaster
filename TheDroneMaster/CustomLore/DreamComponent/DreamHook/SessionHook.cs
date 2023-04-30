@@ -5,6 +5,7 @@ using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheDroneMaster.CustomLore.SpecificScripts;
 using UnityEngine;
 using static TheDroneMaster.CreatureScanner;
 using static TheDroneMaster.CustomLore.SpecificScripts.Simple3DObject;
@@ -17,7 +18,6 @@ namespace TheDroneMaster.GameHooks
     {
         static public void Patch()
         {
-            On.RoomSpecificScript.AddRoomSpecificScript += RoomSpecificScript_AddRoomSpecificScript;
             On.RoomCamera.Update += RoomCamera_Update;
             On.RoomCamera.ApplyPalette += RoomCamera_ApplyPalette;
         }
@@ -37,17 +37,6 @@ namespace TheDroneMaster.GameHooks
             orig(self);
         }
 
-        private static void RoomSpecificScript_AddRoomSpecificScript(On.RoomSpecificScript.orig_AddRoomSpecificScript orig, Room room)
-        {
-            orig(room);
-            //TODO : 结局判断
-            if (room.abstractRoom.name == "SI_A07" && room.world.game.session.characterStats.name.value == "thedronemaster")
-            {
-                Plugin.Log("Try Play Endding");
-                room.AddObject(new DroneMasterEnding(room));
-            }
-
-        }
         public static float ghost = -1;
         public static float origGhost = -1;
     }
@@ -69,6 +58,9 @@ namespace TheDroneMaster.GameHooks
             rotVels = new Vector3[RECT_COUNT];
             stdScales = new float[RECT_COUNT];
             scales = new float[RECT_COUNT];
+
+            positionedSoundEmitter = new PositionedSoundEmitter(centerPos, 1f, 1f);
+            room.PlaySound(DroneMasterEnums.DataHumming, positionedSoundEmitter, true, 1f, 1f, false);
 
             if (player.realizedCreature != null 
                 && Plugin.OwnLaserDrone.TryGet(player.realizedCreature as Player, out bool ownLaserDrone) 
@@ -122,11 +114,20 @@ namespace TheDroneMaster.GameHooks
 
 
                 //TODO : 获取扫描的生物
-                creatureQueue.Enqueue(CreatureTemplate.Type.BigEel);
-                creatureQueue.Enqueue(CreatureTemplate.Type.BlueLizard);
-                creatureQueue.Enqueue(CreatureTemplate.Type.CicadaA);
-                creatureQueue.Enqueue(CreatureTemplate.Type.MirosBird);
-                creatureQueue.Enqueue(CreatureTemplate.Type.Salamander);
+                var scannedCreatures = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().scanedTypes;
+                scannedCreatures.Remove(MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing);
+                scannedCreatures.Add(MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing);
+
+                foreach(var type in scannedCreatures)
+                {
+                    creatureQueue.Enqueue(type);
+                }
+
+                //creatureQueue.Enqueue(CreatureTemplate.Type.BigEel);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.BlueLizard);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.CicadaA);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.MirosBird);
+                //creatureQueue.Enqueue(CreatureTemplate.Type.Salamander);
                 //creatureQueue.Enqueue(CreatureTemplate.Type.Scavenger);
                 //creatureQueue.Enqueue(CreatureTemplate.Type.Slugcat);
                 //creatureQueue.Enqueue(CreatureTemplate.Type.BigNeedleWorm);
@@ -146,13 +147,15 @@ namespace TheDroneMaster.GameHooks
 
         public override void Update(bool eu)
         {
-
             if (!init && !slatedForDeletetion)
             {
                 Plugin.Log("DMEnding : Create Ending Failed");
                 slatedForDeletetion = true;
             }
-            if (slatedForDeletetion) return;
+            if (slatedForDeletetion)
+            {
+                return;
+            }
 
             base.Update(eu);
             endingCounter++;
@@ -183,7 +186,17 @@ namespace TheDroneMaster.GameHooks
                 room.game.cameras[0].hardLevelGfxOffset.y = Mathf.SmoothStep(0, 100, endingCounter / 60f);
                 for (int i = 0; i < rects.Length; i++)
                     FoolSetScale(rects[i], Custom.LerpBackEaseOut(0, stdScales[i], endingCounter / 100f));
-                SessionHook.ghost = endingCounter / 120f;
+
+                room.game.cameras[0].paletteBlend += 1 / 100f;
+
+                if(room.game.cameras[0].paletteBlend >= 1 && room.game.cameras[0].paletteB != 10)
+                {
+                    room.game.cameras[0].paletteBlend = 0f;
+                    room.game.cameras[0].ChangeBothPalettes(room.game.cameras[0].paletteB, 10, room.game.cameras[0].paletteBlend);
+                }
+
+                room.game.cameras[0].ApplyFade();
+                //SessionHook.ghost = endingCounter / 120f;
             }
             //creature display process
             else if (endingCounter > 120 && CurSenders < curMaxSenders && (--nextSenderCd) < 0 && creatureQueue.Count !=0)
@@ -293,6 +306,12 @@ namespace TheDroneMaster.GameHooks
             }
         }
 
+        public override void Destroy()
+        {
+            positionedSoundEmitter.Destroy();
+            base.Destroy();
+        }
+
         Player focusedPlayer;
 
 
@@ -319,7 +338,9 @@ namespace TheDroneMaster.GameHooks
 
         EndingMessageSender sender;
 
-        public Color color = LaserDroneGraphics.defaulLaserColor;
+        PositionedSoundEmitter positionedSoundEmitter;
+
+        public Color color = LaserDroneGraphics.defaultLaserColor;
         public Vector2 centerPos;
 
         public class GlyphPoint
@@ -513,6 +534,8 @@ namespace TheDroneMaster.GameHooks
                             owner.senderList.Remove(this);
                         Plugin.Log("DM Ending : current sender count" + owner.CurSenders.ToString() + "max sender count" + owner.curMaxSenders);
                         slatedForDeletetion = true;
+
+                        room.AddObject(new DataWave(room, owner.centerPos, 300f, 30f, 80, 30f));
                     }
 
                     if (count < 140)

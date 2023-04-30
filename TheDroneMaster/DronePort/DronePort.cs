@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using RWCustom;
+using TheDroneMaster.DreamComponent.DreamHook;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -37,20 +38,21 @@ namespace TheDroneMaster
             get
             {
                 int result = 1;
-                if(owner.TryGetTarget(out Player player))
+                if (owner.TryGetTarget(out Player player))
                 {
                     result = Mathf.CeilToInt((player.Karma + 1f) * Plugin.instance.config.CountPerKarma.Value);
-                }
-                if(DronePortOverride.overrides.TryGetValue(this,out var dronePortOverride))
-                {
-                    result = dronePortOverride.availableDroneCount;
+
+                    if (PlayerPatchs.modules.TryGetValue(player, out var module) && module.ownDrones && module.stateOverride != null)
+                    {
+                        result = module.stateOverride.availableDroneCount;
+                    }
                 }
 
                 return result - crashedDroneCount;
             }
         }
 
-        public bool CanSpawnDrone 
+        public bool CanSpawnDrone
         {
             get
             {
@@ -64,39 +66,25 @@ namespace TheDroneMaster
         public bool InRegionGateOrInShelter => owner.TryGetTarget(out var player) && (player.room.regionGate != null || player.room.shelterDoor != null);
 
 
-        public DronePort (Player player)
+        public DronePort(Player player)
         {
-            SetUpOverrides(player);
-
             owner = new WeakReference<Player>(player);
             drones = new List<WeakReference<LaserDrone>>();
             //pearlReader = new PortPearlReader();
 
             states = new DroneState[availableDroneCount];
-            for(int i = 0;i < states.Length; i++)
+            for (int i = 0; i < states.Length; i++)
             {
                 states[i] = new DroneState(this);
             }
             Plugin.Log("This cycle player can get " + availableDroneCount.ToString() + " drones");
         }
 
-        /// <summary>
-        /// 用于在不同的梦境中修改背包的状态
-        /// </summary>
-        public void SetUpOverrides(Player player)
-        {
-            if(PlayerPatchs.modules.TryGetValue(player,out var module) && module.ownDrones && module.isStoryGamePlayer)
-            {
-                if (player.room.world.name == "DMD")
-                {
-                    new DronePortOverride(this, 0, true, Vector2.zero, 0f);
-                }
-            }
-        }
+
 
         public void Update()
         {
-            for (int i = drones.Count - 1;i >= 0; i--)
+            for (int i = drones.Count - 1; i >= 0; i--)
             {
                 if (!drones[i].TryGetTarget(out var drone) || drone.slatedForDeletetion)
                 {
@@ -106,7 +94,7 @@ namespace TheDroneMaster
             if (spawnDroneCoolDown > 0) spawnDroneCoolDown--;
             if (preSpawnWaitCounter > 0) preSpawnWaitCounter--;
 
-            if(owner.TryGetTarget(out Player player))
+            if (owner.TryGetTarget(out Player player))
             {
                 if (player.inShortcut) return;
 
@@ -114,12 +102,12 @@ namespace TheDroneMaster
 
                 for (int i = drones.Count - 1; i >= 0; i--)
                 {
-                    if(drones[i].TryGetTarget(out var drone))
+                    if (drones[i].TryGetTarget(out var drone))
                     {
                         if (drone.inShortcut || player.inShortcut) continue;
                         if (drone.room.world.region != player.room.world.region)
                         {
-                            drone.Des("Not in same region",false);
+                            drone.Des("Not in same region", false);
                         }
                     }
                 }
@@ -128,14 +116,14 @@ namespace TheDroneMaster
                 {
                     SpawnNewDrone(player);
                 }
-                if(drones.Count > availableDroneCount)
+                if (drones.Count > availableDroneCount)
                 {
-                    for(int i = drones.Count - availableDroneCount - 1; i >= 0; i--)
+                    for (int i = drones.Count - availableDroneCount - 1; i >= 0; i--)
                     {
                         var reference = drones.Pop();
                         if (reference.TryGetTarget(out var drone))
                         {
-                            drone.Des("Too many drones",false);
+                            drone.Des("Too many drones", false);
                         }
                         else continue;
                     }
@@ -226,7 +214,7 @@ namespace TheDroneMaster
                 danger *= creature.abstractCreature.abstractAI.RealAI.CurrentPlayerAggression(player.abstractCreature);
             }
 
-            if(creature is Centipede)
+            if (creature is Centipede)
             {
                 danger *= (player.CurrentFood < player.MaxFoodInStomach) ? 0.1f : 1f;
             }
@@ -244,7 +232,7 @@ namespace TheDroneMaster
             drone.firstChunk.pos = player.DangerPos;
             drone.port = this;
 
-            for(int i = 0;i < states.Length; i++)
+            for (int i = 0; i < states.Length; i++)
             {
                 if (states[i].ThisStateAvailableForMe(drone))
                 {
@@ -271,17 +259,17 @@ namespace TheDroneMaster
         public void ResummonDrones()
         {
             if (!owner.TryGetTarget(out var player)) return;
-            for(int i = drones.Count - 1;i >= 0; i--)
+            for (int i = drones.Count - 1; i >= 0; i--)
             {
                 if (drones[i].TryGetTarget(out var getDrone))
                 {
-                    if(getDrone.room == player.room)
+                    if (getDrone.room == player.room)
                     {
                         getDrone.ChangeMovementType(MovementType.CallBack);
                     }
                     else
                     {
-                        getDrone.Des("Resummon Drones",false);
+                        getDrone.Des("Resummon Drones", false);
                     }
                 }
             }
@@ -301,9 +289,9 @@ namespace TheDroneMaster
 
         public void AddDroneToPort(LaserDrone drone)
         {
-            for(int i = drones.Count - 1;i >= 0; i--)
+            for (int i = drones.Count - 1; i >= 0; i--)
             {
-                if(drones[i].TryGetTarget(out var getDrone) && getDrone == drone)
+                if (drones[i].TryGetTarget(out var getDrone) && getDrone == drone)
                 {
                     return;
                 }
@@ -313,32 +301,6 @@ namespace TheDroneMaster
             {
                 DroneHUD.instance.TryRequestHUDForDrone(drone);
             }
-        }
-    }
-
-    public class DronePortOverride
-    {
-        public static ConditionalWeakTable<DronePort, DronePortOverride> overrides = new ConditionalWeakTable<DronePort, DronePortOverride>();
-
-        public int availableDroneCount = 0;
-        public bool initDronePortGraphics = false;
-        public Vector2 dronePortGraphicsPos = Vector2.zero;
-        public Vector2 currentPortPos = Vector2.zero;
-        public float dronePortGraphicsRotation = 0f;
-
-        public float connectToDMProggress = 0f;
-
-        public WeakReference<DronePort> portRef;
-
-        public DronePortOverride(DronePort port,int availableDroneCount, bool initDronePortGraphics, Vector2 dronePortGraphicsPos, float dronePortGraphicsRotation)
-        {
-            this.availableDroneCount = availableDroneCount;
-            this.initDronePortGraphics = initDronePortGraphics;
-            this.dronePortGraphicsPos = dronePortGraphicsPos;
-            this.dronePortGraphicsRotation = dronePortGraphicsRotation;
-            portRef = new WeakReference<DronePort>(port);
-
-            overrides.Add(port, this);
         }
     }
 }

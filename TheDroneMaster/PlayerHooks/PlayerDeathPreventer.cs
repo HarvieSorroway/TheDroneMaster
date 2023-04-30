@@ -26,6 +26,8 @@ namespace TheDroneMaster
         public PlayerDeathPreventer(PlayerPatchs.PlayerModule module)
         {
             this.module = module;
+            if(module.stateOverride != null)
+                acceptableDamageCount = module.stateOverride.overrideHealth;
         }
 
         public void Update()

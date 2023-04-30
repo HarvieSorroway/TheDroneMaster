@@ -7,6 +7,7 @@ using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TheDroneMaster.CustomLore.SpecificScripts;
+using TheDroneMaster.DreamComponent.DreamHook;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -182,12 +183,13 @@ namespace TheDroneMaster
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.N))
             {
                 //self.room.game.Win(false);
+                //self.room.AddObject(new MeshTest(self));
                 //if (Simple3DObject.instance != null) return;
                 //    self.room.AddObject(new Simple3DObject(self.room, self));
-                self.room.PlaySound(DroneMasterEnums.DataHumming, self.mainBodyChunk, true, 1f, 1f);
+
             }
 
             //if(Random.value < 0.3f)
@@ -215,6 +217,7 @@ namespace TheDroneMaster
             public readonly WeakReference<Player> playerRef;
             public readonly SlugcatStats.Name name;
             public readonly SlugBaseCharacter character;
+
 
             public static SlugcatStats.Name DroneMasterName { get; private set; }
 
@@ -248,6 +251,9 @@ namespace TheDroneMaster
             public bool fullCharge => ownDrones && playerRef.TryGetTarget(out var player) && player.playerState.foodInStomach == player.MaxFoodInStomach;
             #endregion
 
+            public DreamStateOverride stateOverride;
+
+
             public DronePort port;
             public PlayerModule(Player player)
             {
@@ -260,7 +266,7 @@ namespace TheDroneMaster
                 if (ownDrones)
                 {
                     ExtEnumBase extEnumBase;
-                    playerDeathPreventer = new PlayerDeathPreventer(this);
+                    
                     bool canParse = ExtEnumBase.TryParse(typeof(SlugcatStats.Name), Plugin.DroneMasterName, true, out extEnumBase);
                     if (canParse && name == null)
                     {
@@ -326,9 +332,13 @@ namespace TheDroneMaster
                             Plugin.Log("Jolly-laserColor : " + ColorUtility.ToHtmlStringRGB(laserColor));
                         }
 
+                        SetUpOverrides(player);
+
                         port = new DronePort(player);
                         if(Plugin.instance.config.moreEnemies.Value && isStoryGamePlayer) enemyCreator = new EnemyCreator(this);
                         if(!Plugin.instance.config.canBackSpear.Value) player.spearOnBack = null;
+
+                        playerDeathPreventer = new PlayerDeathPreventer(this);
                     }
                 }
             }
@@ -339,6 +349,56 @@ namespace TheDroneMaster
                 if(playerDeathPreventer != null) playerDeathPreventer.Update();
                 if(enemyCreator != null)enemyCreator.Update();
             }
+
+            /// <summary>
+            /// 用于在不同的梦境中修改背包的状态
+            /// </summary>
+            void SetUpOverrides(Player player)
+            {
+                if (CustomDreamHook.currentActivateDream == null)
+                    return;
+
+                if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
+                {
+                    stateOverride = new DreamStateOverride(0, false, Vector2.zero, 0f, 3);
+                }
+                else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
+                {
+                    stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 3) { connectToDMProggress = 0f};
+                }
+                else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_2)
+                {
+                    stateOverride = new DreamStateOverride(1, true, Vector2.zero, 0f, 3);
+                }
+                else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_3)
+                {
+                    stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 1);
+                }
+            }
+
+        }
+    }
+
+    public class DreamStateOverride
+    {
+        public int availableDroneCount;
+        public int overrideHealth;
+        public bool initDronePortGraphics = false;
+        public Vector2 dronePortGraphicsPos = Vector2.zero;
+        public Vector2 currentPortPos = Vector2.zero;
+        public float dronePortGraphicsRotation = 0f;
+
+        public float connectToDMProggress = 1f;
+
+        public DreamStateOverride(int availableDroneCount, bool initDronePortGraphics, Vector2 dronePortGraphicsPos, float dronePortGraphicsRotation,int overrideHealth)
+        {
+            this.availableDroneCount = availableDroneCount;
+            this.initDronePortGraphics = initDronePortGraphics;
+            this.dronePortGraphicsPos = dronePortGraphicsPos;
+            this.dronePortGraphicsRotation = dronePortGraphicsRotation;
+            this.overrideHealth = overrideHealth;
+
+            Plugin.Log("Set up override {0},{1},{2},{3}", availableDroneCount, initDronePortGraphics, dronePortGraphicsPos, dronePortGraphicsRotation);
         }
     }
 }

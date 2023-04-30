@@ -94,6 +94,11 @@ namespace TheDroneMaster
 				}
 			}
 			totalSprites = ((!this.colored) ? this.scalesPositions.Length : (this.scalesPositions.Length * 2));
+
+			if(PlayerPatchs.modules.TryGetValue(pGraphics.owner as Player,out var module))
+			{
+				acceptableDamage = module.playerDeathPreventer.AcceptableDamageCount;
+			}
         }
 
         public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
