@@ -225,11 +225,11 @@ namespace TheDroneMaster.GameHooks
             }
             if (endingCounter == 10200)
             {
-                room.game.manager.rainWorld.progression.SaveProgressionAndDeathPersistentDataOfCurrentState(false,false);
-                room.game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits,5f);
-            }
+                //room.game.manager.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
+                room.game.manager.rainWorld.progression.SaveProgressionAndDeathPersistentDataOfCurrentState(false, false);
+                room.game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 5f);
 
-                
+            }
         }
 
         public Vector2? CalNewPos()
@@ -1140,5 +1140,3 @@ namespace TheDroneMaster.GameHooks
     }
 
 }
-
-

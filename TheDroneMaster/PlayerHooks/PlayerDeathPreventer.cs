@@ -27,7 +27,7 @@ namespace TheDroneMaster
         {
             this.module = module;
             if(module.stateOverride != null)
-                acceptableDamageCount = module.stateOverride.overrideHealth;
+                acceptableDamageCount = Mathf.Min(2,module.stateOverride.overrideHealth);
         }
 
         public void Update()
@@ -97,7 +97,15 @@ namespace TheDroneMaster
                 }
             }
 
-            if (player.room != null && player.room.waterObject != null && player.room.waterObject.WaterIsLethal) result = false;
+            if (player.room != null && player.room.waterObject != null && player.room.waterObject.WaterIsLethal) 
+                result = false;
+
+            if (player.drown >= 1f)
+                result = false;
+
+            if (player.rainDeath >= 1f)
+                result = false;
+
             DeathPreventCounter = 5;
 
             if (deathExplosion)

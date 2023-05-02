@@ -1,4 +1,5 @@
-﻿using Menu;
+﻿using RWCustom;
+using Menu;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -146,6 +147,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
             On.RainWorldGame.GameOver += RainWorldGame_GameOver;
             On.RainWorldGame.Win += RainWorldGame_Win;
+            On.RainWorldGame.SpawnPlayers_bool_bool_bool_bool_WorldCoordinate += RainWorldGame_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate;
 
             On.ProcessManager.PostSwitchMainProcess += ProcessManager_PostSwitchMainProcess;
 
@@ -157,6 +159,20 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             On.Menu.SleepAndDeathScreen.GetDataFromGame += SleepAndDeathScreen_GetDataFromGame;
 
             registed = true;
+        }
+
+        private static AbstractCreature RainWorldGame_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate(On.RainWorldGame.orig_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate orig, RainWorldGame self, bool player1, bool player2, bool player3, bool player4, WorldCoordinate location)
+        {
+            if(currentActivateDream != null && currentActivateDream.dreamStarted)
+            {
+                var param = currentActivateDream.GetBuildDreamWorldParams();
+                if(param.overridePlayerPos != null)
+                {
+                    location.x = param.overridePlayerPos.Value.x;
+                    location.y = param.overridePlayerPos.Value.y;
+                }
+            }
+            return orig.Invoke(self, player1, player2, player3, player4, location);
         }
 
         private static void ProcessManager_PostSwitchMainProcess(On.ProcessManager.orig_PostSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
@@ -353,6 +369,8 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             public bool singleRoomWorld;
 
             public SlugcatStats.Name playAs;
+
+            public IntVector2? overridePlayerPos;
         }
 
         public class DataBridge
@@ -367,6 +385,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
         public static readonly DreamsState.DreamID DroneMasterDream_1 = new DreamsState.DreamID("DroneMasterDream_1", true);
         public static readonly DreamsState.DreamID DroneMasterDream_2 = new DreamsState.DreamID("DroneMasterDream_2", true);
         public static readonly DreamsState.DreamID DroneMasterDream_3 = new DreamsState.DreamID("DroneMasterDream_3", true);
+        public static readonly DreamsState.DreamID DroneMasterDream_4 = new DreamsState.DreamID("DroneMasterDream_4", true);
 
         public DroneMasterDream() : base(new SlugcatStats.Name(Plugin.DroneMasterName))
         {
@@ -394,8 +413,8 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             upcomingDream = null;
             cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
 
-            //upcomingDream = DroneMasterDream_3;
-            //return;
+            upcomingDream = DroneMasterDream_4;
+            return;
 
             switch (familyThread)
             {
@@ -415,6 +434,10 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                     if (cyclesSinceLastDream > 4)
                         upcomingDream = DroneMasterDream_3;
                     break;
+                case 4:
+                    if (cyclesSinceLastDream > 4)
+                        upcomingDream = DroneMasterDream_4;
+                    break;
             }
             if (upcomingDream != null)
             {
@@ -425,7 +448,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
         public override CustomDreamHook.BuildDreamWorldParams GetBuildDreamWorldParams()
         {
-            if(activateDreamID == DroneMasterDream_0 ||
+            if (activateDreamID == DroneMasterDream_0 ||
                activateDreamID == DroneMasterDream_1 ||
                activateDreamID == DroneMasterDream_3)
             {
@@ -437,7 +460,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                     playAs = PlayerModule.DroneMasterName
                 };
             }
-            else if(activateDreamID == DroneMasterDream_2)
+            else if (activateDreamID == DroneMasterDream_2)
             {
                 return new CustomDreamHook.BuildDreamWorldParams()
                 {
@@ -445,6 +468,17 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                     singleRoomWorld = false,
 
                     playAs = PlayerModule.DroneMasterName
+                };
+            }
+            else if (activateDreamID == DroneMasterDream_4)
+            {
+                return new CustomDreamHook.BuildDreamWorldParams()
+                {
+                    firstRoom = "DMD_ROOF",
+                    singleRoomWorld = false,
+
+                    playAs = PlayerModule.DroneMasterName,
+                    overridePlayerPos = new IntVector2{ x = 707,y = 8},
                 };
             }
             else

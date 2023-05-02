@@ -23,6 +23,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         private static void RoomSpecificScript_AddRoomSpecificScript(On.RoomSpecificScript.orig_AddRoomSpecificScript orig, Room room)
         {
             orig.Invoke(room);
+            Plugin.Log("{0},{1},{2}", room.game.IsStorySession, room.game.GetStorySession.saveState.saveStateNumber, room.abstractRoom.name);
             if (room.game.IsStorySession && room.game.GetStorySession.saveState.saveStateNumber == new SlugcatStats.Name(Plugin.DroneMasterName))
             {
                 if (room.abstractRoom.name == "LC_FINAL")
@@ -38,6 +39,10 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 if(room.abstractRoom.name == "DMD_LAB01")
                 {
                     room.AddObject(new DMD_LAB01Lore(room));
+                }
+                if(room.abstractRoom.name == "DMD_ROOF")
+                {
+                    room.AddObject(new DMD_ROOFLore(room));
                 }
             }
             
@@ -121,16 +126,56 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         }
     }
 
-    public class DMD_LAB01Lore : UpdatableAndDeletable
+    public class DMD_LAB01Lore : RoomLore
+    {
+        public DMD_LAB01Lore(Room room) : base(room, 200) 
+        {
+        }
+
+        public override void AddTextEvents(DialogBox dialogBox)
+        {
+            events.Add(new TextEvent(this, ".  .  .", dialogBox, 0));
+            events.Add(new TextEvent(this, "", dialogBox, 40));
+            events.Add(new TextEvent(this, "Can you hear me little creature?", dialogBox, 0, SoundID.SL_AI_Talk_1));
+            events.Add(new TextEvent(this, "You're now some distance from my room, <LINE>this is a perfect opportunity to test the functionality of your backpack!", dialogBox, 0, SoundID.SL_AI_Talk_2));
+            events.Add(new TextEvent(this, "Please wait a moment for me to start the testing process. . .", dialogBox, 0, SoundID.SL_AI_Talk_3));
+            events.Add(new TextEvent(this, "", dialogBox, 80));
+            events.Add(new TextEvent(this, "Biomass reactor, check.<LINE>Drone port, check.<LINE>Scanning equipment, check.<LINE>Communication equipment, check<LINE>.  .  .", dialogBox, 0, SoundID.SL_AI_Talk_4));
+            events.Add(new TextEvent(this, "Everything looks normal, how about trying to scan a creature next?", dialogBox, 0, SoundID.SL_AI_Talk_5));
+
+            base.AddTextEvents(dialogBox);
+        }
+    }
+
+    public class DMD_ROOFLore : RoomLore
+    {
+        public DMD_ROOFLore(Room room) : base(room, 240)
+        {
+        }
+
+        public override void AddTextEvents(DialogBox dialogBox)
+        {
+            events.Add(new TextEvent(this, "This is your first time to the wall little creature, do you like the view there?", dialogBox, 0, SoundID.SL_AI_Talk_3));
+            events.Add(new TextEvent(this, "You may be wondering what those buildings are.<LINE>They once belonged to my creators, but now they are long gone.", dialogBox, 0, SoundID.SL_AI_Talk_5));
+            events.Add(new TextEvent(this, "Although you are about to travel far, I can still guide you in my precinct, so go down the left side next.", dialogBox, 0, SoundID.SL_AI_Talk_1));
+            events.Add(new TextEvent(this, "Don't forget to watch your step when climbing those coolers", dialogBox, 0, SoundID.SL_AI_Talk_4));
+
+            base.AddTextEvents(dialogBox);
+        }
+    }
+
+    public class RoomLore : UpdatableAndDeletable
     {
         public int age;
+        public int preWaitCounter;
         public List<TextEvent> events = new List<TextEvent>();
         public Player player;
 
         public bool inited = false;
-        public DMD_LAB01Lore(Room room)
+        public RoomLore(Room room,int preWaitCounter)
         {
             base.room = room;
+            this.preWaitCounter = preWaitCounter;
         }
 
         public void SetUp()
@@ -152,19 +197,16 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 }
             }
 
+           
             var dialogBox = room.game.cameras[0].hud.dialogBox;
-            
-            events.Add(new TextEvent(this,".  .  .", dialogBox, 0));
-            events.Add(new TextEvent(this, "", dialogBox, 40));
-            events.Add(new TextEvent(this, "Can you here me little creature?", dialogBox, 0,SoundID.SL_AI_Talk_1));
-            events.Add(new TextEvent(this, "You're now some distance from my room, <LINE>this is a perfect opportunity to test the functionality of your backpack!", dialogBox, 0, SoundID.SL_AI_Talk_2));
-            events.Add(new TextEvent(this, "Please wait a moment for me to start the testing process. . .", dialogBox, 0, SoundID.SL_AI_Talk_3));
-            events.Add(new TextEvent(this, "", dialogBox, 80));
-            events.Add(new TextEvent(this, "Biomass reactor, check.<LINE>Drone port, check.<LINE>Scanning equipment, check.<LINE>Communication equipment, check<LINE>.  .  .", dialogBox, 0, SoundID.SL_AI_Talk_4));
-            events.Add(new TextEvent(this, "Everything looks normal, how about trying to scan a creature next?", dialogBox, 0, SoundID.SL_AI_Talk_5));
-            inited = true;
+            AddTextEvents(dialogBox);
 
-            Plugin.Log("DMD_LAB01 text events inited! {0}",events.Count);
+            Plugin.Log("text events inited! {0}",events.Count);
+        }
+
+        public virtual void AddTextEvents(DialogBox dialogBox)
+        {
+            inited = true;
         }
 
         public override void Update(bool eu)
@@ -190,7 +232,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             }
 
             age++;
-            if(age > 120)
+            if(age > preWaitCounter)
             {
                 if(events.Count == 0)
                 {
@@ -212,7 +254,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
         public class TextEvent
         {
-            public DMD_LAB01Lore owner;
+            public RoomLore owner;
 
             public string text;
             public DialogBox dialogBox;
@@ -233,10 +275,10 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 }
             }
 
-            public TextEvent(DMD_LAB01Lore owner,string text, DialogBox dialogBox,int initWait, SoundID partWithSound = null,int extraLinger = 40)
+            public TextEvent(RoomLore owner,string text, DialogBox dialogBox,int initWait, SoundID partWithSound = null,int extraLinger = 40,bool translate = true)
             {
                 this.owner = owner;
-                this.text = text;
+                this.text = translate ? owner.room.game.rainWorld.inGameTranslator.Translate(text) : text;
                 this.dialogBox = dialogBox;
                 this.initWait = initWait;
                 this.partWithSound = partWithSound;

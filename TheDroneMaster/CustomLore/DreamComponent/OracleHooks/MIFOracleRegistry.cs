@@ -486,7 +486,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public int ConversationHad = 0;
 
-        public override int GetWorkingPalette => 79;
+        public override int GetWorkingPalette => 80615;
         public override Vector2 GetToDir => Vector2.up;
 
         public MIFOracleBehaviour(Oracle oracle) : base(oracle) 

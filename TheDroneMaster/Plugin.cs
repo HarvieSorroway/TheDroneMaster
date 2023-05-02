@@ -23,6 +23,7 @@ using TheDroneMaster.CustomLore.SpecificScripts;
 using Menu;
 using TheDroneMaster.CustomLore.CustomEnding;
 using TheDroneMaster.CreatureAndObjectHooks;
+using static Menu.SlideShow;
 
 
 #pragma warning disable CS0618
@@ -121,7 +122,6 @@ namespace TheDroneMaster
                 CustomEnding.PatchOn();
                 ObjectPatch.PatchOn();
                 //PearlReaderPatchs.Patch();
-
 
                 //TODO: DEBUG
                 On.Player.Update += Player_Update;
@@ -251,8 +251,15 @@ namespace TheDroneMaster
         public static SlideShow.SlideShowID DroneMasterAltEnd;
         public static SlideShow.SlideShowID DroneMasterIntro;
 
+        //Scene
+        public static MenuScene.SceneID TheDroneMaster_Outro1;
+        public static MenuScene.SceneID TheDroneMaster_Outro2;
+        public static MenuScene.SceneID TheDroneMaster_Outro3;
+        public static MenuScene.SceneID TheDroneMaster_AltEndScene;
+
         //Sound
         public static SoundID DataHumming;
+
         public static void RegisterValues()
         {
             if (registed) return;
@@ -266,6 +273,11 @@ namespace TheDroneMaster
 
             DroneMasterAltEnd = new SlideShow.SlideShowID("DroneMasterAltEnd", true);
             DroneMasterIntro = new SlideShow.SlideShowID("DroneMasterIntro", true);
+
+            TheDroneMaster_Outro1 = new MenuScene.SceneID("TheDroneMaster_Outro1", true);
+            TheDroneMaster_Outro2 = new MenuScene.SceneID("TheDroneMaster_Outro2", true);
+            TheDroneMaster_Outro3 = new MenuScene.SceneID("TheDroneMaster_Outro3", true);
+            TheDroneMaster_AltEndScene = new MenuScene.SceneID("TheDroneMaster_AltEndScene", true);
 
             DataHumming = new SoundID("Data_Humming", true);
             registed = true;

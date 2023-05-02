@@ -186,10 +186,17 @@ namespace TheDroneMaster
             if (Input.GetKeyDown(KeyCode.N))
             {
                 //self.room.game.Win(false);
+                self.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
+                self.room.game.GoToRedsGameOver();
+                
                 //self.room.AddObject(new MeshTest(self));
                 //if (Simple3DObject.instance != null) return;
                 //    self.room.AddObject(new Simple3DObject(self.room, self));
 
+            }
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                Plugin.Log(self.abstractCreature.pos.Tile.ToString());
             }
 
             //if(Random.value < 0.3f)
@@ -360,19 +367,23 @@ namespace TheDroneMaster
 
                 if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
                 {
-                    stateOverride = new DreamStateOverride(0, false, Vector2.zero, 0f, 3);
+                    stateOverride = new DreamStateOverride(0, false, Vector2.zero, 0f, 2);
                 }
                 else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
                 {
-                    stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 3) { connectToDMProggress = 0f};
+                    stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 2) { connectToDMProggress = 0f};
                 }
                 else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_2)
                 {
-                    stateOverride = new DreamStateOverride(1, true, Vector2.zero, 0f, 3);
+                    stateOverride = new DreamStateOverride(1, true, Vector2.zero, 0f, 2);
                 }
                 else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_3)
                 {
                     stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 1);
+                }
+                else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_4)
+                {
+                    stateOverride = new DreamStateOverride(1, true, Vector2.zero, 0f, 2);
                 }
             }
 
