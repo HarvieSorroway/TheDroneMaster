@@ -125,10 +125,6 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                     self.stall = true;
                     manager.musicPlayer.MenuRequestsSong(self.waitForMusic, 1.5f, 10f);
                 }
-                int num = 13;
-                int num2 = 2;
-                int num3 = 5;
-                int num4 = 7;
 
                 self.playList.Add(new SlideShow.Scene(MenuScene.SceneID.Empty, 0f, 0f, 0f));
                 self.playList.Add(new SlideShow.Scene(DroneMasterEnums.TheDroneMaster_Outro1, self.ConvertTime(0, 1, 20), self.ConvertTime(0, 4, 26), self.ConvertTime(0, 15, 0)));

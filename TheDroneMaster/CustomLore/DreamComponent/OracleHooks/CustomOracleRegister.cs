@@ -237,7 +237,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public CustomOracleGraphic(PhysicalObject ow) : base(ow)
         {
-            customCOracleStateViz = new CustomOracleStateViz(oracle);
+            //customCOracleStateViz = new CustomOracleStateViz(oracle);
         }
 
         #region 默认方法
@@ -439,7 +439,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override void Update()
         {
-            customCOracleStateViz.Update();
+            if(customCOracleStateViz != null)
+                customCOracleStateViz.Update();
 
             #region base.Update();
             lastCulled = culled;
@@ -1402,11 +1403,6 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             public int age;
 
-            /// <summary>
-            /// AddEvents 中调用的事件，用于给指定的ID添加对话
-            /// </summary>
-            public event AddEventDelegate AddEvent;
-
             public CustomOracleConversation(CustomOracleBehaviour owner, CustomConversationBehaviour convBehav, ID id, DialogBox dialogBox) : base(owner, id, dialogBox)
             {
                 this.owner = owner;
@@ -1523,7 +1519,6 @@ public class CustomOracleStateViz
 
     public void Update()
     {
-        return;
         label.SetPosition(new Vector2(400f,300f));
         string text = string.Format("Oracle : {0}\n", oracle.ID);
 

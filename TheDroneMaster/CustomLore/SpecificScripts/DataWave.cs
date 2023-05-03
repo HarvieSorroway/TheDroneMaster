@@ -106,7 +106,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 sLeaser.sprites[0]._renderLayer._material.SetFloat("preTwistRad", preTwistRad);
                 sLeaser.sprites[0]._renderLayer._material.SetColor("waveCol", color);
             }
-            catch (Exception e)
+            catch
             {
                 Plugin.Log("Error update {0},{1}", sLeaser.sprites[0], sLeaser.sprites[0]._renderLayer);
             }

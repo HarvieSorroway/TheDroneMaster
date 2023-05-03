@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using TheDroneMaster.DreamComponent.OracleHooks;
 using TheDroneMaster.GameHooks;
 using UnityEngine;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TheDroneMaster.CustomLore.SpecificScripts
 {

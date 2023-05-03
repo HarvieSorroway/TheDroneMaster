@@ -13,7 +13,6 @@ namespace TheDroneMaster
         public static void Patch()
         {
             On.RoomCamera.FireUpSinglePlayerHUD += RoomCamera_FireUpSinglePlayerHUD;
-            Plugin.LoggerLog("HUDPatch apply");
         }
 
         private static void RoomCamera_FireUpSinglePlayerHUD(On.RoomCamera.orig_FireUpSinglePlayerHUD orig, RoomCamera self, Player player)

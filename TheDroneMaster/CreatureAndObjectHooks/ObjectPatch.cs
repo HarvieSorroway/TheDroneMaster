@@ -14,7 +14,6 @@ namespace TheDroneMaster.CreatureAndObjectHooks
         {
             SuperStructureFix.PatchOn();
             On.RoofTopView.ctor += RoofTopView_ctor;
-            Plugin.LoggerLog("ObjectPatch apply");
 
         }
         private static void RoofTopView_ctor(On.RoofTopView.orig_ctor orig, RoofTopView self, Room room, RoomSettings.RoomEffect effect)

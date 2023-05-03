@@ -38,7 +38,6 @@ namespace TheDroneMaster
             On.Player.Destroy += Player_Destroy;
 
             Hook player_get_CanPutSpearToBack_Hook = new Hook(typeof(Player).GetProperty("CanPutSpearToBack", propFlags).GetGetMethod(), typeof(PlayerPatchs).GetMethod("Player_get_CanPutSpearOnBack", methodFlags));
-            Plugin.LoggerLog("PlayerPatch apply");
         }
 
         private static void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
@@ -185,21 +184,21 @@ namespace TheDroneMaster
                 }
             }
 
-            if (Input.GetKeyDown(KeyCode.N))
-            {
-                self.room.game.Win(false);
-                //self.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
-                //self.room.game.GoToRedsGameOver();
+            //if (Input.GetKeyDown(KeyCode.N))
+            //{
+            //    self.room.game.Win(false);
+            //    //self.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
+            //    //self.room.game.GoToRedsGameOver();
 
-                //self.room.AddObject(new MeshTest(self));
-                //if (Simple3DObject.instance != null) return;
-                //    self.room.AddObject(new Simple3DObject(self.room, self));
+            //    //self.room.AddObject(new MeshTest(self));
+            //    //if (Simple3DObject.instance != null) return;
+            //    //    self.room.AddObject(new Simple3DObject(self.room, self));
 
-            }
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                Plugin.Log(self.abstractCreature.pos.Tile.ToString());
-            }
+            //}
+            //if (Input.GetKeyDown(KeyCode.K))
+            //{
+            //    Plugin.Log(self.abstractCreature.pos.Tile.ToString());
+            //}
 
             //if(Random.value < 0.3f)
             //{
