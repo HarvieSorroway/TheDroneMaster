@@ -28,16 +28,19 @@ namespace TheDroneMaster.CustomLore.CustomEnding
 
         private static void SlugcatPage_AddAltEndingImage(On.Menu.SlugcatSelectMenu.SlugcatPage.orig_AddAltEndingImage orig, SlugcatSelectMenu.SlugcatPage self)
         {
-            if(self.slugcatNumber == new SlugcatStats.Name(Plugin.DroneMasterName))
+            if (self.slugcatNumber == new SlugcatStats.Name(Plugin.DroneMasterName))
             {
                 var sceneID = DroneMasterEnums.TheDroneMaster_AltEndScene;
-                self.slugcatDepth = 3f;
+                self.imagePos = new Vector2(683f, 484f);
+                self.slugcatDepth = 2f;
                 self.sceneOffset = new Vector2(10f, 75f);
 
                 self.sceneOffset.x = self.sceneOffset.x - (1366f - self.menu.manager.rainWorld.options.ScreenSize.x) / 2f;
                 self.slugcatImage = new InteractiveMenuScene(self.menu, self, sceneID);
                 self.subObjects.Add(self.slugcatImage);
             }
+            else
+                orig.Invoke(self);
         }
 
         private static void MenuDepthIllustration_ctor(On.Menu.MenuDepthIllustration.orig_ctor orig, MenuDepthIllustration self, Menu.Menu menu, MenuObject owner, string folderName, string fileName, Vector2 pos, float depth, MenuDepthIllustration.MenuShader shader)
@@ -170,12 +173,13 @@ namespace TheDroneMaster.CustomLore.CustomEnding
         {
             if(self.GetStorySession.saveState.saveStateNumber == new SlugcatStats.Name(Plugin.DroneMasterName))
             {
+                self.manager.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
                 if (self.manager.upcomingProcess != null)
                     return;
                 if (self.manager.musicPlayer != null)
                     self.manager.musicPlayer.FadeOutAllSongs(20f);
 
-                self.manager.rainWorld.progression.SaveWorldStateAndProgression(false);
+                self.GetStorySession.saveState.SessionEnded(self, true, false);
 
                 self.manager.statsAfterCredits = true;
                 self.manager.nextSlideshow = DroneMasterEnums.DroneMasterAltEnd;

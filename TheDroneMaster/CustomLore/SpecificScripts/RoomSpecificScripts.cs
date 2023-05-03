@@ -18,6 +18,14 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         public static void PatchOn()
         {
             On.RoomSpecificScript.AddRoomSpecificScript += RoomSpecificScript_AddRoomSpecificScript;
+            On.Room.Loaded += Room_Loaded;
+        }
+
+        private static void Room_Loaded(On.Room.orig_Loaded orig, Room self)
+        {
+            orig.Invoke(self);
+            if(self.abstractRoom.name == "SI_A07")
+                RoomSpecificScript.AddRoomSpecificScript(self);
         }
 
         private static void RoomSpecificScript_AddRoomSpecificScript(On.RoomSpecificScript.orig_AddRoomSpecificScript orig, Room room)
@@ -31,10 +39,10 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                     room.AddObject(new LC_BossFight(room));
                 }
                 //TODO : 结局判断
-                if (room.abstractRoom.name == "SI_A07" && DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned)
+                if (room.abstractRoom.name == "SI_A07" && DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned && !room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding)
                 {
                     Plugin.Log("Try Play Endding");
-                    room.AddObject(new DroneMasterEnding(room));
+                    room.AddObject(new DroneMasterEndingManager(room));
                 }
                 if(room.abstractRoom.name == "DMD_LAB01")
                 {
@@ -49,11 +57,58 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         }
     }
 
+    public class DroneMasterEndingManager : UpdatableAndDeletable
+    {
+        Player player;
+        DroneMasterEnding ending;
+        public DroneMasterEndingManager(Room room)
+        {
+            base.room = room;
+        }
+
+        public override void Update(bool eu)
+        {
+            base.Update(eu);
+            if (slatedForDeletetion)
+                return;
+
+            AbstractCreature firstAlivePlayer = room.game.FirstAlivePlayer;
+            if (firstAlivePlayer == null)
+            {
+                return;
+            }
+
+            if (!DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned)
+            {
+                Destroy();
+                return;
+            }
+
+            if (player == null && room.game.Players.Count > 0 && firstAlivePlayer.realizedCreature != null && firstAlivePlayer.realizedCreature.room == room)
+            {
+                player = (firstAlivePlayer.realizedCreature as Player);
+            }
+            if(player != null)
+            {
+                if(player.DangerPos.y > 560f - 120f)
+                {
+                    ending = new DroneMasterEnding(room);
+                    room.AddObject(ending);
+                    player.controller = new Player.NullController();
+                }
+            }
+
+            if (ending != null)
+                Destroy();
+        }
+    }
+
     public class LC_BossFight : UpdatableAndDeletable
     {
         public Player player;
 
         public bool triggeredBoss;
+        public bool kingSpawned;
         public LC_BossFight(Room room)
         { 
             base.room = room;
@@ -71,6 +126,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             {
                 return;
             }
+            SpawnKing();
 
             if (DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned)
             {
@@ -106,29 +162,39 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 triggeredBoss = true;
                 //player.sceneFlag = true;
                 room.TriggerCombatArena();
+                SpawnKing();
                 WorldCoordinate pos = new WorldCoordinate(room.abstractRoom.index, 122, 7, -1);
-                AbstractCreature abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing), null, pos, room.game.GetNewID());
-                abstractCreature.ID.setAltSeed(8875);
-                abstractCreature.Die();
-                abstractCreature.ignoreCycle = true;
-                room.abstractRoom.AddEntity(abstractCreature);
-                abstractCreature.RealizeInRoom();
 
-                for(int i = 0; i< 15; i++)
+                for(int i = 0; i< 10; i++)
                 {
                     WorldCoordinate position = new WorldCoordinate(room.abstractRoom.index, 122 - i, 7, -1);
-                    abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite), null, position, room.game.GetNewID());
+                    var abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite), null, position, room.game.GetNewID());
                     abstractCreature.ignoreCycle = triggeredBoss;
                     room.abstractRoom.AddEntity(abstractCreature);
                     abstractCreature.RealizeInRoom();
                 }
             }
         }
+
+        public void SpawnKing()
+        {
+            if (kingSpawned)
+                return;
+            WorldCoordinate pos = new WorldCoordinate(room.abstractRoom.index, 122, 7, -1);
+            AbstractCreature abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing), null, pos, room.game.GetNewID());
+            abstractCreature.ID.setAltSeed(8875);
+            abstractCreature.Die();
+            abstractCreature.ignoreCycle = true;
+            room.abstractRoom.AddEntity(abstractCreature);
+            abstractCreature.RealizeInRoom();
+
+            kingSpawned = true;
+        }
     }
 
     public class DMD_LAB01Lore : RoomLore
     {
-        public DMD_LAB01Lore(Room room) : base(room, 200) 
+        public DMD_LAB01Lore(Room room) : base(room, 200, "Multi-Iterate Fractal (Multiple Recursive Processor Unit)") 
         {
         }
 
@@ -136,12 +202,12 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         {
             events.Add(new TextEvent(this, ".  .  .", dialogBox, 0));
             events.Add(new TextEvent(this, "", dialogBox, 40));
-            events.Add(new TextEvent(this, "Can you hear me little creature?", dialogBox, 0, SoundID.SL_AI_Talk_1));
-            events.Add(new TextEvent(this, "You're now some distance from my room, <LINE>this is a perfect opportunity to test the functionality of your backpack!", dialogBox, 0, SoundID.SL_AI_Talk_2));
-            events.Add(new TextEvent(this, "Please wait a moment for me to start the testing process. . .", dialogBox, 0, SoundID.SL_AI_Talk_3));
+            events.Add(new TextEvent(this, Translate("Can you hear me little creature?"), dialogBox, extraLingerFactor * 60, SoundID.SL_AI_Talk_1));
+            events.Add(new TextEvent(this, Translate("You're now some distance from my chamber, <LINE>this is a perfect opportunity to test the functionality of your backpack!"), dialogBox, extraLingerFactor * 120, SoundID.SL_AI_Talk_2));
+            events.Add(new TextEvent(this, Translate("Please wait a moment for me to start the testing process. . ."), dialogBox, extraLingerFactor * 80, SoundID.SL_AI_Talk_3));
             events.Add(new TextEvent(this, "", dialogBox, 80));
-            events.Add(new TextEvent(this, "Biomass reactor, check.<LINE>Drone port, check.<LINE>Scanning equipment, check.<LINE>Communication equipment, check<LINE>.  .  .", dialogBox, 0, SoundID.SL_AI_Talk_4));
-            events.Add(new TextEvent(this, "Everything looks normal, how about trying to scan a creature next?", dialogBox, 0, SoundID.SL_AI_Talk_5));
+            events.Add(new TextEvent(this, Translate("Biomass reactor, check.<LINE>Drone port, check.<LINE>Scanning equipment, check.<LINE>Communication equipment, check.<LINE>.  .  ."), dialogBox, extraLingerFactor * 120, SoundID.SL_AI_Talk_4));
+            events.Add(new TextEvent(this, Translate("Everything looks normal, how about trying to scan a creature next?"), dialogBox, extraLingerFactor * 80, SoundID.SL_AI_Talk_5));
 
             base.AddTextEvents(dialogBox);
         }
@@ -149,16 +215,16 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
     public class DMD_ROOFLore : RoomLore
     {
-        public DMD_ROOFLore(Room room) : base(room, 240)
+        public DMD_ROOFLore(Room room) : base(room, 240, "The Wall")
         {
         }
 
         public override void AddTextEvents(DialogBox dialogBox)
         {
-            events.Add(new TextEvent(this, "This is your first time to the wall little creature, do you like the view there?", dialogBox, 0, SoundID.SL_AI_Talk_3));
-            events.Add(new TextEvent(this, "You may be wondering what those buildings are.<LINE>They once belonged to my creators, but now they are long gone.", dialogBox, 0, SoundID.SL_AI_Talk_5));
-            events.Add(new TextEvent(this, "Although you are about to travel far, I can still guide you in my precinct, so go down the left side next.", dialogBox, 0, SoundID.SL_AI_Talk_1));
-            events.Add(new TextEvent(this, "Don't forget to watch your step when climbing those coolers", dialogBox, 0, SoundID.SL_AI_Talk_4));
+            events.Add(new TextEvent(this, Translate("This is your first time to the wall little creature, do you like the view there?"), dialogBox, extraLingerFactor * 100, SoundID.SL_AI_Talk_3));
+            events.Add(new TextEvent(this, Translate("You may be wondering what those buildings are.<LINE>They once belonged to my creators, but now they are long gone."), dialogBox, extraLingerFactor * 120, SoundID.SL_AI_Talk_5));
+            events.Add(new TextEvent(this, Translate("Although you are about to travel far, I can still guide you in my precinct, so go down the left side next."), dialogBox, extraLingerFactor * 100, SoundID.SL_AI_Talk_1));
+            events.Add(new TextEvent(this, Translate("Don't forget to watch your step when climbing those coolers."), dialogBox, extraLingerFactor * 80, SoundID.SL_AI_Talk_4));
 
             base.AddTextEvents(dialogBox);
         }
@@ -166,16 +232,48 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
     public class RoomLore : UpdatableAndDeletable
     {
+        public int extraLingerFactor = 0;
+
         public int age;
         public int preWaitCounter;
         public List<TextEvent> events = new List<TextEvent>();
         public Player player;
 
+        public bool textPrompted = false;
         public bool inited = false;
-        public RoomLore(Room room,int preWaitCounter)
+
+        public string textPrompt;
+        public RoomLore(Room room,int preWaitCounter,string textprompt = "")
         {
             base.room = room;
             this.preWaitCounter = preWaitCounter;
+
+            this.textPrompt = textprompt;
+
+            extraLingerFactor = room.game.rainWorld.inGameTranslator.currentLanguage == InGameTranslator.LanguageID.Chinese ? 1 : 0;
+
+            if (textPrompt == string.Empty)
+                textPrompted = true;
+        }
+
+        public string Translate(string orig)
+        {
+            string result = room.game.rainWorld.inGameTranslator.Translate(orig);
+            Plugin.Log("{0}\n{1}", orig, result);
+            return result;
+        }
+
+        public void PromptText()
+        {
+            if (textPrompted)
+                return;
+            if (room.game.cameras == null || room.game.cameras[0].hud == null)
+                return;
+            if (room.game.cameras[0].hud.textPrompt == null)
+                room.game.cameras[0].hud.AddPart(new TextPrompt(room.game.cameras[0].hud));
+
+            room.game.cameras[0].hud.textPrompt.AddMessage(Translate(textPrompt), 0, 320, true, true);
+            textPrompted = true;
         }
 
         public void SetUp()
@@ -215,9 +313,16 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 return;
             base.Update(eu);
 
+            if (!textPrompted)
+            {
+                PromptText();
+                return;
+            }
+
             if (!inited)
             {
-                SetUp();
+                if (room.game.cameras[0].hud.textPrompt.currentlyShowing == TextPrompt.InfoID.Nothing)
+                    SetUp();
                 return;
             }
 
@@ -269,16 +374,16 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             {
                 get
                 {
-                    if (age < initWait)
+                    if (age < initWait || !activated)
                         return false;
                     return dialogBox.CurrentMessage == null;
                 }
             }
 
-            public TextEvent(RoomLore owner,string text, DialogBox dialogBox,int initWait, SoundID partWithSound = null,int extraLinger = 40,bool translate = true)
+            public TextEvent(RoomLore owner,string text, DialogBox dialogBox,int initWait, SoundID partWithSound = null,int extraLinger = 40)
             {
                 this.owner = owner;
-                this.text = translate ? owner.room.game.rainWorld.inGameTranslator.Translate(text) : text;
+                this.text = text;
                 this.dialogBox = dialogBox;
                 this.initWait = initWait;
                 this.partWithSound = partWithSound;
@@ -288,7 +393,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             public void Activate()
             {
                 activated = true;
-                if(text != string.Empty)
+                if(text != "")
                     dialogBox.NewMessage(text, extraLinger);
                 if (partWithSound != null)
                     owner.room.PlaySound(partWithSound, owner.player.mainBodyChunk, false, 0.8f, MIFOracleRegistry.MIFTalkPitch);

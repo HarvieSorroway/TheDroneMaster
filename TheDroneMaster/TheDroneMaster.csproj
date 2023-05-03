@@ -122,7 +122,6 @@
     </Compile>
     <Compile Include="DronePort\CreatureScanner.cs" />
     <Compile Include="Fixer.cs" />
-    <Compile Include="CustomLore\DreamComponent\GameHook\GamePatch.cs" />
     <Compile Include="LaserDrone\DroneLaserGun.cs" />
     <Compile Include="CustomLore\OracleHooks\InGameTrasnlatorPatch.cs" />
     <Compile Include="PearlReader\PearlReaderPatchs.cs" />
@@ -130,6 +129,7 @@
     <Compile Include="DronePort\DronePortGraphics.cs" />
     <Compile Include="PlayerHooks\MetalGills.cs" />
     <Compile Include="PlayerHooks\PlayerDeathPreventer.cs" />
+    <Compile Include="PlayerHooks\PlayerExtraMovement.cs" />
     <Compile Include="PlayerHooks\PlayerGraphicsPatch.cs" />
     <Compile Include="PlayerHooks\PlayerPatchs.cs" />
     <Compile Include="Plugin.cs" />
@@ -154,6 +154,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Origs.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CustomLore\DreamComponent\GameHook\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

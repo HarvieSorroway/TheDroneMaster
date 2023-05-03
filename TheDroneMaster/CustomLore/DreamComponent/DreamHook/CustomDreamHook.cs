@@ -413,9 +413,6 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             upcomingDream = null;
             cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
 
-            upcomingDream = DroneMasterDream_4;
-            return;
-
             switch (familyThread)
             {
                 case 0:
@@ -442,7 +439,7 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             if (upcomingDream != null)
             {
                 familyThread++;
-                cyclesSinceLastDream = 10;
+                cyclesSinceLastDream = 0;
             }
         }
 
@@ -467,7 +464,8 @@ namespace TheDroneMaster.DreamComponent.DreamHook
                     firstRoom = "DMD_LAB01",
                     singleRoomWorld = false,
 
-                    playAs = PlayerModule.DroneMasterName
+                    playAs = PlayerModule.DroneMasterName,
+                    overridePlayerPos = new IntVector2 { x = 7, y = 54 },
                 };
             }
             else if (activateDreamID == DroneMasterDream_4)

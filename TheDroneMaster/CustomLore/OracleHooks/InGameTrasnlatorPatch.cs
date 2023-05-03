@@ -35,6 +35,8 @@ namespace TheDroneMaster
 
             foreach(var pair in shortStrings)
             {
+                if(self.shortStrings.ContainsKey(pair.Key)) 
+                    continue;
                 self.shortStrings.Add(pair.Key, pair.Value);
                 Plugin.Log("Load Trans : " + pair.Key + " - " + pair.Value);
             }

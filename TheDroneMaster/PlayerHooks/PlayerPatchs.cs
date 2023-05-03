@@ -38,6 +38,7 @@ namespace TheDroneMaster
             On.Player.Destroy += Player_Destroy;
 
             Hook player_get_CanPutSpearToBack_Hook = new Hook(typeof(Player).GetProperty("CanPutSpearToBack", propFlags).GetGetMethod(), typeof(PlayerPatchs).GetMethod("Player_get_CanPutSpearOnBack", methodFlags));
+            Plugin.LoggerLog("PlayerPatch apply");
         }
 
         private static void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
@@ -162,10 +163,11 @@ namespace TheDroneMaster
             bool getModule = modules.TryGetValue(self, out var module) && module.ownDrones;
 
             orig.Invoke(self, eu);
-            
+
+
             if (getModule)
             {
-                module.Update();
+                module.Update(self);
 
                 //if some creature like lizard grab player for more than 60 frames, record as the player's death
                 if (self.dangerGraspTime == 60 && self.AI == null)
@@ -185,10 +187,10 @@ namespace TheDroneMaster
 
             if (Input.GetKeyDown(KeyCode.N))
             {
-                //self.room.game.Win(false);
-                self.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
-                self.room.game.GoToRedsGameOver();
-                
+                self.room.game.Win(false);
+                //self.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
+                //self.room.game.GoToRedsGameOver();
+
                 //self.room.AddObject(new MeshTest(self));
                 //if (Simple3DObject.instance != null) return;
                 //    self.room.AddObject(new Simple3DObject(self.room, self));
@@ -224,7 +226,7 @@ namespace TheDroneMaster
             public readonly WeakReference<Player> playerRef;
             public readonly SlugcatStats.Name name;
             public readonly SlugBaseCharacter character;
-
+            public readonly PlayerExtraMovement playerExtraMovement;
 
             public static SlugcatStats.Name DroneMasterName { get; private set; }
 
@@ -346,15 +348,17 @@ namespace TheDroneMaster
                         if(!Plugin.instance.config.canBackSpear.Value) player.spearOnBack = null;
 
                         playerDeathPreventer = new PlayerDeathPreventer(this);
+                        playerExtraMovement = new PlayerExtraMovement();
                     }
                 }
             }
 
-            public void Update() // call in Player.Update
+            public void Update(Player player) // call in Player.Update
             {
                 if(port != null) port.Update();
                 if(playerDeathPreventer != null) playerDeathPreventer.Update();
                 if(enemyCreator != null)enemyCreator.Update();
+                if (playerExtraMovement != null) playerExtraMovement.Update(player);
             }
 
             /// <summary>

@@ -18,6 +18,7 @@ namespace TheDroneMaster
             On.PlayerGraphics.ApplyPalette += PlayerGraphics_ApplyPalette;
 
             On.PlayerGraphics.Update += PlayerGraphics_Update;
+            Plugin.LoggerLog("PlayerGraphics apply");
         }
 
 

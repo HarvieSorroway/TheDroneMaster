@@ -23,38 +23,53 @@ namespace TheDroneMaster
         private static void PebblesConversation_AddEvents(On.SSOracleBehavior.PebblesConversation.orig_AddEvents orig, SSOracleBehavior.PebblesConversation self)
         {
             orig.Invoke(self);
+            int extralingerfactor = self.owner.rainWorld.inGameTranslator.currentLanguage == InGameTranslator.LanguageID.Chinese ? 1 : 0;
+
             if(self.id == DroneMasterEnums.Pebbles_DroneMaster_FirstMeet)
             {
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate(".  .  ."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A little animal, on the floor of my chamber, is this reaching you?"), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is obvious that you are not a product of natural evolution. I'm wondering who your creator are."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Sorry, I don't have any idea of the blueprints of your body,<LINE>and my communication array is already offline so I can't announce your existence to anyone else."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Due to the scan of parts of your structure, you have the ability to read and store information.<LINE>Your creator seems to want you to be able to gather all kinds of information across as far as possible."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("From the video sent back by my overseers, it seems that you will inflict violence on the scavengers."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Well, I would recommend you to go to my top city and say hello to the neighbors there."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Although a purposed organism similar to yours managed to kill their chief not long ago,<LINE>it looks like they continue to destroy my top structure."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Given that the purpose of your journey is to gather information, maybe then we can all get what we want."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A little animal, on the floor of my chamber, is this reaching you?"), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is obvious that you are not a product of natural evolution. I'm wondering who your creator are."), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Sorry, I don't have any idea of the blueprints of your body,<LINE>and my communication array is already offline so I can't announce your existence to anyone else."), extralingerfactor * 120));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Due to the scan of parts of your structure, you have the ability to read and store information.<LINE>Your creator seems to want you to be able to gather all kinds of information across as far as possible."), extralingerfactor * 160));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("From the video sent back by my overseers, it seems that you will inflict violence on the scavengers."), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Well, I would recommend you to go to my top city and say hello to the neighbors there."), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Although a purposed organism similar to yours managed to kill their chief not long ago,<LINE>it looks like they continue to destroy my top structure."), extralingerfactor * 120));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Given that the purpose of your journey is to gather information, maybe then we can all get what we want."), extralingerfactor * 40));
                 self.events.Add(new Conversation.WaitEvent(self, 40));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have to get back to work, and I hope you gather the ideal information."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have to get back to work, and I hope you gather the ideal information."), extralingerfactor * 80));
             }
             else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_AfterMet)
             {
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh, you're back, little creature."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("How was your journey?"), 0)); 
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh, you're back, little creature."), extralingerfactor * 40));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("How was your journey?"), extralingerfactor * 40)); 
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate(".  .  ."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Apparently I can't get any useful information from your hollow eyes."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("If you can keep quiet, I may allow you to stop for a little longer."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("But now I have to keep working."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Apparently I can't get any useful information from your hollow eyes."), extralingerfactor * 60));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("If you can keep quiet, I may allow you to stop for a little longer."), extralingerfactor * 60));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("But now I have to keep working."), extralingerfactor * 40));
             }
             else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_ExplainPackage)
             {
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh you're back again, little creature."), 0));
-                self.events.Add(new Conversation.WaitEvent(self, 30));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Judging by your current state, I think you've found what you were looking for."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your pack seems to want to send some data, and given that the only structure<LINE>around that can send data is the communications array, I would recommend you head there."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Although I won't be able to use it from here, you might be able to take your chances."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh you're back again, little creature."), extralingerfactor * 60));
+                self.events.Add(new Conversation.WaitEvent(self, 40));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Judging by your current state, I think you've found what you were looking for."), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your pack seems to want to send some data, and given that the only structure<LINE>around that can send data is the communications array, I would recommend you head there."), extralingerfactor * 120));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Although I won't be able to use it from here, you might be able to take your chances."), extralingerfactor * 80));
                 self.events.Add(new Conversation.WaitEvent(self, 50));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Good luck then, I'll have to get back to my work."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Good luck then, I'll have to get back to my work."), extralingerfactor * 60));
+            }
+            else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_ExplainPackageFirstMeet)
+            {
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate(".  .  ."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A little animal, on the floor of my chamber, is this reaching you?"), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is obvious that you are not a product of natural evolution. I'm wondering who your creator are."), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Sorry, I don't have any idea of the blueprints of your body,<LINE>and my communication array is already offline so I can't announce your existence to anyone else."), extralingerfactor * 120));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Due to the scan of parts of your structure, you have the ability to read and store information.<LINE>Your creator seems to want you to be able to gather all kinds of information across as far as possible."), extralingerfactor * 160));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Judging by your current state, I think you've found what you were looking for."), extralingerfactor * 80));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your pack seems to want to send some data, and given that the only structure<LINE>around that can send data is the communications array, I would recommend you head there."), extralingerfactor * 120));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Although I won't be able to use it from here, you might be able to take your chances."), extralingerfactor * 80));
+                self.events.Add(new Conversation.WaitEvent(self, 50));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Good luck then, I'll have to get back to my work."), extralingerfactor * 60));
             }
         }
 
@@ -138,24 +153,28 @@ namespace TheDroneMaster
 
                 if(!initMessage && !dialogBox.ShowingAMessage && dialogBox.messages.Count == 0)
                 {
+                    var scannedSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>();
+                    var pebbleConvSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<SSConversationStateSaveUnit>();
+
                     if (oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad == 0)
                     {
-                        owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_FirstMeet, this);
+                        if (scannedSaveUnit.KingScanned && !pebbleConvSaveUnit.explainPackage)
+                        {
+                            pebbleConvSaveUnit.explainPackage = true;
+                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_ExplainPackageFirstMeet, this);
+                        }
+                        else
+                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_FirstMeet, this);
                     }
                     else
                     {
-                        var scannedSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>();
-                        var pebbleConvSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<SSConversationStateSaveUnit>();
-
                         if(scannedSaveUnit.KingScanned && !pebbleConvSaveUnit.explainPackage)
                         {
                             pebbleConvSaveUnit.explainPackage = true;
                             owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_ExplainPackage, this);
                         }
                         else
-                        {
                             owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_AfterMet, this);
-                        }
                     }
 
                     oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad++;

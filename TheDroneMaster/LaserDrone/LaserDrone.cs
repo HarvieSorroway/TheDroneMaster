@@ -227,20 +227,21 @@ namespace TheDroneMaster
             {
                 owner.mainBodyChunk.vel += Vector2.up * owner.gravity * 0.8f;
             }
+            PlayerPatchs.modules.TryGetValue(owner, out var module);
 
             if (Plugin.instance.config.OverPowerdSuperJump.Value)
             {
                 Vector2 adder = owner.input[0].analogueDir;
                 adder.x *= 0.25f;
                 adder.y *= 0.4f;
-                owner.mainBodyChunk.vel += adder;
+                module.playerExtraMovement.PlusSpeed(adder);
             }
 
             if (owner.bodyMode != Player.BodyModeIndex.ZeroG)
             {
-                Vector2 airBoost = owner.input[0].analogueDir * 0.2f;
-                owner.mainBodyChunk.vel += airBoost;
-                owner.mainBodyChunk.vel.x = Mathf.Clamp(owner.mainBodyChunk.vel.x,-owner.slugcatStats.runspeedFac * 12f, owner.slugcatStats.runspeedFac * 12f);
+                Vector2 airBoost = owner.input[0].analogueDir * 2f;
+                airBoost.y *= 0.1f;
+                module.playerExtraMovement.extraVelocity += airBoost;
                 infRotation.RotateTo(Custom.VecToDeg(owner.mainBodyChunk.vel.normalized));
             }
             else
@@ -251,8 +252,7 @@ namespace TheDroneMaster
                     Vector2 velDir = owner.mainBodyChunk.vel.normalized;
 
                     float factor = Mathf.Abs(Vector2.Dot(bodyDir, velDir));
-                    owner.mainBodyChunk.vel += bodyDir * factor * 0.2f;
-                    owner.mainBodyChunk.vel = Vector2.ClampMagnitude(owner.mainBodyChunk.vel, owner.slugcatStats.runspeedFac * 3f);
+                    module.playerExtraMovement.PlusSpeed(bodyDir* factor * 0.15f);
                     infRotation.RotateTo(Custom.VecToDeg(bodyDir));
                 }
             }

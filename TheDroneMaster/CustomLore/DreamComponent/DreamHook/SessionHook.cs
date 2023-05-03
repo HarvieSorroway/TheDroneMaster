@@ -123,14 +123,6 @@ namespace TheDroneMaster.GameHooks
                     creatureQueue.Enqueue(type);
                 }
 
-                //creatureQueue.Enqueue(CreatureTemplate.Type.BigEel);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.BlueLizard);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.CicadaA);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.MirosBird);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.Salamander);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.Scavenger);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.Slugcat);
-                //creatureQueue.Enqueue(CreatureTemplate.Type.BigNeedleWorm);
                 room.AddObject(light = new LightSource(centerPos, false, color, this));
                 light.rad = 500f;
                 init = true;
@@ -187,7 +179,7 @@ namespace TheDroneMaster.GameHooks
                 for (int i = 0; i < rects.Length; i++)
                     FoolSetScale(rects[i], Custom.LerpBackEaseOut(0, stdScales[i], endingCounter / 100f));
 
-                room.game.cameras[0].paletteBlend += 1 / 100f;
+                room.game.cameras[0].paletteBlend += 1 / 110f;
 
                 if(room.game.cameras[0].paletteBlend >= 1 && room.game.cameras[0].paletteB != 10)
                 {
@@ -205,7 +197,7 @@ namespace TheDroneMaster.GameHooks
                 if (pos != null)
                 {
                     nextSenderCd = Random.Range(120, 180);
-                    curMaxSenders = Random.Range(4, 6);
+                    curMaxSenders = Random.Range(8, 10);
                     var a = new CreatureEndingSender(this, creatureQueue.Dequeue(), room, pos.Value, color + new Color(Random.value / 10f, Random.value / 10f, Random.value / 10f));
                     senderList.Add(a);
                     room.AddObject(a);
@@ -216,19 +208,21 @@ namespace TheDroneMaster.GameHooks
             //send process
             else if(creatureQueue.Count == 0 && CurSenders ==0)
             {
-                if (sender == null)
+                if (dataWave == null)
                 {
                     endingCounter = 10000;
-                    room.AddObject(sender = new EndingMessageSender(this));
+                    room.AddObject(dataWave = new DataWave(room,centerPos,200f,40f,200,20f));
+                    room.PlaySound(DroneMasterEnums.DataWaveShock, centerPos, 1f, 1f);
                 }
+
                 room.game.cameras[0].hardLevelGfxOffset.y = Mathf.Lerp(room.game.cameras[0].hardLevelGfxOffset.y, 300, 0.02f);
             }
             if (endingCounter == 10200)
             {
                 //room.game.manager.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding = true;
-                room.game.manager.rainWorld.progression.SaveProgressionAndDeathPersistentDataOfCurrentState(false, false);
-                room.game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 5f);
-
+                //room.game.manager.rainWorld.progression.SaveProgressionAndDeathPersistentDataOfCurrentState(false, false);
+                //room.game.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Credits, 5f);
+                room.game.GoToRedsGameOver();
             }
         }
 
@@ -337,6 +331,7 @@ namespace TheDroneMaster.GameHooks
         LightSource light;
 
         EndingMessageSender sender;
+        DataWave dataWave;
 
         PositionedSoundEmitter positionedSoundEmitter;
 
@@ -429,9 +424,6 @@ namespace TheDroneMaster.GameHooks
                 sLeaser.sprites[0].SetPosition(owner.centerPos- camPos);
                 sLeaser.sprites[0].height = Mathf.Clamp01(((counter-10)/ 25f))* 700f;
                 sLeaser.sprites[0].width = Mathf.Lerp(40,20,(counter / 20f));
-
- 
-
             }
 
             public override void Update(bool eu)
@@ -534,8 +526,6 @@ namespace TheDroneMaster.GameHooks
                             owner.senderList.Remove(this);
                         Plugin.Log("DM Ending : current sender count" + owner.CurSenders.ToString() + "max sender count" + owner.curMaxSenders);
                         slatedForDeletetion = true;
-
-                        room.AddObject(new DataWave(room, owner.centerPos, 300f, 30f, 80, 30f));
                     }
 
                     if (count < 140)

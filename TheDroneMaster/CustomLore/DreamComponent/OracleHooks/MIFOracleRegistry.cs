@@ -566,32 +566,34 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override void AddConversationEvents(CustomOracleConversation conv, Conversation.ID id)
         {
+            int extralingerfactor = oracle.room.game.rainWorld.inGameTranslator.currentLanguage == InGameTranslator.LanguageID.Chinese ? 1 : 0;
             if(id == DroneMaster_DreamTalk0)
             {
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "Great success!", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "The way they say it works really works!", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("Great success!"), 40 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("The way they say it works really works!"), 60 * extralingerfactor));
                 conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
                 conv.events.Add(new PauseAndWaitForStillEvent(conv, conv.convBehav, 40));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "Oh little one you are awake, how does it feel to be in this world?", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("Oh little one you are awake, how does it feel to be in this world?"), 80 * extralingerfactor));
             }
             else if(id == DroneMaster_DreamTalk1)
             {
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "The current environment outside is too dangerous even for you.", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "To keep you safe, I made this for you.", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "A drone backpack, although you may not always understand it, but it will protect you to the maximum extent.", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "Also if you are not too far from my precinct, I can talk to you through it.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("The current environment outside is too dangerous even for you."), 80 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("To keep you safe, I made this for you."), 60 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("A drone backpack, although you may not always understand it, but it will protect you to the maximum extent."), 120 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("Also if you are not too far from my precinct, I can talk to you through it."), 80 * extralingerfactor));
                 conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "I hope you will like it.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("I hope you will like it."), 40 * extralingerfactor));
             }
             else if(id == DroneMaster_DreamTalk2)
             {
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "What a blessing to have you back!", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "It wasn't a long trip, but it looks like you still had trouble.", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "Let me check you out.", 0));
+                
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("What a blessing to have you back!"), 60 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("It wasn't a long trip, but it looks like you still had trouble."), 80 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("Let me check you out."), 40 * extralingerfactor));
                 conv.events.Add(new Conversation.TextEvent(conv, 0, ".  .  .", 0));
                 conv.events.Add(new PauseAndWaitForStillEvent(conv, conv.convBehav, 40));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "Well, I'm glad you didn't have any problems, but your backpack seems to be broken.", 0));
-                conv.events.Add(new Conversation.TextEvent(conv, 0, "I need some time to fix it. Please help yourself here.", 0));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("Well, I'm glad you didn't have any problems, but your backpack seems to be broken."), 100 * extralingerfactor));
+                conv.events.Add(new Conversation.TextEvent(conv, 0, Translate("I need some time to fix it. Please help yourself here."), 60 * extralingerfactor));
             }
         }
     }

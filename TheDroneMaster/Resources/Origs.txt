@@ -31,3 +31,14 @@ It wasn't a long trip, but it looks like you still had trouble.
 Let me check you out.
 Well, I'm glad you didn't have any problems, but your backpack seems to be broken.
 I need some time to fix it. Please help yourself here.
+Can you hear me little creature?
+You're now some distance from my chamber, <LINE>this is a perfect opportunity to test the functionality of your backpack!
+Please wait a moment for me to start the testing process. . .
+Biomass reactor, check.<LINE>Drone port, check.<LINE>Scanning equipment, check.<LINE>Communication equipment, check.<LINE>.  .  .
+Everything looks normal, how about trying to scan a creature next?
+This is your first time to the wall little creature, do you like the view there?
+You may be wondering what those buildings are.<LINE>They once belonged to my creators, but now they are long gone.
+Although you are about to travel far, I can still guide you in my precinct, so go down the left side next.
+Don't forget to watch your step when climbing those coolers.
+Multi-Iterate Fractal (Multiple Recursive Processor Unit)
+The Wall

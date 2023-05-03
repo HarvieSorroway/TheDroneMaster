@@ -33,18 +33,15 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
     {
         public static void PatchOn()
         {
- 
-                OraclePatchs();
-                OracleGraphicPatchs();
-                OracleArmPatch.PatchOn();
+            OraclePatchs();
+            OracleGraphicPatchs();
+            OracleArmPatch.PatchOn();
 
 
-                OracleGraphicsModulePatch.PatchOn();
-                OracleGraphicsPropertiesPatch.PatchOn();
+            OracleGraphicsModulePatch.PatchOn();
+            OracleGraphicsPropertiesPatch.PatchOn();
 
             On.Room.ReadyForAI += Room_ReadyForAI;
-
-            CustomOracleExtender.RegistryCustomOracle(new MIFOracleRegistry());
         }
 
         public static void OraclePatchs()

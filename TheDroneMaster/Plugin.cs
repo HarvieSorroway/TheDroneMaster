@@ -116,28 +116,29 @@ namespace TheDroneMaster
                 InGameTrasnlatorPatch.Patch();
                 Fixer.Patch();
                 DeathPersistentSaveDataPatch.Patch();
-                GamePatch.Patch(self);
+                
                 SessionHook.Patch();
                 RoomSpecificScriptPatch.PatchOn();
                 CustomEnding.PatchOn();
                 ObjectPatch.PatchOn();
                 //PearlReaderPatchs.Patch();
 
-                //TODO: DEBUG
-                On.Player.Update += Player_Update;
-
                 OraclePatch.PatchOn();
 
+                CustomDreamHook.RegistryDream(new DroneMasterDream());
+                CustomOracleExtender.RegistryCustomOracle(new MIFOracleRegistry());
                 DroneMasterEnums.RegisterValues();
 
                 LoadResources(self);
 
                 MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
                 inited = true;
+                Plugin.LoggerLog("All Patch apply!");
             }
             catch(Exception e)
             {
                 Debug.LogException(e);
+                Logger.LogError(e.Message);
             }
         }
 
@@ -182,34 +183,42 @@ namespace TheDroneMaster
 
         public void LoadResources(RainWorld rainWorld)
         {
-            InGameTrasnlatorPatch.LoadResource();
+            try
+            {
+                InGameTrasnlatorPatch.LoadResource();
 
-            string path = AssetManager.ResolveFilePath("assetbundles/posttestshader");
-            AssetBundle ab = AssetBundle.LoadFromFile(path);
+                string path = AssetManager.ResolveFilePath("assetbundles/posttestshader");
+                AssetBundle ab = AssetBundle.LoadFromFile(path);
 
-            postShade = ab.LoadAsset<Shader>("assets/posttestshader.shader");
-            bufferShader = ab.LoadAsset<Shader>("assets/buffershader.shader");
-            customHoloGridShader = ab.LoadAsset<Shader>("assets/customhologrid.shader");
-            dataWaveShader = ab.LoadAsset<Shader>("assets/myshader/datawave.shader");
+                postShade = ab.LoadAsset<Shader>("assets/posttestshader.shader");
+                bufferShader = ab.LoadAsset<Shader>("assets/buffershader.shader");
+                customHoloGridShader = ab.LoadAsset<Shader>("assets/customhologrid.shader");
+                dataWaveShader = ab.LoadAsset<Shader>("assets/myshader/datawave.shader");
 
-            Camera cam = GameObject.FindObjectOfType<Camera>();
-            postEffect = cam.gameObject.AddComponent<PostEffect>();
+                Camera cam = GameObject.FindObjectOfType<Camera>();
+                postEffect = cam.gameObject.AddComponent<PostEffect>();
 
-            rainWorld.Shaders.Add("CustomHoloGrid", FShader.CreateShader("CustomHoloGrid", customHoloGridShader));
-            rainWorld.Shaders.Add("DataWave", FShader.CreateShader("DataWave", dataWaveShader));
+                rainWorld.Shaders.Add("CustomHoloGrid", FShader.CreateShader("CustomHoloGrid", customHoloGridShader));
+                rainWorld.Shaders.Add("DataWave", FShader.CreateShader("DataWave", dataWaveShader));
 
-            FAtlas falseRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectFalse");
-            falseRectName = falseRect.name;
+                FAtlas falseRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectFalse");
+                falseRectName = falseRect.name;
 
-            FAtlas trueRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectTrue");
-            trueRectName = trueRect.name;
+                FAtlas trueRect = Futile.atlasManager.LoadImage("assetbundles/SelectRectTrue");
+                trueRectName = trueRect.name;
 
-            ab.Unload(false);
+                ab.Unload(false);
 
-            string path2 = AssetManager.ResolveFilePath("assetbundles/linemaskshader");
-            AssetBundle ab2 = AssetBundle.LoadFromFile(path2);
-            lineMaskShader = ab2.LoadAsset<Shader>("assets/LineMask.shader");
-            rainWorld.Shaders.Add("LineMask", FShader.CreateShader("LineMask", lineMaskShader));
+                string path2 = AssetManager.ResolveFilePath("assetbundles/linemaskshader");
+                AssetBundle ab2 = AssetBundle.LoadFromFile(path2);
+                lineMaskShader = ab2.LoadAsset<Shader>("assets/LineMask.shader");
+                rainWorld.Shaders.Add("LineMask", FShader.CreateShader("LineMask", lineMaskShader));
+            }
+            catch(Exception e)
+            {
+                Debug.LogException(e);
+                Logger.LogError(e);
+            }
 
         }
 
@@ -246,6 +255,7 @@ namespace TheDroneMaster
         public static Conversation.ID Pebbles_DroneMaster_AfterMet;
 
         public static Conversation.ID Pebbles_DroneMaster_ExplainPackage;
+        public static Conversation.ID Pebbles_DroneMaster_ExplainPackageFirstMeet;
 
         //Ending
         public static SlideShow.SlideShowID DroneMasterAltEnd;
@@ -259,6 +269,7 @@ namespace TheDroneMaster
 
         //Sound
         public static SoundID DataHumming;
+        public static SoundID DataWaveShock;
 
         public static void RegisterValues()
         {
@@ -268,8 +279,9 @@ namespace TheDroneMaster
 
             Pebbles_DroneMaster_FirstMeet = new Conversation.ID("Pebbles_DroneMaster_FirstMeet", true);
             Pebbles_DroneMaster_AfterMet = new Conversation.ID("Pebbles_DroneMaster_AfterMet", true);
-
             Pebbles_DroneMaster_ExplainPackage = new Conversation.ID("Pebbles_DroneMaster_ExplainPackage", true);
+            Pebbles_DroneMaster_ExplainPackageFirstMeet = new Conversation.ID("Pebbles_DroneMaster_ExplainPackageFirstMeet", true);
+
 
             DroneMasterAltEnd = new SlideShow.SlideShowID("DroneMasterAltEnd", true);
             DroneMasterIntro = new SlideShow.SlideShowID("DroneMasterIntro", true);
@@ -280,6 +292,7 @@ namespace TheDroneMaster
             TheDroneMaster_AltEndScene = new MenuScene.SceneID("TheDroneMaster_AltEndScene", true);
 
             DataHumming = new SoundID("Data_Humming", true);
+            DataWaveShock = new SoundID("DataWaveShock", true);
             registed = true;
         }
 

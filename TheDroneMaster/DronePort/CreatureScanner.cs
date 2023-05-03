@@ -171,7 +171,7 @@ namespace TheDroneMaster
                 filter.InitiateSprites(sLeaser, rCam);
             }
 
-            AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("BackgroundShortcuts"));
+            AddToContainer(sLeaser, rCam, rCam.ReturnFContainer("HUD"));
         }
 
         public override void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)

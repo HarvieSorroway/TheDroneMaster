@@ -14,6 +14,7 @@ namespace TheDroneMaster.CreatureAndObjectHooks
         {
             SuperStructureFix.PatchOn();
             On.RoofTopView.ctor += RoofTopView_ctor;
+            Plugin.LoggerLog("ObjectPatch apply");
 
         }
         private static void RoofTopView_ctor(On.RoofTopView.orig_ctor orig, RoofTopView self, Room room, RoomSettings.RoomEffect effect)
@@ -149,13 +150,13 @@ namespace TheDroneMaster.CreatureAndObjectHooks
 
 
                         float modifyDepth = (tile.Solid && !anySlopeOrAir && tile.Terrain != Room.Tile.TerrainType.Slope) ? (1f - (2f / 90f)) : 0f;
-                        Plugin.Log("Solid : {0},depth : {1},tile:{2}-{3}, AnySlopeOrAir : {4}", tile.Solid, modifyDepth, (int)(i / 2f) + self.rect.left, (int)(j / 2f) + self.rect.bottom, anySlopeOrAir);
+                        //Plugin.Log("Solid : {0},depth : {1},tile:{2}-{3}, AnySlopeOrAir : {4}", tile.Solid, modifyDepth, (int)(i / 2f) + self.rect.left, (int)(j / 2f) + self.rect.bottom, anySlopeOrAir);
                         sLeaser.sprites[num].alpha = modifyDepth;
                         num++;
                     }
                 }
                 self.broken = 0f; 
-                Plugin.Log("Apply for {0} sprites", num);
+                //Plugin.Log("Apply for {0} sprites", num);
             } 
         }
     }

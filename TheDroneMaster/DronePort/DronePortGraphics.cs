@@ -72,7 +72,7 @@ namespace TheDroneMaster
 
             if(pGraphics.player.room.game.session is StoryGameSession)
             {
-                portLightFlashing = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned;
+                portLightFlashing = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned && !pGraphics.player.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding;
             }
             
         }
