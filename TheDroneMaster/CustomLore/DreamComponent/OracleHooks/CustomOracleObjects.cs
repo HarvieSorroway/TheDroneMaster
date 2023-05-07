@@ -46,6 +46,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public virtual CustomOrbitableOraclePearl.AbstractCustomOraclePearl AbstractPhysicalObjectFromString(AbstractPhysicalObject.AbstractObjectType type,World world,EntityID id,WorldCoordinate pos, string[] dataArray)
         {
+            if (type != pearlObjectType)
+                return null;
             return new CustomOrbitableOraclePearl.AbstractCustomOraclePearl(pearlObjectType,dataPearlType,world,null,pos,id, int.Parse(dataArray[3]), int.Parse(dataArray[4]), null, int.Parse(dataArray[6]), int.Parse(dataArray[7]));
         }
 

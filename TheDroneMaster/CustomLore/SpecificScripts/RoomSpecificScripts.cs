@@ -125,6 +125,12 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
             {
                 return;
             }
+
+            if(!room.readyForAI || room.aimap == null)
+            {
+                return;
+            }
+
             SpawnKing();
 
             if (DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned)

@@ -413,6 +413,8 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             upcomingDream = null;
             cyclesSinceLastFamilyDream = 0;//屏蔽FamilyDream计数，防止被原本的方法干扰
 
+            //Plugin.Log("DreamState : cycleSinceLastDream{0},FamilyThread{1}", cyclesSinceLastDream, familyThread);
+
             switch (familyThread)
             {
                 case 0:
