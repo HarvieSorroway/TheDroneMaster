@@ -38,7 +38,7 @@ namespace TheDroneMaster
         {
             this.instance = instance;
             this.logSource = loggerSource;
-
+            
             UsingHUDEffect = config.Bind<bool>("DroneMaster_UsingHUDEffect", true);
             OpenHUDKey = config.Bind<KeyCode>("DroneMaster_OpenHUDKey", KeyCode.C);
             UsingPlayerInput = config.Bind<bool>("DroneMaster_UsingMouseInput", false);
