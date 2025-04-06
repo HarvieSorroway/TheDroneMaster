@@ -95,7 +95,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             halo = new Halo(this, totalSprites);
             totalSprites += halo.totalSprites;
-            gown = new Gown(this);
+            //TODO:不确定是否是这样改的
+            gowns = new Gown[1];
+            gowns[0] = new Gown(this,0);
             robeSprite = totalSprites;
             totalSprites++;
 
@@ -179,7 +181,8 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
 
                 sLeaser.sprites[HandSprite(k, 0)].color = color;
-                if (gown != null)
+                //TODO:不确定是否是这样改的
+                if (gowns[0] != null)
                 {
                     for (int l = 0; l < 7; l++)
                     {
@@ -226,9 +229,12 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 armJointGraphics[j].InitiateSprites(sLeaser, rCam);
             }
 
-            if (gown != null)
+            if (gowns != null)
             {
-                gown.InitiateSprite(robeSprite, sLeaser, rCam);
+                foreach(var gown in gowns)
+                {
+                    gown.InitiateSprite(robeSprite, sLeaser, rCam);
+                }
             }
 
             if (halo != null)
@@ -375,13 +381,15 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             {
                 for (int x = 0; x < divs; x++)
                 {
-                    collarPos[x] = owner.gown.clothPoints[x, 0, 0];
+                    // TODO: 需要确认是否应该使用gowns[0] - 原代码使用gown
+                    collarPos[x] = owner.gowns[0].clothPoints[x, 0, 0];
                 }
 
                 for (int y = 0; y < divs; y++)
                 {
-                    Vector2 delta = owner.gown.clothPoints[5, y, 0] - owner.gown.clothPoints[5, 0, 0];
-                    midColPos[y] = owner.gown.clothPoints[5, 0, 0] + delta / 2f;
+                    // TODO: 需要确认是否应该使用gowns[0] - 原代码使用gown
+                    Vector2 delta = owner.gowns[0].clothPoints[5, y, 0] - owner.gowns[0].clothPoints[5, 0, 0];
+                    midColPos[y] = owner.gowns[0].clothPoints[5, 0, 0] + delta / 2f;
                 }
             }
 

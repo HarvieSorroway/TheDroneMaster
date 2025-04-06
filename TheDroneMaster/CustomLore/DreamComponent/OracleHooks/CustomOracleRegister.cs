@@ -33,7 +33,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// 当前迭代器的gravity
         /// </summary>
         public float gravity = 0.9f;
-        
+
         /// <summary>
         /// 迭代器在房价中的初始位置
         /// </summary>
@@ -58,9 +58,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// </summary>
         /// <param name="oracle">迭代器本身</param>
         /// <param name="room">迭代器所在的房间</param>
-        public virtual void LoadBehaviourAndSurroundings(ref Oracle oracle,Room room)
+        public virtual void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
         {
-            oracleEx.Add(oracle,new CustomOralceEX(oracle));
+            oracleEx.Add(oracle, new CustomOralceEX(oracle));
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             var centerPearl = marbles[marbles.Count - 1];
 
-            for(int i = 0; i < 6; i++)
+            for (int i = 0; i < 6; i++)
             {
                 int color;
                 switch (i)
@@ -279,7 +279,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             //CustomOracleGraphcis Updates
             CustomOracleBehaviour oracleBehaviour = oracle.oracleBehavior as CustomOracleBehaviour;
-            if(oracleBehaviour != null)
+            if (oracleBehaviour != null)
             {
                 CustomOracleDrawBehaviour(sLeaser, rCam, timeStacker, camPos, oracleBehaviour);
             }
@@ -292,9 +292,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             sLeaser.sprites[neckSprite].rotation = Custom.AimFromOneVectorToAnother(bodyPos, headPos);
             sLeaser.sprites[neckSprite].scaleY = Vector2.Distance(bodyPos, headPos);
 
-            if (gown != null)
+            if (gowns != null)
             {
-                gown.DrawSprite(robeSprite, sLeaser, rCam, timeStacker, camPos);
+                foreach (var gown in gowns)
+                {
+                    // gown.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+                    gown.DrawSprite(robeSprite, sLeaser, rCam, timeStacker, camPos);
+                }
             }
             if (halo != null)
             {
@@ -439,7 +443,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public override void Update()
         {
-            if(customCOracleStateViz != null)
+            if (customCOracleStateViz != null)
                 customCOracleStateViz.Update();
 
             #region base.Update();
@@ -460,9 +464,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             breathe += 1f / Mathf.Lerp(10f, 60f, oracle.health);
             lastBreatheFac = breathFac;
             breathFac = Mathf.Lerp(0.5f + 0.5f * Mathf.Sin(breathe * 3.1415927f * 2f), 1f, Mathf.Pow(oracle.health, 2f));
-
-            if (gown != null)
-                gown.Update();
+            if (gowns != null)
+                foreach (var gown in gowns)
+                    gown.Update();
 
             if (halo != null)
                 halo.Update();
@@ -540,7 +544,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     {
                         averageVoice += voiceFreqSamples[k];
                     }
-                    averageVoice /= (float)voiceFreqSamples.Length; 
+                    averageVoice /= (float)voiceFreqSamples.Length;
                     averageVoice = Mathf.InverseLerp(0f, 0.00014f, averageVoice);
                     if (averageVoice > 0.7f && Random.value < averageVoice / 14f)
                     {
@@ -676,7 +680,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         /// <param name="timeStacker"></param>
         /// <param name="camPos"></param>
         /// <param name="oracleBehaviour"></param>
-        public virtual void CustomOracleDrawBehaviour(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos,CustomOracleBehaviour oracleBehaviour)
+        public virtual void CustomOracleDrawBehaviour(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos, CustomOracleBehaviour oracleBehaviour)
         {
             if (killSprite > 0)
             {
@@ -893,7 +897,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 playerOutOfRoomCounter++;
             }
 
-            if (pathProgression >= 1f && consistentBasePosCounter > 100 && !oracle.arm.baseMoving) 
+            if (pathProgression >= 1f && consistentBasePosCounter > 100 && !oracle.arm.baseMoving)
                 allStillCounter++;
             else
                 allStillCounter = 0;
@@ -955,10 +959,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 return float.MaxValue;
             }
             float num = Mathf.Abs(Vector2.Distance(tryPos, player.DangerPos) - ((movementBehavior == CustomMovementBehavior.Talk) ? 250f : 400f));
-            num -= (float)Custom.IntClamp(oracle.room.aimap.getAItile(tryPos).terrainProximity, 0, 8) * 10f;
+            num -= (float)Custom.IntClamp(oracle.room.aimap.getTerrainProximity(tryPos), 0, 8) * 10f;
             if (movementBehavior == CustomMovementBehavior.ShowMedia)
             {
-                num += (float)(Custom.IntClamp(oracle.room.aimap.getAItile(tryPos).terrainProximity, 8, 16) - 8) * 10f;
+                num += (float)(Custom.IntClamp(oracle.room.aimap.getTerrainProximity(tryPos), 8, 16) - 8) * 10f;
             }
             return num;
         }
@@ -1038,7 +1042,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             if (movementBehavior == CustomMovementBehavior.Idle)
             {
                 invstAngSpeed = 1f;
-                if(CustomOracleRegister.oracleEx.TryGetValue(oracle, out var customOralceEX))
+                if (CustomOracleRegister.oracleEx.TryGetValue(oracle, out var customOralceEX))
                 {
                     if (investigateCustomMarble == null && customOralceEX.customMarbles.Count > 0)
                     {
@@ -1077,7 +1081,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 {
                     lookPoint = player.DangerPos;
                     Vector2 vector = new Vector2(Random.value * oracle.room.PixelWidth, Random.value * oracle.room.PixelHeight);
-                    if (!oracle.room.GetTile(vector).Solid && oracle.room.aimap.getAItile(vector).terrainProximity > 2 && Vector2.Distance(vector, player.DangerPos) > Vector2.Distance(nextPos, player.DangerPos) + 100f)
+                    if (!oracle.room.GetTile(vector).Solid && oracle.room.aimap.getTerrainProximity(vector)> 2 && Vector2.Distance(vector, player.DangerPos) > Vector2.Distance(nextPos, player.DangerPos) + 100f)
                     {
                         SetNewDestination(vector);
                     }
@@ -1092,13 +1096,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 else
                 {
                     lookPoint = player.DangerPos;
-                    if (investigateAngle < -90f || investigateAngle > 90f || oracle.room.aimap.getAItile(nextPos).terrainProximity < 2f)
+                    if (investigateAngle < -90f || investigateAngle > 90f || oracle.room.aimap.getTerrainProximity(nextPos) < 2f)
                     {
                         investigateAngle = Mathf.Lerp(-70f, 70f, Random.value);
                         invstAngSpeed = Mathf.Lerp(0.4f, 0.8f, Random.value) * ((Random.value < 0.5f) ? (-1f) : 1f);
                     }
                     Vector2 vector = player.DangerPos + Custom.DegToVec(investigateAngle) * 150f;
-                    if (oracle.room.aimap.getAItile(vector).terrainProximity >= 2f)
+                    if (oracle.room.aimap.getTerrainProximity(vector) >= 2f)
                     {
                         if (pathProgression > 0.9f)
                         {
@@ -1249,7 +1253,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             }
         }
 
-        public virtual void AddConversationEvents(CustomOracleConversation conv,Conversation.ID id)
+        public virtual void AddConversationEvents(CustomOracleConversation conv, Conversation.ID id)
         {
 
         }
@@ -1482,7 +1486,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
         public class CustomMovementBehavior : ExtEnum<CustomMovementBehavior>
         {
-            public CustomMovementBehavior (string value, bool register = false) : base(value, register)
+            public CustomMovementBehavior(string value, bool register = false) : base(value, register)
             {
             }
 
@@ -1513,24 +1517,24 @@ public class CustomOracleStateViz
 
     public void InitSprites()
     {
-        label = new FLabel(Custom.GetFont(), "") { anchorX = 0f, anchorY = 1f, scale = 1.1f,isVisible = true,alpha = 1f };
+        label = new FLabel(Custom.GetFont(), "") { anchorX = 0f, anchorY = 1f, scale = 1.1f, isVisible = true, alpha = 1f };
         Futile.stage.AddChild(label);
     }
 
     public void Update()
     {
-        label.SetPosition(new Vector2(400f,300f));
+        label.SetPosition(new Vector2(400f, 300f));
         string text = string.Format("Oracle : {0}\n", oracle.ID);
 
-        for(int i = 0;i < oracle.bodyChunks.Length;i++)
+        for (int i = 0; i < oracle.bodyChunks.Length; i++)
         {
             text += string.Format("Bodychunk{0} pos : {1}\n", i, oracle.bodyChunks[i].pos);
         }
 
-        
+
         CustomOracleGraphic customOracleGraphic = oracle.graphicsModule as CustomOracleGraphic;
         CustomOracleBehaviour behaviour = (oracle.oracleBehavior as CustomOracleBehaviour);
-        if (customOracleGraphic != null) 
+        if (customOracleGraphic != null)
         {
             text += string.Format("getToPos {0}\n", behaviour.OracleGetToPos);
             text += string.Format("idealPos {0}\n", behaviour.baseIdeal);

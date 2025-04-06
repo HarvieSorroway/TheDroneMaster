@@ -15,14 +15,14 @@ namespace TheDroneMaster
         public readonly float buttonGap = 15f;
 
         public WeakReference<LaserDrone> followDrone;
-        public DroneHUD droneHUD;
+        public PlayerDroneHUD droneHUD;
 
 
         public List<Button3D> buttons = new List<Button3D>();
         public Button3D autoModeButton;
         public List<FNode> nodes = new List<FNode>();
 
-        public DroneUI(DroneHUD part,LaserDrone drone)
+        public DroneUI(PlayerDroneHUD part,LaserDrone drone)
         {
             this.droneHUD = part;
             this.followDrone = new WeakReference<LaserDrone>(drone);

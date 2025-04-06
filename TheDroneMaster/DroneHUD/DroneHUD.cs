@@ -9,16 +9,16 @@ using RWCustom;
 
 namespace TheDroneMaster
 {
-    public class DroneHUD : HudPart
+    public class PlayerDroneHUD : HudPart
     {
-        public static DroneHUD instance;
+        public static PlayerDroneHUD instance;
         public DronePort port;
         public DroneHUDInputManager inputManager;
 
         public static Color LaserColor = new Color(1f, 0.26f, 0.45f);
 
         public List<FNode> publicNodes = new List<FNode>();
-        
+
         public List<DroneUI> droneUIs = new List<DroneUI>();
         public DroneCursor cursor;
 
@@ -29,16 +29,16 @@ namespace TheDroneMaster
         public bool reval = false;
         public bool lastButtonPress = false;
 
-        public DroneHUD(HUD.HUD hud,DronePort port) : base(hud)
+        public PlayerDroneHUD(HUD.HUD hud, DronePort port) : base(hud)
         {
             Plugin.Log("Init DroneHUD");
             this.port = port;
             instance = this;
 
             inputManager = new DroneHUDInputManager(this);
-            cursor = new DroneCursor(this,30f,Color.red);
+            cursor = new DroneCursor(this, 30f, Color.red);
             resummmonDroneButton = new ResummmonDroneButton(200f, 20f, 5f, Color.red);
-            
+
 
             InitSprites();
             LaserDrone.pauseMovement = false;
@@ -59,11 +59,11 @@ namespace TheDroneMaster
             resummmonDroneButton.centerPos = new Vector2(screenVec.x - resummmonDroneButton.width / 2f - 20f, screenVec.y - resummmonDroneButton.height / 2f - 20f);
 
             lightSprite = new CustomFSprite("Futile_White") { shader = hud.rainWorld.Shaders["CustomHoloGrid"] };
-            
+
 
             publicNodes.Add(lightSprite);
 
-            for (int i = 0;i < publicNodes.Count; i++)
+            for (int i = 0; i < publicNodes.Count; i++)
             {
                 hud.fContainers[0].AddChild(publicNodes[i]);
             }
@@ -123,9 +123,11 @@ namespace TheDroneMaster
             base.Update();
 
             Plugin.postEffect.Strength = alpha;
+            
+            //让玩家可以用特殊键或者自定义的按键来打开无人机操作界面
+            bool buttonPress = (hud.owner as Player).input[0].spec||Input.GetKeyDown(Plugin.instance.config.OpenHUDKey.Value);
 
-            bool buttonPress = Input.GetKey(Plugin.instance.config.OpenHUDKey.Value);
-            if(buttonPress != lastButtonPress && buttonPress)
+            if (buttonPress != lastButtonPress && buttonPress)
             {
                 reval = !reval;
                 LaserDrone.pauseMovement = reval;
@@ -133,7 +135,7 @@ namespace TheDroneMaster
             lastButtonPress = buttonPress;
             alpha = Mathf.Lerp(alpha, reval ? 1f : 0f, 0.2f);
 
-            for (int i = droneUIs.Count - 1;i >= 0; i--)
+            for (int i = droneUIs.Count - 1; i >= 0; i--)
             {
                 droneUIs[i].Update();
             }
@@ -147,7 +149,7 @@ namespace TheDroneMaster
         {
             for (int i = droneUIs.Count - 1; i >= 0; i--)
             {
-                if(droneUIs[i].followDrone.TryGetTarget(out var drone) && drone == newDrone)
+                if (droneUIs[i].followDrone.TryGetTarget(out var drone) && drone == newDrone)
                 {
                     return;
                 }
@@ -172,11 +174,11 @@ namespace TheDroneMaster
         {
             if (pressed) return;
 
-            if(DroneHUD.instance.port != null && DroneHUD.instance.port.owner.TryGetTarget(out var player))
+            if (PlayerDroneHUD.instance.port != null && PlayerDroneHUD.instance.port.owner.TryGetTarget(out var player))
             {
-                if(!player.inShortcut)
+                if (!player.inShortcut)
                 {
-                    DroneHUD.instance.port.ResummonDrones();
+                    PlayerDroneHUD.instance.port.ResummonDrones();
                     pressed = true;
                 }
             }
@@ -214,7 +216,7 @@ namespace TheDroneMaster
 
         FLabel pannel;
 
-        public BaseButton3D(float width, float height, float depth, Color color, string message,DroneUI ui = null)
+        public BaseButton3D(float width, float height, float depth, Color color, string message, DroneUI ui = null)
         {
             this.ui = ui;
             this.width = width;
@@ -223,8 +225,8 @@ namespace TheDroneMaster
             this.color = color;
             this.message = message;
 
-            DroneHUD.instance.inputManager.pressKeyUp += OnPressKeyUp;
-            DroneHUD.instance.inputManager.pressKeyDown += PressMe;
+            PlayerDroneHUD.instance.inputManager.pressKeyUp += OnPressKeyUp;
+            PlayerDroneHUD.instance.inputManager.pressKeyDown += PressMe;
             Update();
         }
 
@@ -252,8 +254,8 @@ namespace TheDroneMaster
 
         public virtual void Destroy()
         {
-            DroneHUD.instance.inputManager.pressKeyUp -= OnPressKeyUp;
-            DroneHUD.instance.inputManager.pressKeyDown -= PressMe;
+            PlayerDroneHUD.instance.inputManager.pressKeyUp -= OnPressKeyUp;
+            PlayerDroneHUD.instance.inputManager.pressKeyDown -= PressMe;
         }
 
         public void InitSprites(ref List<FNode> nodes, RoomCamera rCam)
@@ -344,7 +346,7 @@ namespace TheDroneMaster
 
         public virtual void PressMe()
         {
-            if (DroneHUD.instance.inputManager.IsPressMe(this)) PressMe(false);
+            if (PlayerDroneHUD.instance.inputManager.IsPressMe(this)) PressMe(false);
         }
 
         public virtual void PressMe(bool pressWithoutCommand = false)
@@ -358,7 +360,7 @@ namespace TheDroneMaster
         public DroneCursor.Mode mode;
         public bool pressWithoutCommand = false;
 
-        public Button3D(float width,float height,float depth,Color color,string message, DroneCommandSystem.CommandType command,DroneCursor.Mode mode, DroneUI ui = null) : base(width,height,depth,color,message,ui)
+        public Button3D(float width, float height, float depth, Color color, string message, DroneCommandSystem.CommandType command, DroneCursor.Mode mode, DroneUI ui = null) : base(width, height, depth, color, message, ui)
         {
             this.command = command;
             this.mode = mode;
@@ -366,7 +368,7 @@ namespace TheDroneMaster
 
         public override void PressMe(bool pressWithoutCommand = false)
         {
-            if (DroneHUD.instance.inputManager.buttonPressLock) return;
+            if (PlayerDroneHUD.instance.inputManager.buttonPressLock) return;
             this.pressWithoutCommand = pressWithoutCommand;
             pressed = true;
         }
@@ -393,10 +395,10 @@ namespace TheDroneMaster
 
     public class DroneHUDInputManager
     {
-        public  float moveCursorSpeed = 20f;
-        public DroneHUD droneHUD;
+        public float moveCursorSpeed = 20f;
+        public PlayerDroneHUD droneHUD;
 
-        public Vector2 CursorPos = new Vector2(Screen.width / 2f,Screen.height / 2f);
+        public Vector2 CursorPos = new Vector2(Screen.width / 2f, Screen.height / 2f);
         public bool UsingMouseInput = true;
         public bool GetPressKeyDown = false;
 
@@ -407,7 +409,7 @@ namespace TheDroneMaster
 
         public static List<Player.InputPackage> inputPackages = new List<Player.InputPackage>();
 
-        public DroneHUDInputManager(DroneHUD hud)
+        public DroneHUDInputManager(PlayerDroneHUD hud)
         {
             droneHUD = hud;
             UsingMouseInput = !Plugin.instance.config.UsingPlayerInput.Value;
@@ -421,12 +423,12 @@ namespace TheDroneMaster
                 CursorPos = Input.mousePosition;
                 GetPressKeyDown = Input.GetMouseButton(0);
                 if (Input.GetMouseButtonDown(0) && pressKeyDown != null) pressKeyDown();
-                if (Input.GetMouseButtonUp(0) && pressKeyUp != null) pressKeyUp(); 
+                if (Input.GetMouseButtonUp(0) && pressKeyUp != null) pressKeyUp();
             }
             else
             {
                 moveCursorSpeed = 1f;
-                for(int i = 0;i < inputPackages.Count; i++)
+                for (int i = 0; i < inputPackages.Count; i++)
                 {
                     if (inputPackages[i].x == 0 && inputPackages[i].y == 0) break;
                     moveCursorSpeed += 0.5f;

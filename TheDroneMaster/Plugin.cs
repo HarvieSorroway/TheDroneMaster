@@ -19,6 +19,7 @@ using Menu;
 using TheDroneMaster.CustomLore.CustomEnding;
 using TheDroneMaster.CreatureAndObjectHooks;
 using static Menu.SlideShow;
+using Rewired;
 
 
 #pragma warning disable CS0618
@@ -141,7 +142,7 @@ namespace TheDroneMaster
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self,eu);
-            if (Input.GetKey(KeyCode.Y))
+            if (UnityEngine.Input.GetKey(KeyCode.Y))
             {
                 foreach (var i in self.room.drawableObjects)
                 {

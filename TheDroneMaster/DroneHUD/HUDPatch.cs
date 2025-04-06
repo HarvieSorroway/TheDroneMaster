@@ -22,7 +22,7 @@ namespace TheDroneMaster
             if(PlayerPatchs.modules.TryGetValue(player,out var module) && module.ownDrones)
             {
                 Debug.Log("FireUpPlayerHUD" + module.port.ToString());
-                self.hud.AddPart(new DroneHUD(self.hud,module.port));
+                self.hud.AddPart(new PlayerDroneHUD(self.hud,module.port));
             }
         }
     }

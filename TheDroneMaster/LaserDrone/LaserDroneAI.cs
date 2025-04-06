@@ -435,9 +435,9 @@ namespace TheDroneMaster
 
         public void SyncUIButtons()
         {
-            if(DroneHUD.instance != null && DroneHUD.instance.droneUIs.Count > 0)
+            if(PlayerDroneHUD.instance != null && PlayerDroneHUD.instance.droneUIs.Count > 0)
             {
-                foreach(var ui in DroneHUD.instance.droneUIs)
+                foreach(var ui in PlayerDroneHUD.instance.droneUIs)
                 {
                     foreach(var button in ui.buttons)
                     {
