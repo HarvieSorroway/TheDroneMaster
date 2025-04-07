@@ -135,80 +135,113 @@ namespace TheDroneMaster
             lastButtonPress = buttonPress;
             alpha = Mathf.Lerp(alpha, reval ? 1f : 0f, 0.2f);
 
+            List<Vector2> uiPos = new List<Vector2>();
             for (int i = droneUIs.Count - 1; i >= 0; i--)
             {
+                droneUIs[i].targetOffset = Vector2.zero;
+                if(i==droneUIs.Count-1)
+                {
+                    uiPos.Add(droneUIs[i].followDrone.TryGetTarget(out var drone) ? drone.firstChunk.pos : Vector2.zero);
+                }
+                else
+                {
+                    if(droneUIs[i].followDrone.TryGetTarget(out var drone))
+                    {
+                        Vector2 pos = drone.firstChunk.pos;
+                        // 检查是否有重叠的按钮
+                        foreach(var existingPos in uiPos)
+                        {
+                            if(Mathf.Abs(existingPos.x - pos.x) < 175f && Mathf.Abs(existingPos.y - pos.y) < 25f)
+                            {
+                                // 如果有重叠,将当前按钮下移50格并设置UI偏移
+                                pos.y = existingPos.y - 50f;
+                                droneUIs[i].targetOffset = new Vector2(0,pos.y-drone.firstChunk.pos.y);
+                            }
+                        }
+                        uiPos.Add(pos);
+                    }
+                }
                 droneUIs[i].Update();
+
             }
 
             cursor.alpha = alpha;
             cursor.Update();
-            if(!inputManager.UsingMouseInput&&cursor.mode==DroneCursor.Mode.Free&&reval)
+            if(!inputManager.UsingMouseInput && cursor.mode==DroneCursor.Mode.Free && reval)
             {
-                // 找到最近的按钮
-                BaseButton3D nearestButton = null;
-                float minDist = float.MaxValue;
-                
-                // 先检查召回按钮的距离
-                float recallDistX = Mathf.Abs(inputManager.CursorPos.x - resummmonDroneButton.centerPos.x);
-                float recallDistY = Mathf.Abs(inputManager.CursorPos.y - resummmonDroneButton.centerPos.y);
-                
-                if(recallDistX < resummmonDroneButton.width/2f + 30f && recallDistY < resummmonDroneButton.height/2f + 30f)
-                {
-                    float recallDist = Vector2.Distance(inputManager.CursorPos, resummmonDroneButton.centerPos);
-                    minDist = recallDist;
-                    nearestButton = resummmonDroneButton;
-                }
-                
-                // 然后检查其他按钮
-                foreach(var button in droneUIs.SelectMany(ui => ui.buttons).Where(b => b.alpha > 0.0001f))
-                {
-                    float distX = Mathf.Abs(inputManager.CursorPos.x - button.centerPos.x);
-                    float distY = Mathf.Abs(inputManager.CursorPos.y - button.centerPos.y);
-                    
-                    // 增大吸引范围
-                    if(distX < button.width/2f + 30f && distY < button.height/2f + 30f)
-                    {
-                        float dist = Vector2.Distance(inputManager.CursorPos, button.centerPos);
-                        if(dist < minDist)
-                        {
-                            minDist = dist;
-                            nearestButton = button;
-                        }
-                    }
-                }
-
-                // 对最近的按钮施加吸引力
-                if(nearestButton != null)
-                {
-                    float dist = Vector2.Distance(inputManager.CursorPos, nearestButton.centerPos);
-                    float maxSize = Mathf.Max(nearestButton.width, nearestButton.height);
-                    
-                    // 计算吸引力，距离越近力越大，但在非常接近中心时减少吸引力
-                    float normalizedDist = dist / maxSize;
-                    float force;
-                    
-                    if(normalizedDist < 0.2f) // 非常接近中心时减少吸引力
-                    {
-                        // 在中心区域，吸引力随距离线性增加
-                        force = Mathf.Lerp(0.5f, 2f, normalizedDist / 0.2f);
-                    }
-                    else
-                    {
-                        // 在外部区域，吸引力随距离线性减少
-                        force = Mathf.Lerp(4f, 0f, (normalizedDist - 0.2f) / 0.8f);
-                    }
-                    
-                    // 计算方向向量
-                    Vector2 dir = (nearestButton.centerPos - inputManager.CursorPos).normalized;
-                    
-                    // 施加力
-                    // 距离按钮中心越近速度越慢
-                    float slowdown = Mathf.Lerp(0.5f, 1f, normalizedDist);
-                    inputManager.vel *= slowdown;
-                    inputManager.vel += dir * force;
-                }
+                ApplyButtonSnapForce();
             }
             resummmonDroneButton.Update();
+        }
+
+        /// <summary>
+        /// 实现按钮吸附功能，当光标靠近按钮时会有一个向按钮中心的吸引力
+        /// </summary>
+        private void ApplyButtonSnapForce()
+        {
+            // 找到最近的按钮
+            BaseButton3D nearestButton = null;
+            float minDist = float.MaxValue;
+            
+            // 先检查召回按钮的距离
+            float recallDistX = Mathf.Abs(inputManager.CursorPos.x - resummmonDroneButton.centerPos.x);
+            float recallDistY = Mathf.Abs(inputManager.CursorPos.y - resummmonDroneButton.centerPos.y);
+            
+            if(recallDistX < resummmonDroneButton.width/2f + 30f && recallDistY < resummmonDroneButton.height/2f + 30f)
+            {
+                float recallDist = Vector2.Distance(inputManager.CursorPos, resummmonDroneButton.centerPos);
+                minDist = recallDist;
+                nearestButton = resummmonDroneButton;
+            }
+            
+            // 然后检查其他按钮
+            foreach(var button in droneUIs.SelectMany(ui => ui.buttons).Where(b => b.alpha > 0.0001f))
+            {
+                float distX = Mathf.Abs(inputManager.CursorPos.x - button.centerPos.x);
+                float distY = Mathf.Abs(inputManager.CursorPos.y - button.centerPos.y);
+                
+                // 增大吸引范围
+                if(distX < button.width/2f + 30f && distY < button.height/2f + 30f)
+                {
+                    float dist = Vector2.Distance(inputManager.CursorPos, button.centerPos);
+                    if(dist < minDist)
+                    {
+                        minDist = dist;
+                        nearestButton = button;
+                    }
+                }
+            }
+
+            // 对最近的按钮施加吸引力
+            if(nearestButton != null)
+            {
+                float dist = Vector2.Distance(inputManager.CursorPos, nearestButton.centerPos);
+                float maxSize = Mathf.Max(nearestButton.width, nearestButton.height);
+                
+                // 计算吸引力，距离越近力越大，但在非常接近中心时减少吸引力
+                float normalizedDist = dist / maxSize;
+                float force;
+                
+                if(normalizedDist < 0.2f) // 非常接近中心时减少吸引力
+                {
+                    // 在中心区域，吸引力随距离线性增加
+                    force = Mathf.Lerp(0.5f, 2f, normalizedDist / 0.2f);
+                }
+                else
+                {
+                    // 在外部区域，吸引力随距离线性减少
+                    force = Mathf.Lerp(4f, 0f, (normalizedDist - 0.2f) / 0.8f);
+                }
+                
+                // 计算方向向量
+                Vector2 dir = (nearestButton.centerPos - inputManager.CursorPos).normalized;
+                
+                // 施加力
+                // 距离按钮中心越近速度越慢
+                float slowdown = Mathf.Lerp(0.5f, 1f, normalizedDist);
+                inputManager.vel *= slowdown;
+                inputManager.vel += dir * force;
+            }
         }
 
         public void TryRequestHUDForDrone(LaserDrone newDrone)

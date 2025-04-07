@@ -17,6 +17,8 @@ namespace TheDroneMaster
         public WeakReference<LaserDrone> followDrone;
         public PlayerDroneHUD droneHUD;
 
+        // 添加偏移量字段
+        public Vector2 targetOffset = Vector2.zero;
 
         public List<Button3D> buttons = new List<Button3D>();
         public Button3D autoModeButton;
@@ -68,7 +70,15 @@ namespace TheDroneMaster
             {
                 if (followDrone.TryGetTarget(out var drone))
                 {
+                    // 平滑过渡到目标偏移量
+                    
+                    // 计算起始位置
                     Vector2 basePos = drone.firstChunk.pos + buttonHeight * Vector2.down - HUDPatch.currentCam.pos;
+                    
+                    // 应用当前偏移量
+                    basePos += targetOffset;
+                    
+                    // 放置每个按钮
                     foreach (var button in buttons)
                     {
                         button.centerPos = basePos;
