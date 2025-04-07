@@ -93,20 +93,47 @@ namespace TheDroneMaster
 
         public void Destroy()
         {
+            Plugin.Log("DroneUI.Destroy() called");
+            
+            // 确保所有按钮都被正确销毁
             foreach(var button in buttons)
             {
-                button.Destroy();
+                try
+                {
+                    button.Destroy();
+                }
+                catch(Exception e)
+                {
+                    Plugin.Log("Error destroying button: " + e.Message);
+                }
             }
             buttons.Clear();
 
-
+            // 确保所有节点都被正确移除
             foreach (var node in nodes)
             {
-                node.isVisible = false;
-                node.RemoveFromContainer();
+                try
+                {
+                    node.isVisible = false;
+                    node.RemoveFromContainer();
+                }
+                catch(Exception e)
+                {
+                    Plugin.Log("Error removing node: " + e.Message);
+                }
             }
+            nodes.Clear();
 
-            droneHUD.droneUIs.Remove(this);
+            // 确保从droneUIs列表中移除
+            if(droneHUD != null && droneHUD.droneUIs != null)
+            {
+                droneHUD.droneUIs.Remove(this);
+                Plugin.Log("DroneUI removed from droneUIs list");
+            }
+            else
+            {
+                Plugin.Log("Warning: droneHUD or droneUIs is null");
+            }
         }
     }
 }

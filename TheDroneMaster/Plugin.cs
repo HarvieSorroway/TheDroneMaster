@@ -225,7 +225,7 @@ namespace TheDroneMaster
         public static void Log(string text)
         {
             if (!LogOutPut) return;
-            Debug.Log("[DroneMaster]" + text);
+            UnityEngine.Debug.Log("[DroneMaster]" + text);
         }
 
         public static void LoggerLog(string text)
@@ -236,7 +236,7 @@ namespace TheDroneMaster
         public static void Log(string pattern, params object[] objects)
         {
             if(!LogOutPut) return;
-            Debug.Log("[DroneMaster]" + string.Format(pattern, objects));
+            UnityEngine.Debug.Log("[DroneMaster]" + string.Format(pattern, objects));
         }
     }
 

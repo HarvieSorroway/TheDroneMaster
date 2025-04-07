@@ -84,9 +84,7 @@ namespace TheDroneMaster
                 if (PlayerDroneHUD.instance.reval)
                 {
                     Player.InputPackage current = new Player.InputPackage();
-                    current.x = self.input[0].x;
-                    current.y = self.input[0].y;
-                    current.thrw = self.input[0].thrw;
+                    current =self.input[0];
                     module.lockMovementInput = true;
                     DroneHUDInputManager.GetPlayerInput(current);
                 }
