@@ -30,5 +30,11 @@ namespace TheDroneMaster
         }
 
         public class ProcessManagerModule
+        {
+            public ProcessManagerModule(ProcessManager manager)
+            {
+
+            }
+        }
     }
 }

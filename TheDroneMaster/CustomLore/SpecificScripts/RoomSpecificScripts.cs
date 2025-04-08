@@ -173,7 +173,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 for(int i = 0; i< 10; i++)
                 {
                     WorldCoordinate position = new WorldCoordinate(room.abstractRoom.index, 122 - i, 7, -1);
-                    var abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite), null, position, room.game.GetNewID());
+                    var abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(DLCSharedEnums.CreatureTemplateType.ScavengerElite), null, position, room.game.GetNewID());
                     abstractCreature.ignoreCycle = triggeredBoss;
                     room.abstractRoom.AddEntity(abstractCreature);
                     abstractCreature.RealizeInRoom();

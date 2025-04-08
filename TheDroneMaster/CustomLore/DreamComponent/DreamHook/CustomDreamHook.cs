@@ -160,7 +160,6 @@ namespace TheDroneMaster.DreamComponent.DreamHook
 
             registed = true;
         }
-
         private static AbstractCreature RainWorldGame_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate(On.RainWorldGame.orig_SpawnPlayers_bool_bool_bool_bool_WorldCoordinate orig, RainWorldGame self, bool player1, bool player2, bool player3, bool player4, WorldCoordinate location)
         {
             if(currentActivateDream != null && currentActivateDream.dreamStarted)
@@ -233,14 +232,14 @@ namespace TheDroneMaster.DreamComponent.DreamHook
             orig.Invoke(self, dt);
         }
 
-        private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
+        private static void RainWorldGame_Win(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished, bool fromWarpPoint)
         {
             if(currentActivateDream != null && currentActivateDream.dreamStarted && currentActivateDream.IsPerformDream)
             {
                 currentActivateDream.EndDream(self);
                 return;
             }
-            orig.Invoke(self, malnourished);
+            orig.Invoke(self, malnourished, fromWarpPoint);
         }
 
         private static void RainWorldGame_GameOver(On.RainWorldGame.orig_GameOver orig, RainWorldGame self, Creature.Grasp dependentOnGrasp)

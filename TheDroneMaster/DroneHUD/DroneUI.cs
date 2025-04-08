@@ -15,14 +15,16 @@ namespace TheDroneMaster
         public readonly float buttonGap = 15f;
 
         public WeakReference<LaserDrone> followDrone;
-        public DroneHUD droneHUD;
+        public PlayerDroneHUD droneHUD;
 
+        // 添加偏移量字段
+        public Vector2 targetOffset = Vector2.zero;
 
         public List<Button3D> buttons = new List<Button3D>();
         public Button3D autoModeButton;
         public List<FNode> nodes = new List<FNode>();
 
-        public DroneUI(DroneHUD part,LaserDrone drone)
+        public DroneUI(PlayerDroneHUD part,LaserDrone drone)
         {
             this.droneHUD = part;
             this.followDrone = new WeakReference<LaserDrone>(drone);
@@ -68,7 +70,15 @@ namespace TheDroneMaster
             {
                 if (followDrone.TryGetTarget(out var drone))
                 {
+                    // 平滑过渡到目标偏移量
+                    
+                    // 计算起始位置
                     Vector2 basePos = drone.firstChunk.pos + buttonHeight * Vector2.down - HUDPatch.currentCam.pos;
+                    
+                    // 应用当前偏移量
+                    basePos += targetOffset;
+                    
+                    // 放置每个按钮
                     foreach (var button in buttons)
                     {
                         button.centerPos = basePos;
@@ -93,20 +103,47 @@ namespace TheDroneMaster
 
         public void Destroy()
         {
+            Plugin.Log("DroneUI.Destroy() called");
+            
+            // 确保所有按钮都被正确销毁
             foreach(var button in buttons)
             {
-                button.Destroy();
+                try
+                {
+                    button.Destroy();
+                }
+                catch(Exception e)
+                {
+                    Plugin.Log("Error destroying button: " + e.Message);
+                }
             }
             buttons.Clear();
 
-
+            // 确保所有节点都被正确移除
             foreach (var node in nodes)
             {
-                node.isVisible = false;
-                node.RemoveFromContainer();
+                try
+                {
+                    node.isVisible = false;
+                    node.RemoveFromContainer();
+                }
+                catch(Exception e)
+                {
+                    Plugin.Log("Error removing node: " + e.Message);
+                }
             }
+            nodes.Clear();
 
-            droneHUD.droneUIs.Remove(this);
+            // 确保从droneUIs列表中移除
+            if(droneHUD != null && droneHUD.droneUIs != null)
+            {
+                droneHUD.droneUIs.Remove(this);
+                Plugin.Log("DroneUI removed from droneUIs list");
+            }
+            else
+            {
+                Plugin.Log("Warning: droneHUD or droneUIs is null");
+            }
         }
     }
 }

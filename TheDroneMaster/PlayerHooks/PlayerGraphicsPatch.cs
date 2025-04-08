@@ -109,8 +109,8 @@ namespace TheDroneMaster
             if (PlayerPatchs.modules.TryGetValue(self.player,out var module) && module.ownDrones && module.newEyeIndex != -1)
             {
                 Color color = module.eyeColor;
-                if (DroneHUD.instance != null)
-                    color = Color.Lerp(module.eyeColor, module.laserColor, DroneHUD.instance.alpha);
+                if (PlayerDroneHUD.instance != null)
+                    color = Color.Lerp(module.eyeColor, module.laserColor, PlayerDroneHUD.instance.alpha);
 
                 sLeaser.sprites[module.newEyeIndex].color = color;
 

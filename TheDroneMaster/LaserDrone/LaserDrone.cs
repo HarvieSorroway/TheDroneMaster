@@ -154,16 +154,16 @@ namespace TheDroneMaster
             //TempPather tempPather = AI.tempPather;
             LaserDroneQuickPather quickPather = AI.quickPather;
 
-            MovementConnection movementConnection = null;
+            MovementConnection? movementConnection = null;
             if (pather != null && pather.DoneMappingAccessibility && !forceUsingTempPather)
             {
                 movementConnection = pather.FollowPath(room.GetWorldCoordinate(followingPos), true);
-                currentConnection = movementConnection;
+                currentConnection = movementConnection.Value;
             }
 
             if (movementConnection != null)
             {
-                FlyFollow(movementConnection,pather.destination);
+                FlyFollow(movementConnection.Value,pather.destination);
             }
             else
             {
