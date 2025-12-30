@@ -119,7 +119,7 @@ namespace TheDroneMaster
                 CustomEnding.PatchOn();
                 ObjectPatch.PatchOn();
 
-                //DMPSEntry.OnModInit();
+                DMPSEntry.OnModInit();
                 //PearlReaderPatchs.Patch();
 
                 DeathPersistentSaveDataRx.AppplyTreatment(new EnemyCreatorSaveUnit(null));
@@ -138,7 +138,7 @@ namespace TheDroneMaster
                 }
 
                 RegisteFisobs();
-                //DMPSEntry.RegisterFisobs();
+                DMPSEntry.RegisterFisobs();
                 LoadResources(self);
 
                 MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
@@ -231,7 +231,7 @@ namespace TheDroneMaster
                 lineMaskShader = ab2.LoadAsset<Shader>("assets/LineMask.shader");
                 rainWorld.Shaders.Add("LineMask", FShader.CreateShader("LineMask", lineMaskShader));
 
-                //DMPSEntry.LoadResources();
+                DMPSEntry.LoadResources();
             }
             catch(Exception e)
             {

@@ -190,6 +190,9 @@ namespace TheDroneMaster.DMPS.DMPSDrone.DroneWeapon
                 var weapon = (graphics.graphics.drone.weapon as DefaultLaserGun);
                 var room = graphics.graphics.drone.room;
 
+                if (room == null)
+                    return;
+
                 float smoothSpread = 1f - DMHelper.EaseInOutCubic(Mathf.Clamp01(charge * 1.2f));
 
                 rotate = (rotate + rotateBias);
