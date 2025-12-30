@@ -9,16 +9,16 @@ using RWCustom;
 
 namespace TheDroneMaster
 {
-    public class DroneHUD : HudPart
+    public class PlayerDroneHUD : HudPart
     {
-        public static DroneHUD instance;
+        public static PlayerDroneHUD instance;
         public DronePort port;
         public DroneHUDInputManager inputManager;
 
         public static Color LaserColor = new Color(1f, 0.26f, 0.45f);
 
         public List<FNode> publicNodes = new List<FNode>();
-        
+
         public List<DroneUI> droneUIs = new List<DroneUI>();
         public DroneCursor cursor;
 
@@ -29,16 +29,16 @@ namespace TheDroneMaster
         public bool reval = false;
         public bool lastButtonPress = false;
 
-        public DroneHUD(HUD.HUD hud,DronePort port) : base(hud)
+        public PlayerDroneHUD(HUD.HUD hud, DronePort port) : base(hud)
         {
             Plugin.Log("Init DroneHUD");
             this.port = port;
             instance = this;
 
             inputManager = new DroneHUDInputManager(this);
-            cursor = new DroneCursor(this,30f,Color.red);
+            cursor = new DroneCursor(this, 30f, Color.red);
             resummmonDroneButton = new ResummmonDroneButton(200f, 20f, 5f, Color.red);
-            
+
 
             InitSprites();
             LaserDrone.pauseMovement = false;
@@ -46,7 +46,7 @@ namespace TheDroneMaster
 
         public void InitSprites()
         {
-            for (int i = droneUIs.Count - 1; i >= 0; i++)
+            for (int i = droneUIs.Count - 1; i >= 0; i--)
             {
                 droneUIs[i].InitSprites();
             }
@@ -59,11 +59,11 @@ namespace TheDroneMaster
             resummmonDroneButton.centerPos = new Vector2(screenVec.x - resummmonDroneButton.width / 2f - 20f, screenVec.y - resummmonDroneButton.height / 2f - 20f);
 
             lightSprite = new CustomFSprite("Futile_White") { shader = hud.rainWorld.Shaders["CustomHoloGrid"] };
-            
+
 
             publicNodes.Add(lightSprite);
 
-            for (int i = 0;i < publicNodes.Count; i++)
+            for (int i = 0; i < publicNodes.Count; i++)
             {
                 hud.fContainers[0].AddChild(publicNodes[i]);
             }
@@ -124,8 +124,10 @@ namespace TheDroneMaster
 
             Plugin.postEffect.Strength = alpha;
 
-            bool buttonPress = Input.GetKey(Plugin.instance.config.OpenHUDKey.Value);
-            if(buttonPress != lastButtonPress && buttonPress)
+            //让玩家可以用特殊键或者自定义的按键来打开无人机操作界面
+            bool buttonPress = (hud.owner as Player).input[0].spec || Input.GetKeyDown(Plugin.instance.config.OpenHUDKey.Value);
+
+            if (buttonPress != lastButtonPress && buttonPress)
             {
                 reval = !reval;
                 LaserDrone.pauseMovement = reval;
@@ -133,21 +135,120 @@ namespace TheDroneMaster
             lastButtonPress = buttonPress;
             alpha = Mathf.Lerp(alpha, reval ? 1f : 0f, 0.2f);
 
-            for (int i = droneUIs.Count - 1;i >= 0; i--)
+            List<Vector2> uiPos = new List<Vector2>();
+            for (int i = droneUIs.Count - 1; i >= 0; i--)
             {
+                droneUIs[i].targetOffset = Vector2.zero;
+                if(i==droneUIs.Count-1)
+                {
+                    uiPos.Add(droneUIs[i].followDrone.TryGetTarget(out var drone) ? drone.firstChunk.pos : Vector2.zero);
+                }
+                else
+                {
+                    if(droneUIs[i].followDrone.TryGetTarget(out var drone))
+                    {
+                        Vector2 pos = drone.firstChunk.pos;
+                        // 检查是否有重叠的按钮
+                        foreach(var existingPos in uiPos)
+                        {
+                            if(Mathf.Abs(existingPos.x - pos.x) < 175f && Mathf.Abs(existingPos.y - pos.y) < 25f)
+                            {
+                                // 如果有重叠,将当前按钮下移50格并设置UI偏移
+                                pos.y = existingPos.y - 50f;
+                                droneUIs[i].targetOffset = new Vector2(0,pos.y-drone.firstChunk.pos.y);
+                            }
+                        }
+                        uiPos.Add(pos);
+                    }
+                }
                 droneUIs[i].Update();
+
             }
 
             cursor.alpha = alpha;
             cursor.Update();
+            if(!inputManager.UsingMouseInput && cursor.mode==DroneCursor.Mode.Free && reval)
+            {
+                ApplyButtonSnapForce();
+            }
             resummmonDroneButton.Update();
+        }
+
+        /// <summary>
+        /// 实现按钮吸附功能，当光标靠近按钮时会有一个向按钮中心的吸引力
+        /// </summary>
+        private void ApplyButtonSnapForce()
+        {
+            // 找到最近的按钮
+            BaseButton3D nearestButton = null;
+            float minDist = float.MaxValue;
+            
+            // 先检查召回按钮的距离
+            float recallDistX = Mathf.Abs(inputManager.CursorPos.x - resummmonDroneButton.centerPos.x);
+            float recallDistY = Mathf.Abs(inputManager.CursorPos.y - resummmonDroneButton.centerPos.y);
+            
+            if(recallDistX < resummmonDroneButton.width/2f + 30f && recallDistY < resummmonDroneButton.height/2f + 30f)
+            {
+                float recallDist = Vector2.Distance(inputManager.CursorPos, resummmonDroneButton.centerPos);
+                minDist = recallDist;
+                nearestButton = resummmonDroneButton;
+            }
+            
+            // 然后检查其他按钮
+            foreach(var button in droneUIs.SelectMany(ui => ui.buttons).Where(b => b.alpha > 0.0001f))
+            {
+                float distX = Mathf.Abs(inputManager.CursorPos.x - button.centerPos.x);
+                float distY = Mathf.Abs(inputManager.CursorPos.y - button.centerPos.y);
+                
+                // 增大吸引范围
+                if(distX < button.width/2f + 30f && distY < button.height/2f + 30f)
+                {
+                    float dist = Vector2.Distance(inputManager.CursorPos, button.centerPos);
+                    if(dist < minDist)
+                    {
+                        minDist = dist;
+                        nearestButton = button;
+                    }
+                }
+            }
+
+            // 对最近的按钮施加吸引力
+            if(nearestButton != null)
+            {
+                float dist = Vector2.Distance(inputManager.CursorPos, nearestButton.centerPos);
+                float maxSize = Mathf.Max(nearestButton.width, nearestButton.height);
+                
+                // 计算吸引力，距离越近力越大，但在非常接近中心时减少吸引力
+                float normalizedDist = dist / maxSize;
+                float force;
+                
+                if(normalizedDist < 0.2f) // 非常接近中心时减少吸引力
+                {
+                    // 在中心区域，吸引力随距离线性增加
+                    force = Mathf.Lerp(0.5f, 2f, normalizedDist / 0.2f);
+                }
+                else
+                {
+                    // 在外部区域，吸引力随距离线性减少
+                    force = Mathf.Lerp(4f, 0f, (normalizedDist - 0.2f) / 0.8f);
+                }
+                
+                // 计算方向向量
+                Vector2 dir = (nearestButton.centerPos - inputManager.CursorPos).normalized;
+                
+                // 施加力
+                // 距离按钮中心越近速度越慢
+                float slowdown = Mathf.Lerp(0.5f, 1f, normalizedDist);
+                inputManager.vel *= slowdown;
+                inputManager.vel += dir * force;
+            }
         }
 
         public void TryRequestHUDForDrone(LaserDrone newDrone)
         {
             for (int i = droneUIs.Count - 1; i >= 0; i--)
             {
-                if(droneUIs[i].followDrone.TryGetTarget(out var drone) && drone == newDrone)
+                if (droneUIs[i].followDrone.TryGetTarget(out var drone) && drone == newDrone)
                 {
                     return;
                 }
@@ -172,11 +273,11 @@ namespace TheDroneMaster
         {
             if (pressed) return;
 
-            if(DroneHUD.instance.port != null && DroneHUD.instance.port.owner.TryGetTarget(out var player))
+            if (PlayerDroneHUD.instance.port != null && PlayerDroneHUD.instance.port.owner.TryGetTarget(out var player))
             {
-                if(!player.inShortcut)
+                if (!player.inShortcut)
                 {
-                    DroneHUD.instance.port.ResummonDrones();
+                    PlayerDroneHUD.instance.port.ResummonDrones();
                     pressed = true;
                 }
             }
@@ -214,7 +315,7 @@ namespace TheDroneMaster
 
         FLabel pannel;
 
-        public BaseButton3D(float width, float height, float depth, Color color, string message,DroneUI ui = null)
+        public BaseButton3D(float width, float height, float depth, Color color, string message, DroneUI ui = null)
         {
             this.ui = ui;
             this.width = width;
@@ -223,8 +324,8 @@ namespace TheDroneMaster
             this.color = color;
             this.message = message;
 
-            DroneHUD.instance.inputManager.pressKeyUp += OnPressKeyUp;
-            DroneHUD.instance.inputManager.pressKeyDown += PressMe;
+            PlayerDroneHUD.instance.inputManager.pressKeyUp += OnPressKeyUp;
+            PlayerDroneHUD.instance.inputManager.pressKeyDown += PressMe;
             Update();
         }
 
@@ -247,13 +348,77 @@ namespace TheDroneMaster
                 layer1Pos[i] = Vector2.Lerp(layer1Pos[i], sourcePos, 1f - alpha);
                 layer2Pos[i] = Vector2.Lerp(layer2Pos[i], sourcePos, 1f - alpha);
             }
+
             pannelPos = centerPos + leftUp;
         }
 
         public virtual void Destroy()
         {
-            DroneHUD.instance.inputManager.pressKeyUp -= OnPressKeyUp;
-            DroneHUD.instance.inputManager.pressKeyDown -= PressMe;
+            try
+            {
+                Plugin.Log("Destroying button: " + message);
+                
+                // 取消注册事件处理程序
+                if(PlayerDroneHUD.instance != null && PlayerDroneHUD.instance.inputManager != null)
+                {
+                    PlayerDroneHUD.instance.inputManager.pressKeyUp -= OnPressKeyUp;
+                    PlayerDroneHUD.instance.inputManager.pressKeyDown -= PressMe;
+                }
+                
+                // 确保按钮不可见
+                alpha = 0f;
+                pressed = false;
+                pressLock = false;
+                
+                // 清理资源
+                if(layer1Sprites != null)
+                {
+                    foreach(var sprite in layer1Sprites)
+                    {
+                        if(sprite != null)
+                        {
+                            sprite.isVisible = false;
+                            sprite.RemoveFromContainer();
+                        }
+                    }
+                }
+                
+                if(layer2Sprites != null)
+                {
+                    foreach(var sprite in layer2Sprites)
+                    {
+                        if(sprite != null)
+                        {
+                            sprite.isVisible = false;
+                            sprite.RemoveFromContainer();
+                        }
+                    }
+                }
+                
+                if(layerConnectSprites != null)
+                {
+                    foreach(var sprite in layerConnectSprites)
+                    {
+                        if(sprite != null)
+                        {
+                            sprite.isVisible = false;
+                            sprite.RemoveFromContainer();
+                        }
+                    }
+                }
+                
+                if(pannel != null)
+                {
+                    pannel.isVisible = false;
+                    pannel.RemoveFromContainer();
+                }
+                
+                Plugin.Log("Button destroyed: " + message);
+            }
+            catch(Exception e)
+            {
+                Plugin.Log("Error destroying button: " + e.Message);
+            }
         }
 
         public void InitSprites(ref List<FNode> nodes, RoomCamera rCam)
@@ -344,7 +509,7 @@ namespace TheDroneMaster
 
         public virtual void PressMe()
         {
-            if (DroneHUD.instance.inputManager.IsPressMe(this)) PressMe(false);
+            if (PlayerDroneHUD.instance.inputManager.IsPressMe(this)) PressMe(false);
         }
 
         public virtual void PressMe(bool pressWithoutCommand = false)
@@ -358,7 +523,7 @@ namespace TheDroneMaster
         public DroneCursor.Mode mode;
         public bool pressWithoutCommand = false;
 
-        public Button3D(float width,float height,float depth,Color color,string message, DroneCommandSystem.CommandType command,DroneCursor.Mode mode, DroneUI ui = null) : base(width,height,depth,color,message,ui)
+        public Button3D(float width, float height, float depth, Color color, string message, DroneCommandSystem.CommandType command, DroneCursor.Mode mode, DroneUI ui = null) : base(width, height, depth, color, message, ui)
         {
             this.command = command;
             this.mode = mode;
@@ -366,7 +531,7 @@ namespace TheDroneMaster
 
         public override void PressMe(bool pressWithoutCommand = false)
         {
-            if (DroneHUD.instance.inputManager.buttonPressLock) return;
+            if (PlayerDroneHUD.instance.inputManager.buttonPressLock) return;
             this.pressWithoutCommand = pressWithoutCommand;
             pressed = true;
         }
@@ -393,10 +558,11 @@ namespace TheDroneMaster
 
     public class DroneHUDInputManager
     {
-        public  float moveCursorSpeed = 20f;
-        public DroneHUD droneHUD;
+        public float moveCursorSpeed = 20f;
+        public Vector2 vel = Vector2.zero;
+        public PlayerDroneHUD droneHUD;
 
-        public Vector2 CursorPos = new Vector2(Screen.width / 2f,Screen.height / 2f);
+        public Vector2 CursorPos = new Vector2(Screen.width / 2f, Screen.height / 2f);
         public bool UsingMouseInput = true;
         public bool GetPressKeyDown = false;
 
@@ -407,7 +573,7 @@ namespace TheDroneMaster
 
         public static List<Player.InputPackage> inputPackages = new List<Player.InputPackage>();
 
-        public DroneHUDInputManager(DroneHUD hud)
+        public DroneHUDInputManager(PlayerDroneHUD hud)
         {
             droneHUD = hud;
             UsingMouseInput = !Plugin.instance.config.UsingPlayerInput.Value;
@@ -421,21 +587,44 @@ namespace TheDroneMaster
                 CursorPos = Input.mousePosition;
                 GetPressKeyDown = Input.GetMouseButton(0);
                 if (Input.GetMouseButtonDown(0) && pressKeyDown != null) pressKeyDown();
-                if (Input.GetMouseButtonUp(0) && pressKeyUp != null) pressKeyUp(); 
+                if (Input.GetMouseButtonUp(0) && pressKeyUp != null) pressKeyUp();
             }
             else
             {
-                moveCursorSpeed = 1f;
-                for(int i = 0;i < inputPackages.Count; i++)
-                {
-                    if (inputPackages[i].x == 0 && inputPackages[i].y == 0) break;
-                    moveCursorSpeed += 0.5f;
-                }
+                // 计算有多少个输入包含非零移动值(x或y不为0)
+                int movingPackages = inputPackages.Count(p => p.x != 0 || p.y != 0);
+                
+                moveCursorSpeed = Mathf.Lerp(0.1f, 8f, movingPackages / 40f);
 
-                if (droneHUD.reval)
+                vel *= 0.68f;
+                if (inputPackages.Count > 0)
                 {
-                    CursorPos.x = Mathf.Clamp(CursorPos.x + inputPackages[0].x * moveCursorSpeed, 0, Screen.width);
-                    CursorPos.y = Mathf.Clamp(CursorPos.y + inputPackages[0].y * moveCursorSpeed, 0, Screen.height);
+                    vel += inputPackages[0].analogueDir * moveCursorSpeed;
+                }
+                // for (int i = 0; i < inputPackages.Count; i++)
+                // {
+                //     if (inputPackages[i].x == 0 && inputPackages[i].y == 0) break;
+                //     moveCursorSpeed += 0.5f;
+                // }
+
+                if (droneHUD.reval) // reval 是 reveal 的缩写,表示是否显示/激活无人机HUD界面
+                {
+                    CursorPos += vel;
+                    if (CursorPos.y < 0 || CursorPos.y > Screen.height)
+                    {
+                        vel.y *= -1;
+                    }
+                    if (CursorPos.x < 0 || CursorPos.x > Screen.width)
+                    {
+                        vel.x *= -1;
+                    }
+                    CursorPos.x = Mathf.Clamp(CursorPos.x, 0, Screen.width);
+                    CursorPos.y = Mathf.Clamp(CursorPos.y, 0, Screen.height);
+
+                    // Clamp是一个数学函数,用于将一个数值限制在指定的最小值和最大值之间
+                    // 这里用于确保光标位置不会超出屏幕范围(0到Screen.width/height)
+                    // CursorPos.x = Mathf.Clamp(CursorPos.x + inputPackages[0].x * moveCursorSpeed, 0, Screen.width);
+                    // CursorPos.y = Mathf.Clamp(CursorPos.y + inputPackages[0].y * moveCursorSpeed, 0, Screen.height);
 
                     GetPressKeyDown = inputPackages[0].thrw;
 
@@ -453,6 +642,7 @@ namespace TheDroneMaster
         public bool IsPressMe(BaseButton3D button)
         {
             Plugin.Log("Button:" + button.message + button.centerPos.ToString());
+            
 
             if (!GetPressKeyDown || buttonPressLock || droneHUD.cursor.mode != DroneCursor.Mode.Free) return false;
             if (Mathf.Abs(CursorPos.x - button.centerPos.x) < button.width / 2f && Mathf.Abs(CursorPos.y - button.centerPos.y) < button.height / 2f)

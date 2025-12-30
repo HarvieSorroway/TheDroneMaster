@@ -161,7 +161,7 @@ namespace TheDroneMaster
         private void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self,eu);
-            if (Input.GetKey(KeyCode.Y))
+            if (UnityEngine.Input.GetKey(KeyCode.Y))
             {
                 foreach (var i in self.room.drawableObjects)
                 {
@@ -248,7 +248,7 @@ namespace TheDroneMaster
         public static void Log(string text)
         {
             if (!LogOutPut) return;
-            Debug.Log("[DroneMaster]" + text);
+            UnityEngine.Debug.Log("[DroneMaster]" + text);
         }
 
         public static void LoggerLog(string text)
@@ -259,7 +259,7 @@ namespace TheDroneMaster
         public static void Log(string pattern, params object[] objects)
         {
             if(!LogOutPut) return;
-            Debug.Log("[DroneMaster]" + string.Format(pattern, objects));
+            UnityEngine.Debug.Log("[DroneMaster]" + string.Format(pattern, objects));
         }
     }
 

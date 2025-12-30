@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Ignore project file changes
+TheDroneMaster.csproj
+.vscode/settings.json

@@ -260,9 +260,9 @@ namespace TheDroneMaster
                 }
             }
             drones.Add(new WeakReference<LaserDrone>(drone));
-            if (DroneHUD.instance != null)
+            if (PlayerDroneHUD.instance != null)
             {
-                DroneHUD.instance.TryRequestHUDForDrone(drone);
+                PlayerDroneHUD.instance.TryRequestHUDForDrone(drone);
             }
         }
     }

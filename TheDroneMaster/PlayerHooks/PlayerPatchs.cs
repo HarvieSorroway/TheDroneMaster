@@ -96,12 +96,10 @@ namespace TheDroneMaster
             bool getModule = modules.TryGetValue(self, out var module) && module is DroneMasterModule;
             if (getModule && Plugin.instance.config.UsingPlayerInput.Value && !Plugin.SkinOnly)
             {
-                if (DroneHUD.instance.reval)
+                if (PlayerDroneHUD.instance.reval)
                 {
                     Player.InputPackage current = new Player.InputPackage();
-                    current.x = self.input[0].x;
-                    current.y = self.input[0].y;
-                    current.thrw = self.input[0].thrw;
+                    current =self.input[0];
                     module.lockMovementInput = true;
                     DroneHUDInputManager.GetPlayerInput(current);
                 }
@@ -117,7 +115,11 @@ namespace TheDroneMaster
             bool getModule = modules.TryGetValue(self, out var module);
             if(getModule && module.lockMovementInput && !Plugin.SkinOnly)
             {
-                self.input[0] = new Player.InputPackage();
+                //确保玩家依旧可以关闭HUD
+                var newInput = new Player.InputPackage();
+                newInput.spec=self.input[0].spec;
+                //锁定玩家输入防止乱跑
+                self.input[0] = newInput;
             }
             orig.Invoke(self, eu);
         }

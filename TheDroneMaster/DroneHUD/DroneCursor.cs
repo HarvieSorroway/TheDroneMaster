@@ -13,7 +13,7 @@ namespace TheDroneMaster
         public readonly float distanceThreshold = 55f;
         public readonly float lineWidth = 1f;
 
-        public DroneHUD hud;
+        public PlayerDroneHUD hud;
 
         public CustomFSprite[] sprites = new CustomFSprite[4];
         public CustomFSprite connectionLine;
@@ -50,7 +50,7 @@ namespace TheDroneMaster
         }
 
 
-        public DroneCursor(DroneHUD hud, float width,Color color)
+        public DroneCursor(PlayerDroneHUD hud, float width,Color color)
         {
             this.hud = hud;
             this.staticWidth = width;
