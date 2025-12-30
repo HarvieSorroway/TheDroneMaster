@@ -1,162 +1,60 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{453BEF76-86C7-4F9A-B4DB-426BFE78690C}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>TheDroneMaster</RootNamespace>
-    <AssemblyName>TheDroneMaster</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
+    <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
-    <None Include="App.config" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="BepInEx">
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\core\BepInEx.dll</HintPath>
+      <HintPath>..\..\..\source\repos\DistancedLand\includings\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="Fisobs">
-      <HintPath>..\..\RW&amp;Modding\references1.9\Fisobs.dll</HintPath>
+    <Reference Include="EmgTx">
+      <HintPath>..\..\..\source\repos\EmgTx\EmgTx\bin\Debug\EmgTx.dll</HintPath>
+    </Reference>
+    <Reference Include="Fisobs, Version=4.0.6.0, Culture=neutral, PublicKeyToken=null">
+	  <SpecificVersion>True</SpecificVersion>
+      <HintPath>E:\Steam\steamapps\workshop\content\312520\2920541687\newest\plugins\Fisobs.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\plugins\HOOKS-Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\source\repos\v1.10.0_include\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Mono.Cecil, Version=0.10.4.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\core\Mono.Cecil.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\source\repos\v1.10.0_include\PUBLIC-Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\..\..\source\repos\v1.10.0_include\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod">
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\core\MonoMod.dll</HintPath>
+      <HintPath>..\..\..\source\repos\v1.10.0_include\MonoMod.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\core\MonoMod.RuntimeDetour.dll</HintPath>
+      <HintPath>..\..\..\source\repos\v1.10.0_include\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
-    <Reference Include="MonoMod.Utils, Version=21.9.19.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\core\MonoMod.Utils.dll</HintPath>
-    </Reference>
-    <Reference Include="PUBLIC-Assembly-CSharp">
-      <HintPath>E:\Steam\steamapps\common\Rain World\BepInEx\utils\PUBLIC-Assembly-CSharp.dll</HintPath>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>..\..\..\source\repos\v1.10.0_include\MonoMod.Utils.dll</HintPath>
     </Reference>
     <Reference Include="SlugBase">
-      <HintPath>..\includes\SlugBase.dll</HintPath>
+      <HintPath>E:\Steam\steamapps\workshop\content\312520\2933196558\newest\plugins\SlugBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="Unity.Mathematics">
+      <HintPath>..\..\..\source\repos\v1.10.0_include\Unity.Mathematics.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>E:\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\RW&amp;Modding\references1.9\UnityEngine.AssetBundleModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.AudioModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>E:\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>E:\Steam\steamapps\common\Rain World\RainWorld_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.InputLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>..\..\..\source\repos\ShadedCanopy\includings\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="CreatureAndObjectHooks\CreaturePatchs.cs" />
-    <Compile Include="CreatureAndObjectHooks\EnemyCreator.cs" />
-    <Compile Include="CreatureAndObjectHooks\GatePatchs.cs" />
-    <Compile Include="CreatureAndObjectHooks\ObjectPatch.cs" />
-    <Compile Include="CustomLore\CustomEnding\CustomEnding.cs" />
-    <Compile Include="CustomLore\DreamComponent\DreamHook\CustomDreamHook.cs" />
-    <Compile Include="CustomLore\DreamComponent\DreamHook\SessionHook.cs" />
-    <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleObjects.cs" />
-    <Compile Include="CustomLore\DreamComponent\OracleHooks\CustomOracleRegister.cs" />
-    <Compile Include="CustomLore\DreamComponent\OracleHooks\MIFOracleRegistry.cs" />
-    <Compile Include="CustomLore\DreamComponent\OracleHooks\OracleGraphicsModulePatch.cs" />
-    <Compile Include="CustomLore\DreamComponent\OracleHooks\OraclePatch.cs" />
-    <Compile Include="CustomLore\SpecificScripts\Components.cs" />
-    <Compile Include="CustomLore\SpecificScripts\Cool3DObject.cs" />
-    <Compile Include="CustomLore\SpecificScripts\DataWave.cs" />
-    <Compile Include="CustomLore\SpecificScripts\MeshTest.cs" />
-    <Compile Include="CustomLore\SpecificScripts\RoomSpecificScripts.cs" />
-    <Compile Include="CustomLore\SpecificScripts\MeshLoader.cs" />
-    <Compile Include="CustomLore\SpecificScripts\Simple3DObject.cs" />
-    <Compile Include="DroneHUD\DroneCursor.cs" />
-    <Compile Include="DroneHUD\DroneHUD.cs" />
-    <Compile Include="DroneHUD\DroneUI.cs" />
-    <Compile Include="DroneHUD\HUDPatch.cs" />
-    <Compile Include="DroneMasterConfig.cs" />
-    <Compile Include="DroneMasterRes.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DroneMasterRes.resx</DependentUpon>
-    </Compile>
-    <Compile Include="DronePort\CreatureScanner.cs" />
-    <Compile Include="Fixer.cs" />
-    <Compile Include="LaserDrone\DroneLaserGun.cs" />
-    <Compile Include="CustomLore\OracleHooks\InGameTrasnlatorPatch.cs" />
-    <Compile Include="PearlReader\PearlReaderPatchs.cs" />
-    <Compile Include="PearlReader\PortPearlReader.cs" />
-    <Compile Include="DronePort\DronePortGraphics.cs" />
-    <Compile Include="PlayerHooks\MetalGills.cs" />
-    <Compile Include="PlayerHooks\PlayerDeathPreventer.cs" />
-    <Compile Include="PlayerHooks\PlayerExtraMovement.cs" />
-    <Compile Include="PlayerHooks\PlayerGraphicsPatch.cs" />
-    <Compile Include="PlayerHooks\PlayerPatchs.cs" />
-    <Compile Include="Plugin.cs" />
-    <Compile Include="DronePort\DronePort.cs" />
-    <Compile Include="LaserDrone\LaserDrone.cs" />
-    <Compile Include="LaserDrone\LaserDroneAI.cs" />
-    <Compile Include="LaserDrone\LaserDroneCritob.cs" />
-    <Compile Include="LaserDrone\LaserDroneGraphics.cs" />
-    <Compile Include="LaserDrone\LaserDroneProperties.cs" />
-    <Compile Include="PostEffect.cs" />
-    <Compile Include="CustomLore\OracleHooks\SSOracleActionPatch.cs" />
-    <Compile Include="SaveStateHook\DeathPersistentSaveDataPatch.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="DroneMasterRes.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>DroneMasterRes.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Translations.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Origs.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CustomLore\DreamComponent\GameHook\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

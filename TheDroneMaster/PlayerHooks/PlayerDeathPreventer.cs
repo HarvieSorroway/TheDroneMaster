@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace TheDroneMaster
 {
-    public class PlayerDeathPreventer
+    public class PlayerDeathPreventer : PlayerModule.PlayerModuleUtil
     {
-        public PlayerPatchs.PlayerModule module;
+        public PlayerModule module;
         int acceptableDamageCount = 2;
         public int DeathPreventCounter;
 
@@ -19,18 +19,18 @@ namespace TheDroneMaster
             set
             {
                 acceptableDamageCount = value;
-                module.metalGills.acceptableDamage = value;
+                module.SyncAcceptableDamage(value);
             }
         }
 
-        public PlayerDeathPreventer(PlayerPatchs.PlayerModule module)
+        public PlayerDeathPreventer(PlayerModule module)
         {
             this.module = module;
             if(module.stateOverride != null)
                 acceptableDamageCount = Mathf.Min(2,module.stateOverride.overrideHealth);
         }
 
-        public void Update()
+        public override void Update(Player player)
         {
             if (DeathPreventCounter > 0) DeathPreventCounter--;
         }
@@ -38,7 +38,9 @@ namespace TheDroneMaster
 
         public bool canTakeDownThisDamage(Player player,string callFrom)
         {
-   
+            if (Plugin.SkinOnly)
+                return false;
+
             bool result = false;
             bool deathExplosion = AcceptableDamageCount >= 0;
             Plugin.Log("" + acceptableDamageCount.ToString() + deathExplosion.ToString() + result.ToString() + DeathPreventCounter.ToString());
@@ -108,14 +110,15 @@ namespace TheDroneMaster
 
             DeathPreventCounter = 5;
 
-            if (deathExplosion)
+            if (deathExplosion && module is DroneMasterModule)
             {
-                module.portGraphics.DeathShock("Death Preventer");
+                (module as DroneMasterModule).portGraphics.DeathShock("Death Preventer");
             }
 
             if (!result)
             {
-                module.port.ClearOutAllDrones();
+                if(module is DroneMasterModule)
+                    (module as DroneMasterModule).port.ClearOutAllDrones();
                 AcceptableDamageCount = -1;
             }
             Plugin.Log(acceptableDamageCount.ToString () + deathExplosion.ToString() + result.ToString() + DeathPreventCounter.ToString());

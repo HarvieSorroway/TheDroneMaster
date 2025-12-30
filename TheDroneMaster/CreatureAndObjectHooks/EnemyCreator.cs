@@ -7,23 +7,24 @@ using UnityEngine;
 using RWCustom;
 using MoreSlugcats;
 using Random = UnityEngine.Random;
-
+using CustomSaveTx;
+using static TheDroneMaster.PlayerModule;
 
 namespace TheDroneMaster
 {
-    public class EnemyCreator
+    public class EnemyCreator : PlayerModuleUtil
     {
         public static string header = "ENEMYCREATOR";
 
         public static readonly int creatureLimit = 200;
 
         public bool created = true;
-        public PlayerPatchs.PlayerModule module;
+        public PlayerModule module;
 
         public int genWaitCounter = 1000;
 
         public Region lastRegion;
-        public EnemyCreator(PlayerPatchs.PlayerModule module)
+        public EnemyCreator(PlayerModule module)
         {
             this.module = module;
         }
@@ -44,36 +45,36 @@ namespace TheDroneMaster
             }
             else if (origType == CreatureTemplate.Type.RedCentipede) result = CreatureTemplate.Type.RedCentipede;
             else if (origType == CreatureTemplate.Type.RedLizard) result = origType;
-            else if (origType == CreatureTemplate.Type.GreenLizard) result = MoreSlugcatsEnums.CreatureTemplateType.SpitLizard;
+            else if (origType == CreatureTemplate.Type.GreenLizard) result = DLCSharedEnums.CreatureTemplateType.SpitLizard;
             else if (origType == CreatureTemplate.Type.PinkLizard || origType == CreatureTemplate.Type.BlueLizard) result = CreatureTemplate.Type.CyanLizard;
             else if (origType == CreatureTemplate.Type.CyanLizard) result = CreatureTemplate.Type.CyanLizard;
             else if (origType == CreatureTemplate.Type.WhiteLizard) result = CreatureTemplate.Type.WhiteLizard;
             else if (origType == CreatureTemplate.Type.Salamander)
             {
                 if (Random.value < 0.5f) result = origType;
-                else result = MoreSlugcatsEnums.CreatureTemplateType.EelLizard;
+                else result = DLCSharedEnums.CreatureTemplateType.EelLizard;
             }
             else if (StaticWorld.GetCreatureTemplate(origType).ancestor != null && StaticWorld.GetCreatureTemplate(origType).ancestor.type == CreatureTemplate.Type.LizardTemplate)
             {
                 if (Random.value < 0.3f) result = MoreSlugcatsEnums.CreatureTemplateType.TrainLizard;
                 else result = CreatureTemplate.Type.RedLizard;
             }
-            else if (origType == CreatureTemplate.Type.Scavenger) result = MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite;
+            else if (origType == CreatureTemplate.Type.Scavenger) result = DLCSharedEnums.CreatureTemplateType.ScavengerElite;
             else if (origType == CreatureTemplate.Type.BigSpider) result = CreatureTemplate.Type.SpitterSpider;
             else if (origType == CreatureTemplate.Type.Vulture)
             {
-                if (Random.value < 0.3f) result = MoreSlugcatsEnums.CreatureTemplateType.MirosVulture;
+                if (Random.value < 0.3f) result = DLCSharedEnums.CreatureTemplateType.MirosVulture;
                 else result = CreatureTemplate.Type.KingVulture;
             }
             else if (origType == CreatureTemplate.Type.KingVulture) result = origType;
-            else if (origType == MoreSlugcatsEnums.CreatureTemplateType.MirosVulture) result = origType;
+            else if (origType == DLCSharedEnums.CreatureTemplateType.MirosVulture) result = origType;
             else if (origType == CreatureTemplate.Type.MirosBird) result = origType;
             else if (origType == CreatureTemplate.Type.BrotherLongLegs) result = CreatureTemplate.Type.DaddyLongLegs;
-            else if (origType == CreatureTemplate.Type.DaddyLongLegs) result = MoreSlugcatsEnums.CreatureTemplateType.TerrorLongLegs;
+            else if (origType == CreatureTemplate.Type.DaddyLongLegs) result = DLCSharedEnums.CreatureTemplateType.TerrorLongLegs;
             else if (origType == CreatureTemplate.Type.SmallNeedleWorm) result = CreatureTemplate.Type.BigNeedleWorm;
             else if (origType == CreatureTemplate.Type.DropBug)
             {
-                if (Random.value < 0.2f) result = MoreSlugcatsEnums.CreatureTemplateType.StowawayBug;
+                if (Random.value < 0.2f) result = DLCSharedEnums.CreatureTemplateType.StowawayBug;
                 else result = origType;
             }
             else if (origType == CreatureTemplate.Type.EggBug) result = MoreSlugcatsEnums.CreatureTemplateType.FireBug;
@@ -90,103 +91,100 @@ namespace TheDroneMaster
                 (type == CreatureTemplate.Type.Fly);
         }
 
-        public void Update()
+        public override void Update(Player player)
         {
-            if(module.playerRef.TryGetTarget(out var player))
+            if (player.room == null) return;
+            if (player.room.world.region == null)
             {
-                if (player.room == null) return;
-                if(player.room.world.region == null)
-                {
-                    lastRegion = null;
-                    return;
-                }
+                lastRegion = null;
+                return;
+            }
 
-                if (genWaitCounter > 0 && player.room.world.abstractRooms.Length > 0 && player.room.world.abstractRooms[0].world == player.room.world) genWaitCounter--;
-                if (!created && genWaitCounter == 0)
-                {
-                    Plugin.Log("Spawn more enemies");
-                    World world = player.abstractCreature.world;
+            if (genWaitCounter > 0 && player.room.world.abstractRooms.Length > 0 && player.room.world.abstractRooms[0].world == player.room.world) genWaitCounter--;
+            if (!created && genWaitCounter == 0)
+            {
+                Plugin.Log("Spawn more enemies");
+                World world = player.abstractCreature.world;
 
-                    int totalCreatureInRegin = 0;
-                    List<AbstractCreature> abstractCreaturesToAdd = new List<AbstractCreature>();
-                    Dictionary<AbstractCreature, AbstractRoom> cretToRoom = new Dictionary<AbstractCreature, AbstractRoom>();
-                    foreach (var abRoom in world.abstractRooms)
+                int totalCreatureInRegin = 0;
+                List<AbstractCreature> abstractCreaturesToAdd = new List<AbstractCreature>();
+                Dictionary<AbstractCreature, AbstractRoom> cretToRoom = new Dictionary<AbstractCreature, AbstractRoom>();
+                foreach (var abRoom in world.abstractRooms)
+                {
+                    if (!abRoom.shelter && !abRoom.gate)
                     {
-                        if (!abRoom.shelter && !abRoom.gate)
+                        if (abRoom.entities.Count > 0)
                         {
-                            if (abRoom.entities.Count > 0)
+                            AbstractWorldEntity[] entityCopy = new AbstractWorldEntity[abRoom.entities.Count];
+                            abRoom.entities.CopyTo(entityCopy);
+                            foreach (var entity in entityCopy)
                             {
-                                AbstractWorldEntity[] entityCopy = new AbstractWorldEntity[abRoom.entities.Count];
-                                abRoom.entities.CopyTo(entityCopy);
-                                foreach (var entity in entityCopy)
+                                if (totalCreatureInRegin > creatureLimit) break;
+                                if (entity is AbstractCreature)
                                 {
-                                    if (totalCreatureInRegin > creatureLimit) break;
-                                    if (entity is AbstractCreature)
-                                    {
-                                        if (IgnoreThisType((entity as AbstractCreature).creatureTemplate.type)) continue;
-                                        totalCreatureInRegin++;
-                                        //Plugin.Log("GetAbstractCreature in " + abRoom.name + " : " + entity.ToString());
-                                        var newCreature = SpawnUperCreature(entity as AbstractCreature);
+                                    if (IgnoreThisType((entity as AbstractCreature).creatureTemplate.type)) continue;
+                                    totalCreatureInRegin++;
+                                    //Plugin.Log("GetAbstractCreature in " + abRoom.name + " : " + entity.ToString());
+                                    var newCreature = SpawnUperCreature(entity as AbstractCreature);
 
-                                        if (newCreature != null)
-                                        {
-                                            abstractCreaturesToAdd.Add(newCreature);
-                                            cretToRoom.Add(newCreature, abRoom);
-                                            totalCreatureInRegin++;
-                                        }
+                                    if (newCreature != null)
+                                    {
+                                        abstractCreaturesToAdd.Add(newCreature);
+                                        cretToRoom.Add(newCreature, abRoom);
+                                        totalCreatureInRegin++;
                                     }
                                 }
                             }
-                            if (abRoom.entitiesInDens.Count > 0)
+                        }
+                        if (abRoom.entitiesInDens.Count > 0)
+                        {
+                            AbstractWorldEntity[] entityCopy = new AbstractWorldEntity[abRoom.entitiesInDens.Count];
+                            abRoom.entitiesInDens.CopyTo(entityCopy);
+                            foreach (var entity in entityCopy)
                             {
-                                AbstractWorldEntity[] entityCopy = new AbstractWorldEntity[abRoom.entitiesInDens.Count];
-                                abRoom.entitiesInDens.CopyTo(entityCopy);
-                                foreach (var entity in entityCopy)
+                                if (totalCreatureInRegin > creatureLimit) break;
+                                if (entity is AbstractCreature)
                                 {
-                                    if (totalCreatureInRegin > creatureLimit) break;
-                                    if (entity is AbstractCreature)
-                                    {
-                                        if (IgnoreThisType((entity as AbstractCreature).creatureTemplate.type)) continue;
-                                        totalCreatureInRegin++;
-                                        //Plugin.Log("GetAbstractCreature in den of " + abRoom.name + " : " + entity.ToString());
-                                        var newCreature = SpawnUperCreature(entity as AbstractCreature);
+                                    if (IgnoreThisType((entity as AbstractCreature).creatureTemplate.type)) continue;
+                                    totalCreatureInRegin++;
+                                    //Plugin.Log("GetAbstractCreature in den of " + abRoom.name + " : " + entity.ToString());
+                                    var newCreature = SpawnUperCreature(entity as AbstractCreature);
 
-                                        if (newCreature != null)
-                                        {
-                                            abstractCreaturesToAdd.Add(newCreature);
-                                            cretToRoom.Add(newCreature, abRoom);
-                                            totalCreatureInRegin++;
-                                        }
+                                    if (newCreature != null)
+                                    {
+                                        abstractCreaturesToAdd.Add(newCreature);
+                                        cretToRoom.Add(newCreature, abRoom);
+                                        totalCreatureInRegin++;
                                     }
                                 }
                             }
                         }
                     }
-                    if (abstractCreaturesToAdd.Count > 0)
+                }
+                if (abstractCreaturesToAdd.Count > 0)
+                {
+                    foreach (var creature in abstractCreaturesToAdd)
                     {
-                        foreach (var creature in abstractCreaturesToAdd)
+                        Plugin.Log("Spawn new enemy of type:" + creature.creatureTemplate.type.ToString() + " in room:" + cretToRoom[creature].name);
+
+                        AbstractRoom abRoom = cretToRoom[creature];
+                        abRoom.AddEntity(creature);
+                        if (abRoom.realizedRoom != null)
                         {
-                            Plugin.Log("Spawn new enemy of type:" + creature.creatureTemplate.type.ToString() + " in room:" + cretToRoom[creature].name);
-                            
-                            AbstractRoom abRoom = cretToRoom[creature];
-                            abRoom.AddEntity(creature);
-                            if (abRoom.realizedRoom != null)
-                            {
-                                creature.RealizeInRoom();
-                            }
+                            creature.RealizeInRoom();
                         }
                     }
-                    created = true;
                 }
+                created = true;
+            }
 
-                if (player.room.world.region != lastRegion && !(DeathPersistentSaveDataPatch.GetUnitOfHeader(header) as EnemyCreatorSaveUnit).isThisRegionSpawnOrNot(player.room.world.region))
-                {
-                    lastRegion = player.room.world.region;
-                    (DeathPersistentSaveDataPatch.GetUnitOfHeader(header) as EnemyCreatorSaveUnit).SpawnEnemyInNewRegion(lastRegion);
-                    Plugin.Log("Spawn Enemies in new Region of name:" + lastRegion.name);
-                    created = false;
-                    genWaitCounter = 200;
-                }
+            if (player.room.world.region != lastRegion && !(DeathPersistentSaveDataRx.GetTreatmentOfHeader(header) as EnemyCreatorSaveUnit).isThisRegionSpawnOrNot(player.room.world.region))
+            {
+                lastRegion = player.room.world.region;
+                (DeathPersistentSaveDataRx.GetTreatmentOfHeader(header) as EnemyCreatorSaveUnit).SpawnEnemyInNewRegion(lastRegion);
+                Plugin.Log("Spawn Enemies in new Region of name:" + lastRegion.name);
+                created = false;
+                genWaitCounter = 200;
             }
         }
 

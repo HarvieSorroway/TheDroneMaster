@@ -19,6 +19,10 @@ using Menu;
 using TheDroneMaster.CustomLore.CustomEnding;
 using TheDroneMaster.CreatureAndObjectHooks;
 using static Menu.SlideShow;
+using CustomDreamTx;
+using CustomSaveTx;
+using System.Linq;
+using TheDroneMaster.DMPS;
 
 
 #pragma warning disable CS0618
@@ -59,6 +63,7 @@ namespace TheDroneMaster
 
         public static int down = 0;
         public static int subStract = 0;
+        public static bool SkinOnly { get; private set; }
         //hook
 
         public Plugin()
@@ -76,7 +81,6 @@ namespace TheDroneMaster
         public void OnEnable()
         {
             On.RainWorld.OnModsInit += RainWorld_OnModsInit;
-            Content.Register(new LaserDroneCritob());
             //DreamSessionHook.RegisterDream(new DroneMasterDream());
         }
 
@@ -110,20 +114,31 @@ namespace TheDroneMaster
                 SSOracleActionPatch.Patch();
                 InGameTrasnlatorPatch.Patch();
                 Fixer.Patch();
-                DeathPersistentSaveDataPatch.Patch();
-                
                 SessionHook.Patch();
                 RoomSpecificScriptPatch.PatchOn();
                 CustomEnding.PatchOn();
                 ObjectPatch.PatchOn();
+
+                //DMPSEntry.OnModInit();
                 //PearlReaderPatchs.Patch();
 
-                OraclePatch.PatchOn();
-
-                CustomDreamHook.RegistryDream(new DroneMasterDream());
-                CustomOracleExtender.RegistryCustomOracle(new MIFOracleRegistry());
+                DeathPersistentSaveDataRx.AppplyTreatment(new EnemyCreatorSaveUnit(null));
+                DeathPersistentSaveDataRx.AppplyTreatment(new ScannedCreatureSaveUnit(null));
+                DeathPersistentSaveDataRx.AppplyTreatment(new SSConversationStateSaveUnit(null));
+                CustomDreamRx.ApplyTreatment(new DroneMasterDream());
+                CustomOracleTx.CustomOracleRx.ApplyTreatment(new MIFOracleTx());
                 DroneMasterEnums.RegisterValues();
 
+                foreach (var mod in ModManager.ActiveMods)
+                {
+                    if (mod.name.ToLower().Contains("fisobs"))
+                    {
+                        Assembly.LoadFile(string.Concat(mod.NewestPath, Path.DirectorySeparatorChar, "plugins", Path.DirectorySeparatorChar, "Fisobs.dll"));
+                    }
+                }
+
+                RegisteFisobs();
+                //DMPSEntry.RegisterFisobs();
                 LoadResources(self);
 
                 MachineConnector.SetRegisteredOI("harvie.thedronemaster", config);
@@ -135,6 +150,11 @@ namespace TheDroneMaster
                 Debug.LogException(e);
                 Logger.LogError(e.Message);
             }
+        }
+
+        void RegisteFisobs()
+        {
+            Content.Register(new LaserDroneCritob());
         }
 
 
@@ -181,6 +201,8 @@ namespace TheDroneMaster
             try
             {
                 InGameTrasnlatorPatch.LoadResource();
+                SkinOnly = File.Exists($"{Application.streamingAssetsPath}{Path.DirectorySeparatorChar}DroneMasterSkinOnly.txt");
+                Log($"SkinOnly {SkinOnly}");
 
                 string path = AssetManager.ResolveFilePath("assetbundles/posttestshader");
                 AssetBundle ab = AssetBundle.LoadFromFile(path);
@@ -208,6 +230,8 @@ namespace TheDroneMaster
                 AssetBundle ab2 = AssetBundle.LoadFromFile(path2);
                 lineMaskShader = ab2.LoadAsset<Shader>("assets/LineMask.shader");
                 rainWorld.Shaders.Add("LineMask", FShader.CreateShader("LineMask", lineMaskShader));
+
+                //DMPSEntry.LoadResources();
             }
             catch(Exception e)
             {

@@ -1,4 +1,5 @@
 ﻿using CoralBrain;
+using CustomSaveTx;
 using MoreSlugcats;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace TheDroneMaster
         public static float xBias = 30f;
 
         public Creature target;
-        public PlayerPatchs.PlayerModule playerModule;
+        public DroneMasterModule playerModule;
         public int scanProgress = 0;
 
         public ScanProjectedCircle ownerCircle;
@@ -47,7 +48,7 @@ namespace TheDroneMaster
         public int BlinkCounter;
         public int ShowFilterCounter;
 
-        public CreatureScanner(Creature target, Vector2 hoverPos, Room room, Color color, PlayerPatchs.PlayerModule module) : base()
+        public CreatureScanner(Creature target, Vector2 hoverPos, Room room, Color color, DroneMasterModule module) : base()
         {
             this.room = room;
             this.target = target;
@@ -68,8 +69,8 @@ namespace TheDroneMaster
             ShowGlyphCounter = ScanCounter + (int)(totalGlyphCount * framesToRevalOne);
             BlinkCounter = ShowGlyphCounter + 200;
             ShowFilterCounter = BlinkCounter + showFilterFrameSpan * filterTags.Count;
-
-            DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().AddScannedType(target.abstractCreature.creatureTemplate.type);
+            
+            DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().AddScannedType(target.abstractCreature.creatureTemplate.type);
         }
 
         public void SetUpFilter()

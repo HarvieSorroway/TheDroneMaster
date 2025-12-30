@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomSaveTx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,181 +10,7 @@ using UnityEngine;
 
 namespace TheDroneMaster
 {
-    public static class DeathPersistentSaveDataPatch
-    {
-        public static string TotalHeader => Plugin.DroneMasterName.ToUpper();
-
-        public static bool UnitsLoaded = false;
-        public static List<DeathPersistentSaveDataUnit> units = new List<DeathPersistentSaveDataUnit>();
-        
-        public static void Patch()//call Patch() in OnModInit
-        {
-            On.SaveState.ctor += SaveState_ctor;
-
-            On.DeathPersistentSaveData.FromString += DeathPersistentSaveData_FromString;
-            On.DeathPersistentSaveData.SaveToString += DeathPersistentSaveData_SaveToString;
-        }
-
-        private static void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
-        {
-            orig.Invoke(self, saveStateNumber, progression);
-            if (UnitsLoaded)
-            {
-                foreach(var unit in units)
-                {
-                    unit.ClearDataForNewSaveState(saveStateNumber);
-                }
-            }
-            else//Load DeathPersistentSaveDataUnits here
-            {
-                units.Add(new EnemyCreatorSaveUnit(saveStateNumber));
-                units.Add(new ScannedCreatureSaveUnit(saveStateNumber));
-                units.Add(new SSConversationStateSaveUnit(saveStateNumber));
-                UnitsLoaded = true;
-            }
-        }
-
-        private static string DeathPersistentSaveData_SaveToString(On.DeathPersistentSaveData.orig_SaveToString orig, DeathPersistentSaveData self, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
-        {
-            string result = orig.Invoke(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
-
-            foreach(var unit in units)
-            {
-                string header = unit.header;
-                string data = unit.SaveToString(saveAsIfPlayerDied, saveAsIfPlayerQuit);
-                if(header != string.Empty && data != string.Empty)
-                {
-                    result += TotalHeader + header + "<dpB>" + data + "<dpA>";
-                }
-                Plugin.Log(header + " Save to string : " + data);
-            }
-            return result;
-        }
-
-        static private void DeathPersistentSaveData_FromString(On.DeathPersistentSaveData.orig_FromString orig, DeathPersistentSaveData self, string s)
-        {
-            orig.Invoke(self, s);
-
-            string[] array = Regex.Split(s, "<dpA>");
-            for (int i = 0; i < array.Length; i++)
-            {
-                string[] array2 = Regex.Split(array[i], "<dpB>");
-                string header = array2[0];
-
-                foreach(var unit in units)
-                {
-                    if (TotalHeader + unit.header == header)
-                    {
-                        for(int k = self.unrecognizedSaveStrings.Count - 1;k >= 0; k--)
-                        {
-                            if (self.unrecognizedSaveStrings[k].Contains(header)) self.unrecognizedSaveStrings.RemoveAt(k);
-                        }
-                        unit.LoadDatas(array2[1]);
-                        Plugin.Log(unit.header + " load from string : " + array2[1]);
-                    }
-                }
-            }
-        }
-
-        public static DeathPersistentSaveDataUnit GetUnitOfHeader(string header)
-        {
-            foreach(var unit in units)
-            {
-                if (unit.header == header) return unit;
-            }
-            return null;
-        }
-
-        public static bool TryGetValue(string header, out DeathPersistentSaveDataUnit unit)
-        {
-            unit = GetUnitOfHeader(header);
-            return unit != null;
-        }
-
-        public static T GetUnitOfType<T>() where T : DeathPersistentSaveDataUnit
-        {
-            foreach(var unit in units)
-            {
-                if (unit is T) return (T)unit;
-            }
-            return null;
-        }
-    }
-
-    public class DeathPersistentSaveDataUnit
-    {
-        public SlugcatStats.Name slugName;
-
-        public string origSaveData;
-        public virtual string header => "";
-  
-        public DeathPersistentSaveDataUnit(SlugcatStats.Name name)
-        {
-            slugName = name;
-        }
-
-        public virtual string SaveToString(bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
-        {
-            return "";
-        }
-
-        public virtual void LoadDatas(string data)
-        {
-            origSaveData = data;
-        }
-
-        public virtual void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
-        {
-            origSaveData = "";
-            slugName = newSlugName;
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + " SlugStateName:" + slugName.ToString() + " header:" + header;
-        }
-    }
-
-    //This is a simpleTest
-    public class TestSaveUnit : DeathPersistentSaveDataUnit
-    {
-        public int loadThisForHowManyTimes = 0;
-        public TestSaveUnit(SlugcatStats.Name name) : base(name)
-        {
-        }
-
-        public override string header => "THISISJUSTATESTLOL";
-
-        public override void LoadDatas(string data)
-        {
-            base.LoadDatas(data);
-
-            loadThisForHowManyTimes = int.Parse(data);
-        }
-
-        public override string SaveToString(bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
-        {
-            if (saveAsIfPlayerDied || saveAsIfPlayerQuit) return origSaveData;
-            else
-            {
-                loadThisForHowManyTimes++;
-                return loadThisForHowManyTimes.ToString();
-            }
-        }
-
-        public override void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
-        {
-            base.ClearDataForNewSaveState(newSlugName);
-            loadThisForHowManyTimes = 0;
-        }
-
-        public override string ToString()
-        {
-            return base.ToString() + " loadThisForHowManyTimes:" + loadThisForHowManyTimes.ToString();
-        }
-    }
-
-    public class ScannedCreatureSaveUnit : DeathPersistentSaveDataUnit
+    public class ScannedCreatureSaveUnit : DeathPersistentSaveDataTx
     {
         public override string header => "SCANNEDCREATURETYPES";
 
@@ -243,7 +70,7 @@ namespace TheDroneMaster
         }
     }
 
-    public class EnemyCreatorSaveUnit : DeathPersistentSaveDataUnit
+    public class EnemyCreatorSaveUnit : DeathPersistentSaveDataTx
     {
         public override string header => "ENEMYCREATOR";
 
@@ -302,7 +129,7 @@ namespace TheDroneMaster
         }
     }
 
-    public class SSConversationStateSaveUnit : DeathPersistentSaveDataUnit
+    public class SSConversationStateSaveUnit : DeathPersistentSaveDataTx
     {
         public override string header => "SSCONVERSATIONSTATE";
         public bool explainPackage = false;

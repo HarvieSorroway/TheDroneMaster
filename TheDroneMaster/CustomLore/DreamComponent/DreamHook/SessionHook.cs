@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using CustomSaveTx;
+using JetBrains.Annotations;
 using Mono.Cecil.Cil;
 using MoreSlugcats;
 using RWCustom;
@@ -114,7 +115,7 @@ namespace TheDroneMaster.GameHooks
 
 
                 //TODO : 获取扫描的生物
-                var scannedCreatures = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().scanedTypes;
+                var scannedCreatures = DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().scanedTypes;
                 scannedCreatures.Remove(MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing);
                 scannedCreatures.Add(MoreSlugcatsEnums.CreatureTemplateType.ScavengerKing);
 

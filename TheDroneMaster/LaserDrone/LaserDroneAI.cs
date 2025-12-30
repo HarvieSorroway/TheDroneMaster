@@ -291,9 +291,9 @@ namespace TheDroneMaster
                 Plugin.Log(drone.ToString() + "Set Attack Target : " + target.ToString());
                 attackTarget = rep;
 
-                if(PlayerPatchs.modules.TryGetValue(drone.owner,out var module))
+                if(PlayerPatchs.modules.TryGetValue(drone.owner,out var module) && module is DroneMasterModule DMM)
                 {
-                    module.portGraphics.ContinuousCast(drone.DangerPos, 10, 10f);
+                    DMM.portGraphics.ContinuousCast(drone.DangerPos, 10, 10f);
                 }
             }
         }
@@ -425,9 +425,9 @@ namespace TheDroneMaster
 
             SyncUIButtons();
 
-            if (PlayerPatchs.modules.TryGetValue(drone.owner, out var module) && drone.owner.room == drone.room && drone.room != null && drone.owner.room != null)
+            if (PlayerPatchs.modules.TryGetValue(drone.owner, out var module) && module is DroneMasterModule DMM && drone.owner.room == drone.room && drone.room != null && drone.owner.room != null)
             {
-                module.portGraphics.ContinuousCast(drone.DangerPos, 40, 10f);
+                DMM.portGraphics.ContinuousCast(drone.DangerPos, 40, 10f);
             }
 
             Plugin.Log(drone.ToString() + " recive command : " + command.ToString());

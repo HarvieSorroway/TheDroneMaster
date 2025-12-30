@@ -1,4 +1,6 @@
-﻿using HUD;
+﻿using CustomDreamTx;
+using CustomSaveTx;
+using HUD;
 using MoreSlugcats;
 using RWCustom;
 using System;
@@ -38,7 +40,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                     room.AddObject(new LC_BossFight(room));
                 }
                 //TODO : 结局判断
-                if (room.abstractRoom.name == "SI_A07" && DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned && !room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding)
+                if (room.abstractRoom.name == "SI_A07" && DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().KingScanned && !room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding)
                 {
                     Plugin.Log("Try Play Endding");
                     room.AddObject(new DroneMasterEndingManager(room));
@@ -77,7 +79,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 return;
             }
 
-            if (!DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned)
+            if (!DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().KingScanned)
             {
                 Destroy();
                 return;
@@ -133,7 +135,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
 
             SpawnKing();
 
-            if (DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned)
+            if (DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().KingScanned)
             {
                 Destroy();
                 return;
@@ -173,7 +175,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 for(int i = 0; i< 10; i++)
                 {
                     WorldCoordinate position = new WorldCoordinate(room.abstractRoom.index, 122 - i, 7, -1);
-                    var abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.ScavengerElite), null, position, room.game.GetNewID());
+                    var abstractCreature = new AbstractCreature(room.world, StaticWorld.GetCreatureTemplate(DLCSharedEnums.CreatureTemplateType.ScavengerElite), null, position, room.game.GetNewID());
                     abstractCreature.ignoreCycle = triggeredBoss;
                     room.abstractRoom.AddEntity(abstractCreature);
                     abstractCreature.RealizeInRoom();
@@ -359,7 +361,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
         public override void Destroy()
         {
             base.Destroy();
-            DreamComponent.DreamHook.CustomDreamHook.currentActivateDream.EndDream(room.game);
+            CustomDreamRx.currentActivateNormalDream.EndDream(room.game);
         }
 
         public class TextEvent
@@ -401,7 +403,7 @@ namespace TheDroneMaster.CustomLore.SpecificScripts
                 if(text != "")
                     dialogBox.NewMessage(text, extraLinger);
                 if (partWithSound != null)
-                    owner.room.PlaySound(partWithSound, owner.player.mainBodyChunk, false, 0.8f, MIFOracleRegistry.MIFTalkPitch);
+                    owner.room.PlaySound(partWithSound, owner.player.mainBodyChunk, false, 0.8f, MIFOracleTx.MIFTalkPitch);
 
                 Plugin.Log("New message {0}", text);
             }

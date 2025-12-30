@@ -14,7 +14,7 @@ using Random = UnityEngine.Random;
 
 namespace TheDroneMaster
 {
-    public class DronePort
+    public class DronePort : PlayerModule.PlayerModuleUtil
     {
         public static float threatMaxDistance = 800f;
 
@@ -37,12 +37,15 @@ namespace TheDroneMaster
         {
             get
             {
+                if (Plugin.SkinOnly)
+                    return 0;
+
                 int result = 1;
                 if (owner.TryGetTarget(out Player player))
                 {
                     result = Mathf.CeilToInt((player.Karma + 1f) * Plugin.instance.config.CountPerKarma.Value);
 
-                    if (PlayerPatchs.modules.TryGetValue(player, out var module) && module.ownDrones && module.stateOverride != null)
+                    if (PlayerPatchs.modules.TryGetValue(player, out var module) && module.stateOverride != null)
                     {
                         result = module.stateOverride.availableDroneCount;
                     }
@@ -56,15 +59,15 @@ namespace TheDroneMaster
         {
             get
             {
+                if (Plugin.SkinOnly)
+                    return false;
+
                 bool preCondition = preSpawnWaitCounter == 0 && spawnDroneCoolDown <= 0 && drones.Count < availableDroneCount;
                 preCondition &= owner.TryGetTarget(out var player) && player.room.regionGate == null;
 
                 return preCondition;
             }
         }
-
-        public bool InRegionGateOrInShelter => owner.TryGetTarget(out var player) && (player.room.regionGate != null || player.room.shelterDoor != null);
-
 
         public DronePort(Player player)
         {
@@ -82,7 +85,7 @@ namespace TheDroneMaster
 
 
 
-        public void Update()
+        public override void Update(Player player)
         {
             for (int i = drones.Count - 1; i >= 0; i--)
             {
@@ -94,42 +97,45 @@ namespace TheDroneMaster
             if (spawnDroneCoolDown > 0) spawnDroneCoolDown--;
             if (preSpawnWaitCounter > 0) preSpawnWaitCounter--;
 
-            if (owner.TryGetTarget(out Player player))
+            if (player.inShortcut) return;
+
+            if (InRegionGateOrInShelter(player)) 
+                CallBackAllDrones();
+
+            for (int i = drones.Count - 1; i >= 0; i--)
             {
-                if (player.inShortcut) return;
-
-                if (InRegionGateOrInShelter) CallBackAllDrones();
-
-                for (int i = drones.Count - 1; i >= 0; i--)
+                if (drones[i].TryGetTarget(out var drone))
                 {
-                    if (drones[i].TryGetTarget(out var drone))
+                    if (drone.inShortcut || player.inShortcut) continue;
+                    if (drone.room.world.region != player.room.world.region)
                     {
-                        if (drone.inShortcut || player.inShortcut) continue;
-                        if (drone.room.world.region != player.room.world.region)
-                        {
-                            drone.Des("Not in same region", false);
-                        }
-                    }
-                }
-
-                if (CanSpawnDrone && !player.room.abstractRoom.shelter)
-                {
-                    SpawnNewDrone(player);
-                }
-                if (drones.Count > availableDroneCount)
-                {
-                    for (int i = drones.Count - availableDroneCount - 1; i >= 0; i--)
-                    {
-                        var reference = drones.Pop();
-                        if (reference.TryGetTarget(out var drone))
-                        {
-                            drone.Des("Too many drones", false);
-                        }
-                        else continue;
+                        drone.Des("Not in same region", false);
                     }
                 }
             }
+
+            if (CanSpawnDrone && !player.room.abstractRoom.shelter)
+            {
+                SpawnNewDrone(player);
+            }
+            if (drones.Count > availableDroneCount)
+            {
+                for (int i = drones.Count - availableDroneCount - 1; i >= 0; i--)
+                {
+                    var reference = drones.Pop();
+                    if (reference.TryGetTarget(out var drone))
+                    {
+                        drone.Des("Too many drones", false);
+                    }
+                    else continue;
+                }
+            }
             SearchThreatCreature(player);
+        }
+
+        public bool InRegionGateOrInShelter(Player player)
+        {
+            return (player.room.regionGate != null || player.room.shelterDoor != null);
         }
 
         public void SearchThreatCreature(Player player)
@@ -145,7 +151,7 @@ namespace TheDroneMaster
                 if (player.room.abstractRoom.creatures[i].realizedCreature != null && player.room.abstractRoom.creatures[i].realizedCreature != player)
                 {
                     if (player.room.abstractRoom.creatures[i].state == null || !player.room.abstractRoom.creatures[i].state.alive) continue;
-                    float danger = ThreatOfCreature(player.room.abstractRoom.creatures[i].realizedCreature, player);
+                    float danger = DMHelper.ThreatOfCreature(player.room.abstractRoom.creatures[i].realizedCreature, player, false);
                     float distance = Vector2.Distance(player.DangerPos, player.room.abstractRoom.creatures[i].realizedCreature.DangerPos);
 
                     float threshold = 0.2f;
@@ -176,49 +182,6 @@ namespace TheDroneMaster
                     }
                 }
             }
-        }
-
-        public float ThreatOfCreature(Creature creature, Player player)
-        {
-            //copy from ThreatDetermination.ThreatOfCreature();
-            float danger = creature.Template.dangerousToPlayer;
-            if (creature is Cicada && Plugin.instance.config.HateCicadas.Value) danger = 0.5f;
-            if (creature.inShortcut) return 0f;
-            if (danger == 0f)
-            {
-                return 0f;
-            }
-            if (creature.dead)
-            {
-                return 0f;
-            }
-            bool visualContact = false;
-            float chanceOfFinding = 0f;
-            if (creature.abstractCreature.abstractAI != null && creature.abstractCreature.abstractAI.RealAI != null && creature.abstractCreature.abstractAI.RealAI.tracker != null)
-            {
-                for (int i = 0; i < creature.abstractCreature.abstractAI.RealAI.tracker.CreaturesCount; i++)
-                {
-                    if (creature.abstractCreature.abstractAI.RealAI.tracker.GetRep(i).representedCreature == player.abstractCreature)
-                    {
-                        visualContact = creature.abstractCreature.abstractAI.RealAI.tracker.GetRep(i).VisualContact;
-                        chanceOfFinding = creature.abstractCreature.abstractAI.RealAI.tracker.GetRep(i).EstimatedChanceOfFinding;
-                        break;
-                    }
-                }
-            }
-            danger *= Custom.LerpMap(Vector2.Distance(creature.DangerPos, player.mainBodyChunk.pos), 300f, 2400f, 1f, visualContact ? 0.2f : 0f);
-            danger *= 1f + Mathf.InverseLerp(300f, 20f, Vector2.Distance(creature.DangerPos, player.mainBodyChunk.pos)) * Mathf.InverseLerp(2f, 7f, creature.firstChunk.vel.magnitude);
-            danger *= Mathf.Lerp(0.33333334f, 1f, Mathf.Pow(chanceOfFinding, 0.75f));
-            if (creature.abstractCreature.abstractAI != null && creature.abstractCreature.abstractAI.RealAI != null)
-            {
-                danger *= creature.abstractCreature.abstractAI.RealAI.CurrentPlayerAggression(player.abstractCreature);
-            }
-
-            if (creature is Centipede)
-            {
-                danger *= (player.CurrentFood < player.MaxFoodInStomach) ? 0.1f : 1f;
-            }
-            return danger;
         }
 
         public void SpawnNewDrone(Player player)

@@ -112,7 +112,9 @@ namespace TheDroneMaster
 
         public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
-            if (newContatiner == null) newContatiner = rCam.ReturnFContainer("Midground");
+            //if (newContatiner == null) 
+            newContatiner = rCam.ReturnFContainer("Midground");
+
             for (int i = 0; i < sLeaser.sprites.Length; i++)
             {
                 sLeaser.sprites[i].RemoveFromContainer();
@@ -235,7 +237,8 @@ namespace TheDroneMaster
                 }
                 targetRollVel = rollDir * maxMovementRollVel * Custom.LerpMap(drone.mainBodyChunk.vel.magnitude, 0, drone.MaxVelocity, 0f, 1f);
             }
-            else targetRollVel = rollDir * chargeRollVel;
+            else 
+                targetRollVel = rollDir * chargeRollVel;
 
             currentRollVel = Mathf.Lerp(currentRollVel, targetRollVel, 0.1f);
             rollAngle += currentRollVel;
@@ -488,7 +491,7 @@ namespace TheDroneMaster
             get
             {
                 Color laserCol = LaserDroneGraphics.defaultLaserColor;
-                if(PlayerPatchs.modules.TryGetValue(drone.owner,out var module) && module.ownDrones)
+                if(PlayerPatchs.modules.TryGetValue(drone.owner, out var module))
                 {
                     laserCol = module.laserColor;
                 }

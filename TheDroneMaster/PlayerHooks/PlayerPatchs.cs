@@ -1,9 +1,13 @@
-﻿using MonoMod.RuntimeDetour;
+﻿using CustomDreamTx;
+using CustomSaveTx;
+using DMPS.PlayerHooks;
+using MonoMod.RuntimeDetour;
 using RWCustom;
 using SlugBase;
 using SlugBase.DataTypes;
 using SlugBase.Features;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TheDroneMaster.CustomLore.SpecificScripts;
@@ -18,8 +22,19 @@ namespace TheDroneMaster
         public static ConditionalWeakTable<Player, PlayerModule> modules = new ConditionalWeakTable<Player, PlayerModule>();
 
         public delegate bool orig_Player_CanPutSpearToBack(Player self);
-        static BindingFlags propFlags = BindingFlags.Instance | BindingFlags.Public;
-        static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.Public;
+        public static BindingFlags propFlags = BindingFlags.Instance | BindingFlags.Public;
+        public static BindingFlags methodFlags = BindingFlags.Static | BindingFlags.Public;
+
+        public static bool TryGetModule<T>(Player p, out T module) where T : PlayerModule
+        {
+            if(modules.TryGetValue(p, out var m) && m is T res)
+            {
+                module = res;
+                return true;
+            }
+            module = null;
+            return false;
+        }
 
         public static void Patch()
         {
@@ -42,12 +57,12 @@ namespace TheDroneMaster
 
         private static void Player_TossObject(On.Player.orig_TossObject orig, Player self, int grasp, bool eu)
         {
-            if (modules.TryGetValue(self, out var module) && module.isStoryGamePlayer && module.ownDrones && self.grasps[grasp] != null && self.room != null)
+            if (!Plugin.SkinOnly && modules.TryGetValue(self, out PlayerModule module) && module.isStoryGamePlayer && self.grasps[grasp] != null && self.room != null && module is DroneMasterModule DMM)
             {
                 Creature creature = self.grasps[grasp].grabbed as Creature;
-                if (creature != null && creature.dead && !DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().IsThisTypeScanned(creature.abstractCreature.creatureTemplate.type))
+                if (creature != null && creature.dead && !DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().IsThisTypeScanned(creature.abstractCreature.creatureTemplate.type))
                 {
-                    CreatureScanner scanner = new CreatureScanner(creature, self.DangerPos + new Vector2(0, 60), self.room, module.laserColor, module);
+                    CreatureScanner scanner = new CreatureScanner(creature, self.DangerPos + new Vector2(0, 60), self.room, DMM.laserColor, DMM);
                     self.room.AddObject(scanner);
                 }
             }
@@ -58,7 +73,7 @@ namespace TheDroneMaster
         {
             bool result = orig.Invoke(self, source, dmg, chunk, appPos, direction);
 
-            if(modules.TryGetValue(self,out var module) && module.ownDrones)
+            if(modules.TryGetValue(self,out var module) && !Plugin.SkinOnly)
             {
                 if (module.playerDeathPreventer.DeathPreventCounter > 0 && module.playerDeathPreventer.AcceptableDamageCount >= 0) result = false; 
             }
@@ -68,7 +83,7 @@ namespace TheDroneMaster
         public static bool Player_get_CanPutSpearOnBack(orig_Player_CanPutSpearToBack orig,Player self)
         {
             bool result = orig.Invoke(self);
-            if(modules.TryGetValue(self,out var module) && module.ownDrones)
+            if(modules.TryGetValue(self,out var module))
             {
                 result = result && Plugin.instance.config.canBackSpear.Value;
             }
@@ -78,8 +93,8 @@ namespace TheDroneMaster
         private static void Player_checkInput(On.Player.orig_checkInput orig, Player self)
         {
             orig.Invoke(self);
-            bool getModule = modules.TryGetValue(self, out var module) && module.ownDrones;
-            if (getModule && Plugin.instance.config.UsingPlayerInput.Value)
+            bool getModule = modules.TryGetValue(self, out var module) && module is DroneMasterModule;
+            if (getModule && Plugin.instance.config.UsingPlayerInput.Value && !Plugin.SkinOnly)
             {
                 if (DroneHUD.instance.reval)
                 {
@@ -99,8 +114,8 @@ namespace TheDroneMaster
 
         private static void Player_MovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
         {
-            bool getModule = modules.TryGetValue(self, out var module) && module.ownDrones;
-            if(getModule && module.lockMovementInput)
+            bool getModule = modules.TryGetValue(self, out var module);
+            if(getModule && module.lockMovementInput && !Plugin.SkinOnly)
             {
                 self.input[0] = new Player.InputPackage();
             }
@@ -109,13 +124,17 @@ namespace TheDroneMaster
 
         private static void Player_Destroy(On.Player.orig_Destroy orig, Player self)
         {
-            if (modules.TryGetValue(self,out var module) && module.ownDrones)
+            if (modules.TryGetValue(self, out var module) && !Plugin.SkinOnly)
             {
-                if (module.port.availableDroneCount != 0) module.port.ClearOutAllDrones();
-                module.playerDeathPreventer.AcceptableDamageCount = -1;
-                if (!self.room.game.cameras[0].hud.textPrompt.gameOverMode)
+                if (module is DroneMasterModule DMM)
                 {
-                    self.room.game.GameOver(null);
+                    if (DMM.port.availableDroneCount != 0) 
+                        DMM.port.ClearOutAllDrones();
+                    DMM.playerDeathPreventer.AcceptableDamageCount = -1;
+                    if (!self.room.game.cameras[0].hud.textPrompt.gameOverMode)
+                    {
+                        self.room.game.GameOver(null);
+                    }
                 }
             }
             orig.Invoke(self);
@@ -123,7 +142,7 @@ namespace TheDroneMaster
 
         private static void Player_Die(On.Player.orig_Die orig, Player self)
         {
-            if(modules.TryGetValue(self, out var module) && module.ownDrones && !self.dead)
+            if(modules.TryGetValue(self, out var module) && !self.dead && !Plugin.SkinOnly)
             {
                 if (module.playerDeathPreventer.canTakeDownThisDamage(self,"player die"))
                 {
@@ -139,7 +158,7 @@ namespace TheDroneMaster
         private static void Player_Jump(On.Player.orig_Jump orig, Player self)
         {
             orig.Invoke(self);
-            if(modules.TryGetValue(self,out var module) && module.ownDrones)
+            if(modules.TryGetValue(self, out var module))
             {
                 self.jumpBoost *= 1.2f;
             }
@@ -150,16 +169,20 @@ namespace TheDroneMaster
             orig.Invoke(self,pos,newRoom,spitOutAllSticks);
 
             Player player = self as Player;
-            if(player != null && modules.TryGetValue(player,out var module) && module.ownDrones && newRoom != null)
+            if(player != null && modules.TryGetValue(player, out var module) && newRoom != null)
             {
-                module.port.lastSpitOutShortcut = pos;
-                module.port.lastSpitOutRoom = new WeakReference<Room>(newRoom);
+                if(module is DroneMasterModule DMM)
+                {
+                    DMM.port.lastSpitOutShortcut = pos;
+                    DMM.port.lastSpitOutRoom = new WeakReference<Room>(newRoom);
+                }
+       
             }
         }
 
         private static void Player_Update(On.Player.orig_Update orig, Player self, bool eu)
         {
-            bool getModule = modules.TryGetValue(self, out var module) && module.ownDrones;
+            bool getModule = modules.TryGetValue(self, out var module);
 
             orig.Invoke(self, eu);
 
@@ -215,183 +238,21 @@ namespace TheDroneMaster
         private static void Player_ctor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig.Invoke(self, abstractCreature, world);
-            modules.Add(self, new PlayerModule(self));
+            if(self.slugcatStats.name == DMEnums.SlugStateName.DroneMaster )
+            {
+                modules.Add(self, new DroneMasterModule(self));
+            }
+            else if(self.slugcatStats.name == DMEnums.SlugStateName.DMPS)
+            {
+                modules.Add(self, new DMPSModule(self));
+            }
+               
             //(self.abstractCreature.world.game.session as StoryGameSession).saveState.deathPersistentSaveData.karma = 9;
         }
 
-
-        public class PlayerModule
-        {
-            public readonly WeakReference<Player> playerRef;
-            public readonly SlugcatStats.Name name;
-            public readonly SlugBaseCharacter character;
-            public readonly PlayerExtraMovement playerExtraMovement;
-
-            public static SlugcatStats.Name DroneMasterName { get; private set; }
-
-            public readonly int wirelessChargeNeeds = 400;
-
-            public readonly bool ownDrones;
-            public readonly bool usingDefaultCol = false;
-            public readonly bool isStoryGamePlayer;
-
-            public readonly Color eyeColor;
-            public readonly Color bodyColor;
-            public readonly Color laserColor;
-
-            #region WorldState
-            public EnemyCreator enemyCreator;
-            #endregion
-
-            #region Graphics
-            public bool graphicsInited = false;
-
-            public MetalGills metalGills;
-            public DronePortGraphics portGraphics;
-            public int grillIndex = -1;
-            public int newEyeIndex = -1;
-            public int portIndex = -1;
-            #endregion
-
-            #region PlayeState
-            public PlayerDeathPreventer playerDeathPreventer;
-            public bool lockMovementInput = false;
-            public bool fullCharge => ownDrones && playerRef.TryGetTarget(out var player) && player.playerState.foodInStomach == player.MaxFoodInStomach;
-            #endregion
-
-            public DreamStateOverride stateOverride;
-
-
-            public DronePort port;
-            public PlayerModule(Player player)
-            {
-                ownDrones = Plugin.OwnLaserDrone.TryGet(player, out bool ownLaserDrone) && ownLaserDrone;
-                playerRef = new WeakReference<Player>(player);
-                isStoryGamePlayer = player.room.game.session is StoryGameSession;
-                
-                //Plugin.Log(DeathPersistentSaveDataPatch.GetUnitOfHeader(EnemyCreator.header).ToString());
-
-                if (ownDrones)
-                {
-                    ExtEnumBase extEnumBase;
-                    
-                    bool canParse = ExtEnumBase.TryParse(typeof(SlugcatStats.Name), Plugin.DroneMasterName, true, out extEnumBase);
-                    if (canParse && name == null)
-                    {
-                        name = extEnumBase as SlugcatStats.Name;
-                        if(DroneMasterName == null)
-                        {
-                            DroneMasterName = name;
-                        }
-                    }
-                    //Plugin.Log(("Get PlayerName : " + name.value);
-                    if (SlugBaseCharacter.TryGet(name, out character))
-                    {
-                        ColorSlot[] array;
-                        bool flag4 = character.Features.TryGet<ColorSlot[]>(PlayerFeatures.CustomColors, out array);
-                        if (flag4)
-                        {
-                            Plugin.Log(array.Length.ToString());
-
-                            if (array.Length > 0)
-                            {
-                                bodyColor = array[0].GetColor(player.playerState.playerNumber);
-                                Plugin.Log("eyecolor : " + ColorUtility.ToHtmlStringRGB(bodyColor));
-
-                            }
-                            if (array.Length > 1)
-                            {
-                                eyeColor = array[1].GetColor(player.playerState.playerNumber);
-                                Plugin.Log("bodyColor : " + ColorUtility.ToHtmlStringRGB(eyeColor));
-                            }
-                            if (array.Length > 2)
-                            {
-                                laserColor = array[2].GetColor(player.playerState.playerNumber);
-                                Plugin.Log("laserColor : " + ColorUtility.ToHtmlStringRGB(laserColor));
-                            }
-                        }
-                        if (PlayerGraphics.customColors != null && !player.IsJollyPlayer)
-                        {
-                            if (PlayerGraphics.customColors.Count > 0)
-                            {
-                                bodyColor = PlayerGraphics.CustomColorSafety(0);
-                                Plugin.Log("Custom-eyecolor : " + ColorUtility.ToHtmlStringRGB(bodyColor));
-                            }
-                            if (PlayerGraphics.customColors.Count > 1)
-                            {
-                                eyeColor = PlayerGraphics.CustomColorSafety(1);
-                                Plugin.Log("Custom-bodyColor : " + ColorUtility.ToHtmlStringRGB(eyeColor));
-                            }
-                            if (PlayerGraphics.customColors.Count > 2)
-                            {
-                                laserColor = PlayerGraphics.CustomColorSafety(2);
-                                Plugin.Log("Custom-laserColor : " + ColorUtility.ToHtmlStringRGB(laserColor));
-                            }
-                        }
-                        if (PlayerGraphics.jollyColors != null && player.IsJollyPlayer)
-                        {
-                            bodyColor = PlayerGraphics.JollyColor(player.playerState.playerNumber, 0);
-                            Plugin.Log("Jolly-eyecolor : " + ColorUtility.ToHtmlStringRGB(bodyColor));
-
-                            eyeColor = PlayerGraphics.JollyColor(player.playerState.playerNumber, 1);
-                            Plugin.Log("Jolly-bodyColor : " + ColorUtility.ToHtmlStringRGB(eyeColor));
-
-                            laserColor = PlayerGraphics.JollyColor(player.playerState.playerNumber, 2);
-                            Plugin.Log("Jolly-laserColor : " + ColorUtility.ToHtmlStringRGB(laserColor));
-                        }
-
-                        SetUpOverrides(player);
-
-                        port = new DronePort(player);
-                        if(Plugin.instance.config.moreEnemies.Value && isStoryGamePlayer) enemyCreator = new EnemyCreator(this);
-                        if(!Plugin.instance.config.canBackSpear.Value) player.spearOnBack = null;
-
-                        playerDeathPreventer = new PlayerDeathPreventer(this);
-                        playerExtraMovement = new PlayerExtraMovement();
-                    }
-                }
-            }
-
-            public void Update(Player player) // call in Player.Update
-            {
-                if(port != null) port.Update();
-                if(playerDeathPreventer != null) playerDeathPreventer.Update();
-                if(enemyCreator != null)enemyCreator.Update();
-                if (playerExtraMovement != null) playerExtraMovement.Update(player);
-            }
-
-            /// <summary>
-            /// 用于在不同的梦境中修改背包的状态
-            /// </summary>
-            void SetUpOverrides(Player player)
-            {
-                if (CustomDreamHook.currentActivateDream == null)
-                    return;
-
-                if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
-                {
-                    stateOverride = new DreamStateOverride(0, false, Vector2.zero, 0f, 2);
-                }
-                else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
-                {
-                    stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 2) { connectToDMProggress = 0f};
-                }
-                else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_2)
-                {
-                    stateOverride = new DreamStateOverride(1, true, Vector2.zero, 0f, 2);
-                }
-                else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_3)
-                {
-                    stateOverride = new DreamStateOverride(0, true, Vector2.zero, 0f, 1);
-                }
-                else if(CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_4)
-                {
-                    stateOverride = new DreamStateOverride(1, true, Vector2.zero, 0f, 2);
-                }
-            }
-
-        }
     }
+
+    
 
     public class DreamStateOverride
     {

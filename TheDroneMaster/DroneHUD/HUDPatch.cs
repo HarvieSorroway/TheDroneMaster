@@ -19,10 +19,10 @@ namespace TheDroneMaster
         {
             orig.Invoke(self, player);
             currentCam = self;
-            if(PlayerPatchs.modules.TryGetValue(player,out var module) && module.ownDrones)
+            if(PlayerPatchs.modules.TryGetValue(player, out var module) && module is DroneMasterModule DMM)
             {
-                Debug.Log("FireUpPlayerHUD" + module.port.ToString());
-                self.hud.AddPart(new DroneHUD(self.hud,module.port));
+                Debug.Log("FireUpPlayerHUD" + DMM.port.ToString());
+                self.hud.AddPart(new DroneHUD(self.hud, DMM.port));
             }
         }
     }

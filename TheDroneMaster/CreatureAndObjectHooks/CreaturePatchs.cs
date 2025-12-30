@@ -126,7 +126,7 @@ namespace TheDroneMaster
             if (otherObject != null && otherObject is LaserDrone) return;
 
             Player player = otherObject as Player;
-            if (player != null && PlayerPatchs.modules.TryGetValue(player, out var module) && module.ownDrones && self.AI.CurrentPlayerAggression(player.abstractCreature) > 0f)
+            if (player != null && PlayerPatchs.modules.TryGetValue(player, out var module) && self.AI.CurrentPlayerAggression(player.abstractCreature) > 0f)
             {
                 if(self.Consious && !self.dead && module.playerDeathPreventer.canTakeDownThisDamage(player, "daddy consume"))
                 {
@@ -155,7 +155,7 @@ namespace TheDroneMaster
 
             if (dRelation.trackerRep != null && dRelation.trackerRep.representedCreature.realizedCreature != null && dRelation.trackerRep.representedCreature.realizedCreature is Player)
             {
-                if (PlayerPatchs.modules.TryGetValue(dRelation.trackerRep.representedCreature.realizedCreature as Player, out var module) && module.ownDrones)
+                if (PlayerPatchs.modules.TryGetValue(dRelation.trackerRep.representedCreature.realizedCreature as Player, out var module))
                 {
                     result = 0f;
                 }
@@ -166,51 +166,55 @@ namespace TheDroneMaster
         private static void Centipede_Shock(On.Centipede.orig_Shock orig, Centipede self, PhysicalObject shockObj)
         {
             Player player = shockObj as Player;
-            if(player != null && PlayerPatchs.modules.TryGetValue(player,out var module) && module.ownDrones)
+            if(player != null && PlayerPatchs.modules.TryGetValue(player, out var module))
             {
-                if (module.fullCharge)
+                if(module is DroneMasterModule DMM)
                 {
-                    orig.Invoke(self, shockObj);
-                    module.portGraphics.OverCharge(self.size);
-     
-                    self.LoseAllGrasps();
-                    self.Die();
-                }
-                else
-                {
-                    self.room.PlaySound(SoundID.Centipede_Shock, self.mainBodyChunk.pos);
-                    if (self.graphicsModule != null)
+                    if (DMM.FullCharge)
                     {
-                        (self.graphicsModule as CentipedeGraphics).lightFlash = 1f;
-                        for (int i = 0; i < (int)Mathf.Lerp(4f, 8f, self.size); i++)
+                        orig.Invoke(self, shockObj);
+                        DMM.portGraphics.OverCharge(self.size);
+
+                        self.LoseAllGrasps();
+                        self.Die();
+                    }
+                    else
+                    {
+                        self.room.PlaySound(SoundID.Centipede_Shock, self.mainBodyChunk.pos);
+                        if (self.graphicsModule != null)
                         {
-                            self.room.AddObject(new Spark(self.HeadChunk.pos, Custom.RNV() * Mathf.Lerp(4f, 14f, Random.value), new Color(0.7f, 0.7f, 1f), null, 8, 14));
+                            (self.graphicsModule as CentipedeGraphics).lightFlash = 1f;
+                            for (int i = 0; i < (int)Mathf.Lerp(4f, 8f, self.size); i++)
+                            {
+                                self.room.AddObject(new Spark(self.HeadChunk.pos, Custom.RNV() * Mathf.Lerp(4f, 14f, Random.value), new Color(0.7f, 0.7f, 1f), null, 8, 14));
+                            }
                         }
-                    }
-                    module.portGraphics.Charge(self.size);
-                    for (int j = 0; j < self.bodyChunks.Length; j++)
-                    {
-                        self.bodyChunks[j].vel += Custom.RNV() * 6f * Random.value;
-                        self.bodyChunks[j].pos += Custom.RNV() * 6f * Random.value;
-                    }
+                        DMM.portGraphics.Charge(self.size);
+                        for (int j = 0; j < self.bodyChunks.Length; j++)
+                        {
+                            self.bodyChunks[j].vel += Custom.RNV() * 6f * Random.value;
+                            self.bodyChunks[j].pos += Custom.RNV() * 6f * Random.value;
+                        }
 
-                    float thisEnergyPoints = Mathf.Clamp(self.size * BaseShockEnergyPoints,0.25f,4f);
-                    int foodPoint = (int)thisEnergyPoints;
-                    int quanterFoodPoint = (int)((thisEnergyPoints - foodPoint) / 0.25f);
+                        float thisEnergyPoints = Mathf.Clamp(self.size * BaseShockEnergyPoints, 0.25f, 4f);
+                        int foodPoint = (int)thisEnergyPoints;
+                        int quanterFoodPoint = (int)((thisEnergyPoints - foodPoint) / 0.25f);
 
-                    player.AddFood(foodPoint);
-                    for (int i = 0; i < quanterFoodPoint; i++)
-                    {
-                        player.AddQuarterFood();
+                        player.AddFood(foodPoint);
+                        for (int i = 0; i < quanterFoodPoint; i++)
+                        {
+                            player.AddQuarterFood();
+                        }
+
+                        self.Stun(200);
+                        self.LoseAllGrasps();
+                        self.room.AddObject(new CreatureSpasmer(self, false, 200));
                     }
-
-                    self.Stun(200);
-                    self.LoseAllGrasps();
-                    self.room.AddObject(new CreatureSpasmer(self, false, 200));
+                    player.Stun(40);
                 }
-                player.Stun(40);
             }
-            else orig.Invoke(self, shockObj);
+            else 
+                orig.Invoke(self, shockObj);
         }
 
 

@@ -7,7 +7,7 @@ using UnityEngine;
 using RWCustom;
 using Random = UnityEngine.Random;
 using MoreSlugcats;
-
+using CustomSaveTx;
 
 namespace TheDroneMaster
 {
@@ -60,7 +60,7 @@ namespace TheDroneMaster
             pGraphics = playerGraphics;
             this.startIndex = startIndex;
 
-            if (PlayerPatchs.modules.TryGetValue(Player, out var module) && module.ownDrones)
+            if (PlayerPatchs.modules.TryGetValue(Player, out var module))
             {
                 LaserColor = module.laserColor;
                 if(module.stateOverride != null)
@@ -72,7 +72,7 @@ namespace TheDroneMaster
 
             if(pGraphics.player.room.game.session is StoryGameSession)
             {
-                portLightFlashing = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>().KingScanned && !pGraphics.player.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding;
+                portLightFlashing = DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>().KingScanned && !pGraphics.player.room.game.rainWorld.progression.currentSaveState.deathPersistentSaveData.altEnding;
             }
             
         }
@@ -119,7 +119,7 @@ namespace TheDroneMaster
 
             sLeaser.sprites[startIndex].color = palette.blackColor;
 
-            if(PlayerPatchs.modules.TryGetValue(Player,out var module) && module.ownDrones)
+            if(PlayerPatchs.modules.TryGetValue(Player, out var module))
             {
                 sLeaser.sprites[startIndex + 1].color = module.laserColor;
             }
@@ -288,7 +288,7 @@ namespace TheDroneMaster
             if (!overrideDisplayDronePort) return;
 
             if (pGraphics == null || pGraphics.owner == null) return;
-            if(PlayerPatchs.modules.TryGetValue(Player,out var module) && module.ownDrones)
+            if(PlayerPatchs.modules.TryGetValue(Player, out var module))
             {
                 switch (module.playerDeathPreventer.AcceptableDamageCount)
                 {

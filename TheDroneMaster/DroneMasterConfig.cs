@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Menu.Remix.MixedUI;
 
-
 namespace TheDroneMaster
 {
     public class DroneMasterConfig : OptionInterface

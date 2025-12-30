@@ -9,13 +9,16 @@ using TheDroneMaster.CustomLore.SpecificScripts;
 using TheDroneMaster.DreamComponent.DreamHook;
 using TheDroneMaster.GameHooks;
 using UnityEngine;
-using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour;
-using static TheDroneMaster.DreamComponent.OracleHooks.CustomOracleBehaviour.CustomOracleConversation;
 using Random = UnityEngine.Random;
+using EmgTx;
+using CustomOracleTx;
+using static CustomOracleTx.CustomOracleBehaviour;
+using static CustomOracleTx.CustomOracleBehaviour.CustomOracleConversation;
+using CustomDreamTx;
 
 namespace TheDroneMaster.DreamComponent.OracleHooks
 {
-    public class MIFOracleRegistry : CustomOracleRegister
+    public class MIFOracleTx : CustomOracleTx.CustomOracleTx
     {
         public static Oracle.OracleID MIFOracle = new Oracle.OracleID("MIF", true);
         public static float MIFTalkPitch = 0.75f;
@@ -24,13 +27,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         public override Oracle.OracleID OracleID => MIFOracle;
         public override Oracle.OracleID InheritOracleID => Oracle.OracleID.SS;
 
-        public MIFOracleRegistry()
+        public MIFOracleTx()
         {
             gravity = 0f;
             startPos = new Vector2(350f, 350f);
 
             pearlRegistry = new MIFPearlRegistry();
-            CustomOraclePearlHook.Registry(pearlRegistry);
+            CustomOraclePearlRx.ApplyTreatment(pearlRegistry);
         }
 
         public override void LoadBehaviourAndSurroundings(ref Oracle oracle, Room room)
@@ -95,7 +98,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
             halo = new Halo(this, totalSprites);
             totalSprites += halo.totalSprites;
-            gown = new Gown(this);
+            gowns = new Gown[1]
+            {
+                new Gown(this, 0)
+            };
             robeSprite = totalSprites;
             totalSprites++;
 
@@ -179,7 +185,7 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
 
 
                 sLeaser.sprites[HandSprite(k, 0)].color = color;
-                if (gown != null)
+                if (gowns != null)
                 {
                     for (int l = 0; l < 7; l++)
                     {
@@ -226,9 +232,10 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 armJointGraphics[j].InitiateSprites(sLeaser, rCam);
             }
 
-            if (gown != null)
+            if (gowns.Count() > 0)
             {
-                gown.InitiateSprite(robeSprite, sLeaser, rCam);
+                foreach(var gown in gowns)
+                    gown.InitiateSprite(robeSprite, sLeaser, rCam);
             }
 
             if (halo != null)
@@ -375,13 +382,13 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
             {
                 for (int x = 0; x < divs; x++)
                 {
-                    collarPos[x] = owner.gown.clothPoints[x, 0, 0];
+                    collarPos[x] = owner.gowns[0].clothPoints[x, 0, 0];
                 }
 
                 for (int y = 0; y < divs; y++)
                 {
-                    Vector2 delta = owner.gown.clothPoints[5, y, 0] - owner.gown.clothPoints[5, 0, 0];
-                    midColPos[y] = owner.gown.clothPoints[5, 0, 0] + delta / 2f;
+                    Vector2 delta = owner.gowns[0].clothPoints[5, y, 0] - owner.gowns[0].clothPoints[5, 0, 0];
+                    midColPos[y] = owner.gowns[0].clothPoints[5, 0, 0] + delta / 2f;
                 }
             }
 
@@ -631,19 +638,19 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                 movementBehavior = CustomMovementBehavior.Idle;
                 if (inActionCounter > 300)
                 {
-                    if(CustomDreamHook.currentActivateDream != null)
+                    if(CustomDreamRx.currentActivateNormalDream != null)
                     {
-                        if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
+                        if (CustomDreamRx.currentActivateNormalDream.activateDreamID == DroneMasterDream.DroneMasterDream_0)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk0);
                             return;
                         }
-                        else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
+                        else if (CustomDreamRx.currentActivateNormalDream.activateDreamID == DroneMasterDream.DroneMasterDream_1)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk1);
                             return;
                         }
-                        else if (CustomDreamHook.currentActivateDream.activateDreamID == DroneMasterDream.DroneMasterDream_3)
+                        else if (CustomDreamRx.currentActivateNormalDream.activateDreamID == DroneMasterDream.DroneMasterDream_3)
                         {
                             owner.NewAction(MIFOracleBehaviour.MeetDroneMaster_DreamTalk2);
                             return;
@@ -668,9 +675,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                         owner.conversation = null;
                         //owner.NewAction(CustomAction.General_Idle);
 
-                        if(CustomDreamHook.currentActivateDream != null)
+                        if(CustomDreamRx.currentActivateNormalDream != null)
                         {
-                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
+                            CustomDreamRx.currentActivateNormalDream.EndDream(oracle.room.game);
                         }
                         return;
                     }
@@ -715,9 +722,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     if (owner.conversation.slatedForDeletion)
                     {
                         owner.conversation = null;
-                        if (CustomDreamHook.currentActivateDream != null)
+                        if (CustomDreamRx.currentActivateNormalDream != null)
                         {
-                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
+                            CustomDreamRx.currentActivateNormalDream.EndDream(oracle.room.game);
                         }
                         return;
                     }
@@ -738,9 +745,9 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
                     {
                         owner.conversation = null;
 
-                        if (CustomDreamHook.currentActivateDream != null)
+                        if (CustomDreamRx.currentActivateNormalDream != null)
                         {
-                            CustomDreamHook.currentActivateDream.EndDream(oracle.room.game);
+                            CustomDreamRx.currentActivateNormalDream.EndDream(oracle.room.game);
                         }
                         return;
                     }
@@ -770,12 +777,11 @@ namespace TheDroneMaster.DreamComponent.OracleHooks
         }
     }
 
-    public class MIFPearlRegistry : CustomOraclePearlRegistry
+    public class MIFPearlRegistry : CustomOraclePearlTx
     {
-        public static AbstractPhysicalObject.AbstractObjectType MIFPearl = new AbstractPhysicalObject.AbstractObjectType("MIFPearl", true);
-        public static DataPearl.AbstractDataPearl.DataPearlType DataPearl_MIF = new DataPearl.AbstractDataPearl.DataPearlType("MIFPearl", true);
-        public MIFPearlRegistry() : base(MIFPearl,DataPearl_MIF)
+        public MIFPearlRegistry() : base("MIFPearl")
         {
+            //Plugin.Log($"MIFPearlRegistry conv id : {pearlConvID}");
         }
 
         public override CustomOrbitableOraclePearl RealizeDataPearl(AbstractPhysicalObject abstractPhysicalObject, World world)

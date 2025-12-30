@@ -30,12 +30,13 @@ namespace TheDroneMaster
             orig.Invoke(self, eu);
 
             bool GetDroneMaster = false;
-            PlayerPatchs.PlayerModule module = null;
+            DroneMasterModule module = null;
             for (int i = 0; i < self.gate.room.game.Players.Count; i++)
             {
                 Player player = self.gate.room.game.Players[i].realizedCreature as Player;
-                if (player != null && PlayerPatchs.modules.TryGetValue(player, out module) && module.ownDrones)
+                if (player != null && PlayerPatchs.modules.TryGetValue(player, out var m) && m is DroneMasterModule)
                 {
+                    module = (DroneMasterModule)m;
                     GetDroneMaster = true;
                     break;
                 }
@@ -117,7 +118,7 @@ namespace TheDroneMaster
                 }
                 if (player == null) return origResult;
 
-                if(PlayerPatchs.modules.TryGetValue(player,out var module) && module.ownDrones)
+                if(PlayerPatchs.modules.TryGetValue(player, out var module))
                 {
                     return true;
                 }

@@ -1,0 +1,607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="TheDroneMaster.Capability.ModHookBase" Collapsed="true">
+    <Position X="0.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEBAAAAABAADAAAAACAAAAABACAAAAAAACAA=</HashCode>
+      <FileName>Capability\ModHookBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.Capability.AimHelperHook" Collapsed="true">
+    <Position X="0.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Capability\ModHookBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CreaturePatchs" Collapsed="true">
+    <Position X="12" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAIABAgAAACAACAAAAEAAAAQIQAAAAAAAQIAAAAA=</HashCode>
+      <FileName>CreatureAndObjectHooks\CreaturePatchs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.EnemyCreator" Collapsed="true">
+    <Position X="20.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgQAAARAAAAAAAAAAAAAAAAABAAAAAKCIAAAAAAAAAg=</HashCode>
+      <FileName>CreatureAndObjectHooks\EnemyCreator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.GatePatchs" Collapsed="true">
+    <Position X="12" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAgAQAAAAAAAAAAAAAQAAAAAAAAAEAAAA=</HashCode>
+      <FileName>CreatureAndObjectHooks\GatePatchs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.InGameTrasnlatorPatch" Collapsed="true">
+    <Position X="17.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAABAAAAAAAAAAAAAAAAEAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\OracleHooks\InGameTrasnlatorPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.SSOracleActionPatch" Collapsed="true">
+    <Position X="20.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAACAAAAAAAAAAAARAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\OracleHooks\SSOracleActionPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.Cool3DObject" Collapsed="true">
+    <Position X="10.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAQAgAAAAAABAAAAAAAAgABBAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Cool3DObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.Lightning" Collapsed="true">
+    <Position X="17.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAQAiQAAAAIBAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Cool3DObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.MeshTest" Collapsed="true">
+    <Position X="20.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAQAgAAAAAABAAAAAAAAAAAAAAABAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\MeshTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.FOpaqueGameObjectNode" Collapsed="true">
+    <Position X="10.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\MeshTest.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneCursor" Collapsed="true">
+    <Position X="12" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QBQAAAwAgAAAAACQBBAAACQAAIBAIACCAAAQAiSAgAA=</HashCode>
+      <FileName>DroneHUD\DroneCursor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneHUD" Collapsed="true">
+    <Position X="13.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAIAAAAQgkAAAgABAAAAABAAAggAgARAgAAAAA=</HashCode>
+      <FileName>DroneHUD\DroneHUD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.ResummmonDroneButton" Collapsed="true">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>DroneHUD\DroneHUD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.BaseButton3D" Collapsed="true">
+    <Position X="6.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AFYAAAAAgACAEAQARAAAACAAAABAoACAAAAQIgMGACA=</HashCode>
+      <FileName>DroneHUD\DroneHUD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.Button3D" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAACABAAAAAAAAAQAAAAAAAAAAAACAAA=</HashCode>
+      <FileName>DroneHUD\DroneHUD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneHUDInputManager" Collapsed="true">
+    <Position X="15.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQBABCFAAAAAAAAAABAEAwAABBAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>DroneHUD\DroneHUD.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneUI" Collapsed="true">
+    <Position X="19" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAAAABgAAAAAAAIAAAAAAAAABCBAAAAAAAAgIAIAA=</HashCode>
+      <FileName>DroneHUD\DroneUI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.HUDPatch" Collapsed="true">
+    <Position X="13.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAQACAAAAA=</HashCode>
+      <FileName>DroneHUD\HUDPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CreatureScanner" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="13.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IJQMBAAAoAAAEEIBIgDACBARgIAAAkCQGQAAIAEQAAA=</HashCode>
+      <FileName>DronePort\CreatureScanner.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="TheDroneMaster.ScanProjectedCircle" Collapsed="true">
+    <Position X="13.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAABAgAAAAIABAAAAAAAAAIIAAACCAAAAAAAAAAA=</HashCode>
+      <FileName>DronePort\CreatureScanner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DronePort" Collapsed="true">
+    <Position X="13.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAQAAgCAAAwAUgBAgABgAAwAAEIQAUAAAABAAAAAA=</HashCode>
+      <FileName>DronePort\DronePort.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DronePortGraphics" Collapsed="true">
+    <Position X="15.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>oAQAAEQQkAQIAAhAAAAgggAAgYBYAgJCAACAIyBABgQ=</HashCode>
+      <FileName>DronePort\DronePortGraphics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneLaserGun" Collapsed="true">
+    <Position X="17.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQQABAgAAAAABAAACAAIACgAgAAAAACACAAAAAAAAAE=</HashCode>
+      <FileName>LaserDrone\DroneLaserGun.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserGunGraphics" Collapsed="true">
+    <Position X="13.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEQAACAAgAAAAAAAAAEAAAAAFgAAAIAQCACAAgAAAAA=</HashCode>
+      <FileName>LaserDrone\DroneLaserGun.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserDrone" Collapsed="true">
+    <Position X="19" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQWJAABDgACAggClAQYKKESCAQDAEEhAACQCCMoQCkA=</HashCode>
+      <FileName>LaserDrone\LaserDrone.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.InfinitRotation" Collapsed="true">
+    <Position X="15.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACEAAIBAIAAAAAAABCAAAABAAAAAAAABhEAAAAAAAA=</HashCode>
+      <FileName>LaserDrone\LaserDrone.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneState" Collapsed="true">
+    <Position X="17.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAABAAAECAA=</HashCode>
+      <FileName>LaserDrone\LaserDrone.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserDroneAI" Collapsed="true">
+    <Position X="20.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQgCQAIAAABAAiAEIQAAQGAghAAEAChAAAAgEAAAEA=</HashCode>
+      <FileName>LaserDrone\LaserDroneAI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneCommandSystem" Collapsed="true">
+    <Position X="10.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQQAAAAAAAIAAAAAAAAAAAAAgAQAAAIACACAAAAAAQA=</HashCode>
+      <FileName>LaserDrone\LaserDroneAI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.TempPather" Collapsed="true">
+    <Position X="24.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQIAAAAAAAAAACAAAAKAAAEAAAAAMCAAAgAEAAAAAA=</HashCode>
+      <FileName>LaserDrone\LaserDroneAI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserDroneQuickPather" Collapsed="true">
+    <Position X="12" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAQAAAAAAAACCAIAAACAAAAIAACgAAIAAAAAAAAAA=</HashCode>
+      <FileName>LaserDrone\LaserDroneAI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserDroneCritob" Collapsed="true">
+    <Position X="22.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAgAAAAAAAAABAAIAAAAEAAAAFEAAAAAAAAAAACAAA=</HashCode>
+      <FileName>LaserDrone\LaserDroneCritob.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserDroneGraphics" Collapsed="true">
+    <Position X="24.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIQAAAaSkAAABIABAkCMEAAAgYB0JkEIAQgAQAACSKI=</HashCode>
+      <FileName>LaserDrone\LaserDroneGraphics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DamageEffect" Collapsed="true">
+    <Position X="20.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAgAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>LaserDrone\LaserDroneGraphics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.LaserDroneProperties" Collapsed="true">
+    <Position X="10.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAABAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LaserDrone\LaserDroneProperties.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PearlReaderPatchs" Collapsed="true">
+    <Position X="20.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAgAAAAAAAAAgAQAAAAAAAAAAAAAQAAAAAAAIAAAAAA=</HashCode>
+      <FileName>PearlReader\PearlReaderPatchs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PortPearlReader" Collapsed="true">
+    <Position X="15.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAgAAgAAAAAAAAAAAAAAAkCQACCAAAADAg=</HashCode>
+      <FileName>PearlReader\PortPearlReader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.MetalGills" Collapsed="true">
+    <Position X="22.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARAAAQAsAkAQAYBYAAAAAQCgIAQABAAQAAAAFBAAQw=</HashCode>
+      <FileName>PlayerHooks\MetalGills.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PlayerDeathPreventer" Collapsed="true">
+    <Position X="22.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ECQAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAABAAAAg=</HashCode>
+      <FileName>PlayerHooks\PlayerDeathPreventer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PlayerExtraMovement" Collapsed="true">
+    <Position X="24.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAABAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PlayerHooks\PlayerExtraMovement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PlayerGraphicsPatch" Collapsed="true">
+    <Position X="10.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAgAAAAAAAAAAAAAAEYAAQAAAAAAAAAAg=</HashCode>
+      <FileName>PlayerHooks\PlayerGraphicsPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PlayerPatchs" Collapsed="true">
+    <Position X="12" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACACBAAEQAAAgQQAABAAAAAQAAAEQQAAAAEAAAAAIAA=</HashCode>
+      <FileName>PlayerHooks\PlayerPatchs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamStateOverride" Collapsed="true">
+    <Position X="24.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAIAAAAAAAAACAAQAAAIAAACAAAAgAAAAA=</HashCode>
+      <FileName>PlayerHooks\PlayerPatchs.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.ScannedCreatureSaveUnit" Collapsed="true">
+    <Position X="12" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAQAQBAAAAAACAAAAAAAAAAAABAAAAQQAA=</HashCode>
+      <FileName>SaveStateHook\DeathPersistentSaveDataPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.EnemyCreatorSaveUnit" Collapsed="true">
+    <Position X="22.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAQAAAAwAQAEAABAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SaveStateHook\DeathPersistentSaveDataPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.SSConversationStateSaveUnit" Collapsed="true">
+    <Position X="19" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAQAAAAQAQAAAAAAACAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SaveStateHook\DeathPersistentSaveDataPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneMasterConfig" Collapsed="true">
+    <Position X="19" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAACAIAAACRAAQCAQAAAAIAgGGBAAAAAABAAAAgAAAA=</HashCode>
+      <FileName>DroneMasterConfig.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneMasterRes" Collapsed="true">
+    <Position X="12" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACCAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.Fixer" Collapsed="true">
+    <Position X="24.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Fixer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.Plugin" Collapsed="true">
+    <Position X="13.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gQYKAABEACACgDAAAAAAADgAAAhAAAAASCgAQACDCEA=</HashCode>
+      <FileName>Plugin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DroneMasterEnums" Collapsed="true">
+    <Position X="10.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAFAAAAAACCAAAAEAAAIAAIAAAAYICAAAAAAAABAAA=</HashCode>
+      <FileName>Plugin.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.PostEffect" Collapsed="true">
+    <Position X="17.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAASAAIAAEQAAAAAAAACBAAAMaAAAAAAAoCAA=</HashCode>
+      <FileName>PostEffect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CreatureAndObjectHooks.ObjectPatch" Collapsed="true">
+    <Position X="19" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>CreatureAndObjectHooks\ObjectPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CreatureAndObjectHooks.SuperStructureFix" Collapsed="true">
+    <Position X="22.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>CreatureAndObjectHooks\ObjectPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.CustomEnding.CustomEnding" Collapsed="true">
+    <Position X="15.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAABAAAAAAAAAAAAAEABAAAAIAABAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\CustomEnding\CustomEnding.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.DreamHook.DroneMasterDream" Collapsed="true">
+    <Position X="20.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAAAAgAAAAIAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\DreamHook\CustomDreamHook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.GameHooks.SessionHook" Collapsed="true">
+    <Position X="15.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAEAAAAAAQAQAAAAAAACAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\DreamHook\SessionHook.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.GameHooks.DroneMasterEnding" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABwCAAQMgDQAEAQRBAAAAgACwIpAEAKAAAAAABABgAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\DreamHook\SessionHook.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="TheDroneMaster.GameHooks.ProcessManagerPatch" Collapsed="true">
+    <Position X="20.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAABAAAAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>GameHooks\ProcessManagerPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.GameHooks.ProcessManagerModule" Collapsed="true">
+    <Position X="19" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAA=</HashCode>
+      <FileName>GameHooks\ProcessManagerPatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.GameHooks.RainWorldGamePatch" Collapsed="true">
+    <Position X="24.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAIAAAAAAAAAAAABAAAAAAAAA=</HashCode>
+      <FileName>GameHooks\RainWorldGamePatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.GameHooks.RainWorldGameModule" Collapsed="true">
+    <Position X="22.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQgAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>GameHooks\RainWorldGamePatch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.CustomOraclePearlRegistry" Collapsed="true">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAQAAAIAAABAAAAAAAAABAAgAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\CustomOracleObjects.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.MIFOracleTx" Collapsed="true">
+    <Position X="13.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAACAAAAAAAAIAAAAgAAAAIIAAAAAQAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\MIFOracleTx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.MIFOracleGraphics" Collapsed="true">
+    <Position X="10.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AASAAIABhAAAAAABAAAAAABAAYAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\MIFOracleTx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.MIFOracleBehaviour" Collapsed="true">
+    <Position X="24.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAQBAAAAAQIAABLgAAAAACAAAgAEAACAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\MIFOracleTx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.MIFOracleMeetDroneMaster" Collapsed="true">
+    <Position X="12" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQABAAAAAAAAAAAAAAAABBAAAAAAACAAAAAAAEAQAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\MIFOracleTx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.MIFPearlRegistry" Collapsed="true">
+    <Position X="17.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\MIFOracleTx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.DreamComponent.OracleHooks.MIFPearl" Collapsed="true">
+    <Position X="15.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\MIFOracleTx.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CustomOracleStateViz" Collapsed="true">
+    <Position X="19" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAABAAAAAAAAAAAAAAAAAAAgABAgAAAAA=</HashCode>
+      <FileName>CustomLore\DreamComponent\OracleHooks\CustomOracleRegister.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.RWComponent" Collapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAACAAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Components.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.ActorComponent" Collapsed="true">
+    <Position X="5.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Components.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.VeterxComponent" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Components.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.RotatorComponent" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Components.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.SceneComponent" Collapsed="true">
+    <Position X="5.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAk4AgAAIEAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Components.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.DataWave" Collapsed="true">
+    <Position X="22.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABUAgAQAkAAAAAAhAAAAAAAAAABAIASAQAgAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\DataWave.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.MeshLoader" Collapsed="true">
+    <Position X="19" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\MeshLoader.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.RoomSpecificScriptPatch" Collapsed="true">
+    <Position X="10.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAFAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\RoomSpecificScripts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.DroneMasterEndingManager" Collapsed="true">
+    <Position X="24.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAQAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\RoomSpecificScripts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.LC_BossFight" Collapsed="true">
+    <Position X="15.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAACAAAAAAAAAAAAAAAAAAAAAIABAAACAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\RoomSpecificScripts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.DMD_LAB01Lore" Collapsed="true">
+    <Position X="0.5" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\RoomSpecificScripts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.DMD_ROOFLore" Collapsed="true">
+    <Position X="2.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\RoomSpecificScripts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.RoomLore" Collapsed="true">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAEAAAAQAgACAAACAAAAABAAAIBAIAEAAQACEA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\RoomSpecificScripts.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="TheDroneMaster.CustomLore.SpecificScripts.Simple3DObject" Collapsed="true">
+    <Position X="17.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAQAgAEAABABAAAAAQAAAABBAAABAAAAAAAAAAA=</HashCode>
+      <FileName>CustomLore\SpecificScripts\Simple3DObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="TheDroneMaster.MovementType" Collapsed="true">
+    <Position X="10.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACAAAAEAACQAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>LaserDrone\LaserDrone.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Microsoft YaHei UI" Size="9" />
+</ClassDiagram>

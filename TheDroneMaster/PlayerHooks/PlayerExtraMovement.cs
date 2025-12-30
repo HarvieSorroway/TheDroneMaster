@@ -7,11 +7,11 @@ using UnityEngine;
 
 namespace TheDroneMaster
 {
-    public class PlayerExtraMovement
+    public class PlayerExtraMovement : PlayerModule.PlayerModuleUtil
     {
         public Vector2 extraVelocity = Vector2.zero;
 
-        public void Update(Player player)
+        public override void Update(Player player)
         {
             float factor = Mathf.InverseLerp(0, player.slugcatStats.runspeedFac * 4f, player.mainBodyChunk.vel.magnitude);
             factor = Mathf.Lerp(0.001f, 1f,1f - factor);

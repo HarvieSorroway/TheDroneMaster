@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using RWCustom;
-
+using CustomSaveTx;
 
 namespace TheDroneMaster
 {
@@ -75,17 +75,17 @@ namespace TheDroneMaster
 
         private static void SSOracleBehavior_SeePlayer(On.SSOracleBehavior.orig_SeePlayer orig, SSOracleBehavior self)
         {
-            PlayerPatchs.PlayerModule module = null;
+            PlayerModule module = null;
             foreach(var player in self.oracle.room.game.Players)
             {
                 Player realizePlayer = player.realizedCreature as Player;
-                if(realizePlayer != null && PlayerPatchs.modules.TryGetValue(realizePlayer,out module) && module.ownDrones)
+                if(realizePlayer != null && PlayerPatchs.modules.TryGetValue(realizePlayer, out module))
                 {
                     break;
                 }
             }
 
-            if(module != null && module.ownDrones)
+            if(module != null)
             {
                 if (self.action != DroneMasterEnums.MeetDroneMaster)
                 {
@@ -141,7 +141,7 @@ namespace TheDroneMaster
         {
             public int noMessageCount = 0;
             public bool initMessage = false;
-            public PlayerPatchs.PlayerModule Module => PlayerPatchs.modules.TryGetValue(player, out var module) ? module : null;
+            public PlayerModule Module => PlayerPatchs.modules.TryGetValue(player, out var module) ? module : null;
 
             public SSOracleMeetDroneMaster(SSOracleBehavior owner) : base(owner, DroneMasterEnums.Meet_DroneMaster, DroneMasterEnums.Pebbles_DroneMaster_FirstMeet)
             {
@@ -153,8 +153,8 @@ namespace TheDroneMaster
 
                 if(!initMessage && !dialogBox.ShowingAMessage && dialogBox.messages.Count == 0)
                 {
-                    var scannedSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<ScannedCreatureSaveUnit>();
-                    var pebbleConvSaveUnit = DeathPersistentSaveDataPatch.GetUnitOfType<SSConversationStateSaveUnit>();
+                    var scannedSaveUnit = DeathPersistentSaveDataRx.GetTreatmentOfType<ScannedCreatureSaveUnit>();
+                    var pebbleConvSaveUnit = DeathPersistentSaveDataRx.GetTreatmentOfType<SSConversationStateSaveUnit>();
 
                     if (oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad == 0)
                     {

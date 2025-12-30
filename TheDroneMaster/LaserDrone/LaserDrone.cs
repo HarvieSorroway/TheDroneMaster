@@ -154,16 +154,16 @@ namespace TheDroneMaster
             //TempPather tempPather = AI.tempPather;
             LaserDroneQuickPather quickPather = AI.quickPather;
 
-            MovementConnection movementConnection = null;
+            MovementConnection? movementConnection = null;
             if (pather != null && pather.DoneMappingAccessibility && !forceUsingTempPather)
             {
                 movementConnection = pather.FollowPath(room.GetWorldCoordinate(followingPos), true);
-                currentConnection = movementConnection;
+                currentConnection = movementConnection.Value;
             }
 
             if (movementConnection != null)
             {
-                FlyFollow(movementConnection,pather.destination);
+                FlyFollow(movementConnection.Value,pather.destination);
             }
             else
             {
@@ -228,41 +228,45 @@ namespace TheDroneMaster
                 owner.mainBodyChunk.vel += Vector2.up * owner.gravity * 0.8f;
             }
             PlayerPatchs.modules.TryGetValue(owner, out var module);
-
-            if (Plugin.instance.config.OverPowerdSuperJump.Value)
+            if(module is DroneMasterModule DMM)
             {
-                Vector2 adder = owner.input[0].analogueDir;
-                adder.x *= 0.25f;
-                adder.y *= 0.4f;
-                module.playerExtraMovement.PlusSpeed(adder);
-            }
-
-            if (owner.bodyMode != Player.BodyModeIndex.ZeroG)
-            {
-                Vector2 airBoost = owner.input[0].analogueDir * 2f;
-                airBoost.y *= 0.1f;
-                module.playerExtraMovement.extraVelocity += airBoost;
-                infRotation.RotateTo(Custom.VecToDeg(owner.mainBodyChunk.vel.normalized));
-            }
-            else
-            {
-                if (owner.input[0].AnyDirectionalInput)
+                if (Plugin.instance.config.OverPowerdSuperJump.Value)
                 {
-                    Vector2 bodyDir = Custom.DirVec(owner.bodyChunks[1].pos, owner.bodyChunks[0].pos);
-                    Vector2 velDir = owner.mainBodyChunk.vel.normalized;
+                    Vector2 adder = owner.input[0].analogueDir;
+                    adder.x *= 0.25f;
+                    adder.y *= 0.4f;
+                    DMM.playerExtraMovement.PlusSpeed(adder);
+                }
 
-                    float factor = Mathf.Abs(Vector2.Dot(bodyDir, velDir));
-                    module.playerExtraMovement.PlusSpeed(bodyDir* factor * 0.15f);
-                    infRotation.RotateTo(Custom.VecToDeg(bodyDir));
+                if (owner.bodyMode != Player.BodyModeIndex.ZeroG)
+                {
+                    Vector2 airBoost = owner.input[0].analogueDir * 2f;
+                    airBoost.y *= 0.1f;
+                    DMM.playerExtraMovement.extraVelocity += airBoost;
+                    infRotation.RotateTo(Custom.VecToDeg(owner.mainBodyChunk.vel.normalized));
+                }
+                else
+                {
+                    if (owner.input[0].AnyDirectionalInput)
+                    {
+                        Vector2 bodyDir = Custom.DirVec(owner.bodyChunks[1].pos, owner.bodyChunks[0].pos);
+                        Vector2 velDir = owner.mainBodyChunk.vel.normalized;
+
+                        float factor = Mathf.Abs(Vector2.Dot(bodyDir, velDir));
+                        DMM.playerExtraMovement.PlusSpeed(bodyDir * factor * 0.15f);
+                        infRotation.RotateTo(Custom.VecToDeg(bodyDir));
+                    }
                 }
             }
+
+            
 
             CourseAngle = infRotation.RealRotation;
         }
 
         public override Color ShortCutColor()
         {
-            if (owner != null && PlayerPatchs.modules.TryGetValue(owner, out var module) && module.ownDrones) return module.laserColor;
+            if (owner != null && PlayerPatchs.modules.TryGetValue(owner, out var module)) return module.laserColor;
             return new Color(1f, 0.26f, 0.45f);
         }
 
@@ -708,5 +712,4 @@ namespace TheDroneMaster
         Following,
         CallBack
     }
-
 }
