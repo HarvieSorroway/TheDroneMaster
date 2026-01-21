@@ -1,0 +1,16 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.3255097
+WaveLength: 0.9127548
+WaveAmplitude: 7.51143E-05
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+Effects: AboveCloudsView-0.6195652-391-297, SkyDandelions-0.6086956-454-499, 
+PlacedObjects: SnowSource><469.427><336.0931><Radial~392~334~50~86.60254~1~0, SnowSource><290.8073><1172.304><Radial~588~38~50~86.60254~1~0, 
+AmbientSounds: OMNI><AM_WIN-HowlingWnd.ogg><399.3592><540.1079><0.5><1, 
+FadePalette: 33, 0.4021739, 0.4021739
+BackgroundOffset: 0,800

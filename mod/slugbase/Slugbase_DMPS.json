@@ -1,0 +1,57 @@
+{
+	"id": "dmps",
+	"name": "The DroneMaster",
+	"description": "Lost once more on the unfinished journey, cycling through the old scenes of the past.",
+	"features": {
+		"color": "8e8696",
+		"custom_colors": [
+			{
+				"name": "Body",
+				"story": "8e8696"
+			},
+			{
+				"name": "Eyes",
+				"story": "3C3543"
+			},
+			{
+				"name": "DroneLaser",
+				"story": "ff4373"
+			},
+			{
+				"name": "TestCol",
+				"story" : "ffffff"
+			}
+		],
+
+		"world_state": "Saint",
+
+		"walk_speed": 1.4,
+		"climb_speed": 1.4,
+		"tunnel_speed": 1.4,
+
+		"throw_skill": 2,
+		"loudness": 1.5,
+		"back_spear": true,
+
+		"has_dreams": true,
+
+		"diet": {
+			"base": "Red",
+			"corpses": 1,
+			"plants": 1,
+			"meat": 1
+		},
+
+		"food_min": 0,
+		"food_max": 0,
+
+		"cycle_length_min": 14,
+		"cycle_length_max": 20,
+
+
+		"TheDroneMaster/own_laserdrone": true,
+
+		"select_menu_scene": "Slugcat_DMPS",
+		"sleep_scene": "Sleep_TheDroneMaster"
+	}
+}

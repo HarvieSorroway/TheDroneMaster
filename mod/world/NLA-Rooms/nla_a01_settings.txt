@@ -1,0 +1,13 @@
+Template: NONE
+CeilingDrips: 0.1086956
+WaveSpeed: 0.4969997
+WaveLength: 0.9984999
+WaveAmplitude: 3.439109E-22
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Grime: 0.8043478
+Palette: 11
+EffectColorA: 6
+EffectColorB: 21
+FadePalette: 10, 0.2065217, 0.2065217, 0.2065217
+WetTerrain: OFF

@@ -1,0 +1,13 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.5021023
+WaveLength: 0.9989488
+WaveAmplitude: 0.04207045
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+PlacedObjects: FirecrackerPlant><589.9025><178.6642><0~0~2~3, FirecrackerPlant><613.0671><181.2544><-44.82184~110.9333~2~3, 
+FadePalette: 33, 0.6008747

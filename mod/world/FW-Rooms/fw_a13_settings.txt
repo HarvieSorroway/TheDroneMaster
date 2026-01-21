@@ -1,0 +1,13 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.6372705
+WaveLength: 0.9313648
+WaveAmplitude: 0.005721457
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+PlacedObjects: LanternOnStick><593.1144><284.3971><-12~-126, LanternOnStick><289.8395><289.1306><21~-130, LanternOnStick><536.6998><309.0074><8~-150, 
+FadePalette: 33, 0.4052224

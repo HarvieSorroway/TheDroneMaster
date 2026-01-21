@@ -1,0 +1,117 @@
+[
+  {
+    "renderNodeIDInfo": "RenderNode.Group.DroneUpg",
+    "layer":1,
+    "typeInfo": "NodeGroup",
+    "subRenderNodeInfo": [
+      "RenderNode.DroneUpg.DamageUpg.Lv0",
+      "RenderNode.DroneUpg.DamageUpg.Lv1",
+      "RenderNode.DroneUpg.DamageUpg.Lv2",
+      "RenderNode.DroneUpg.DamageUpg.Lv3",
+      "RenderNode.DroneUpg.Line0"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv0",
+    "bindSkillNodeInfo": "Skill.DroneUpg.DamageUpg.Lv0",
+    "posInfo": [
+      {
+        "x": 180.0,
+        "y": -180.0
+      },
+      {
+        "x": 400.0,
+        "y": 530.0
+      }
+    ],
+    "layer":2,
+    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv1",
+    "bindSkillNodeInfo": "Skill.DroneUpg.DamageUpg.Lv1",
+    "posInfo": [
+      {
+        "x": 210.0,
+        "y": -180.0
+      },
+      {
+        "x": 540.0,
+        "y": 530.0
+      }
+    ],
+    "layer":2,
+    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv2",
+    "bindSkillNodeInfo": "Skill.DroneUpg.DamageUpg.Lv2",
+    "posInfo": [
+      {
+        "x": 240.0,
+        "y": -180.0
+      },
+      {
+        "x": 680.0,
+        "y": 530.0
+      }
+    ],
+    "layer":2,
+    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv3",
+    "bindSkillNodeInfo": "Skill.DroneUpg.DamageUpg.Lv3",
+    "posInfo": [
+      {
+        "x": 270.0,
+        "y": -180.0
+      },
+      {
+        "x": 820.0,
+        "y": 530.0
+      }
+    ],
+    "layer":2,
+    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line0",
+    "posInfo": [
+      {
+        "x": 200.0,
+        "y": 580.0
+      },
+      {
+        "x": 250.0,
+        "y": 530.0
+      },
+      {
+        "x": 400.0,
+        "y": 530.0
+      },
+      {
+        "x": 540.0,
+        "y": 530.0
+      },
+      {
+        "x": 680.0,
+        "y": 530.0
+      },
+      {
+        "x": 820.0,
+        "y": 530.0
+      }
+    ],
+    "layer":2,
+    "typeInfo": "LineNode"
+  }
+]

@@ -1,0 +1,2 @@
+Template: NONE
+Effects: LethalWater-0.01086957-20-20, 

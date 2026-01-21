@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.DronePortUpg.CoolDown0",
+  "cost": 5.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Drone produce cd upgrade lv.0",
+      "description": "Wawa description test haha."
+    },
+    "Chinese": {
+      "name": "无人机召唤cd lv.0",
+      "description": "wawa这是一个测试哈哈"
+    }
+  }
+}

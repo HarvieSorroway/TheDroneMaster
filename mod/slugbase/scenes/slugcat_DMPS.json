@@ -1,0 +1,41 @@
+{
+	"id": "Slugcat_DMPS",
+	"scene_folder": "scenes/slugcat - dmps",
+	"images": [
+		{
+			"name": "DMPS_Background",
+			"pos": [ 432, 257 ],
+			"depth": 3.7,
+			"shader": "Basic"
+		},
+		{
+			"name": "DMPS_Drone",
+			"pos": [ 400, 250 ],
+			"depth": 3.0,
+			"shader": "Basic"
+		},
+		{
+			"name": "DMPS_Main",
+			"pos": [ 425, 227 ],
+			"depth": 2.4,
+			"shader": "Basic"
+		},
+		{
+			"name": "DMPS_Grass",
+			"pos": [ 402, 264 ],
+			"depth": 2.0,
+			"shader": "Basic"
+		},
+		{
+			"name": "DMPS_Foreground",
+			"pos": [ 446, 243 ],
+			"depth": 1.9,
+			"shader": "Basic"
+		}
+	],
+	"idle_depths": [ 2.4 ],
+	"glow_pos": [ 688, 484 ],
+	"mark_pos": [ 689, 583 ],
+	"select_menu_pos": [ 0, 0 ],
+	"slugcat_depth": 2.4
+}

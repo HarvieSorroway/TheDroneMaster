@@ -1,0 +1,18 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.2866525
+WaveLength: 0.8933262
+WaveAmplitude: 0.0001257955
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0.6086956
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+Effects: SkyDandelions-0.6086956-444-496, AboveCloudsView-0.06521739-454-558, 
+PlacedObjects: DangleFruit><2586.627><1474.595><-327~112~2~3, DangleFruit><2630.644><1503.331><-237~338~2~3, SnowSource><2782.686><1774.073><Radial~-50~446~-569~299.6025~1~0, SnowSource><2660.903><946.8791><Radial~91~496~50~86.60254~1~0, SnowSource><2106.8><912.9434><Radial~101~399~50~86.60254~1~0, SnowSource><1669.197><234.5342><Radial~81~437~50~86.60254~1~0, SnowSource><878.0552><373.7955><Radial~452~122~50~86.60254~1~0, SnowSource><367.6739><902.8488><Radial~366~216~50~86.60254~1~0, 
+AmbientSounds: OMNI><AM_WIN-HowlingWnd.ogg><441.747><501.2819><0.5><1, 
+FadePalette: 33, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739
+WetTerrain: OFF
+BackgroundOffset: 0,800

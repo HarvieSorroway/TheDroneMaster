@@ -1,0 +1,6 @@
+Template: NONE
+Palette: 11
+EffectColorA: 6
+EffectColorB: 21
+Effects: LethalWater-0.0154671-900.7854-359.9111, 
+FadePalette: 10, 0.2065217, 0.2065217, 0.2065217

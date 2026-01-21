@@ -1,0 +1,11 @@
+Template: NONE
+WaveSpeed: 0.4804833
+WaveLength: 0.9902416
+WaveAmplitude: 2.627862E-05
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+FadePalette: 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+BackgroundOffset: 0,800

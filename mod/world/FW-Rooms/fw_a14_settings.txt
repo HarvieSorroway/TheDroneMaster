@@ -1,0 +1,18 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.4669009
+WaveLength: 0.9834505
+WaveAmplitude: 0.0002355482
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+Effects: AboveCloudsView-0.06521739-20-20, SkyDandelions-0.6086956-561-385, 
+PlacedObjects: SnowSource><458.048><2702.306><Radial~151~353~50~86.60254~1~0, SnowSource><648.321><1973.163><Radial~470~-315~50~86.60254~1~0, SnowSource><606.0593><1357.06><Radial~480~-194~50~86.60254~1~0, SnowSource><1529.886><1427.575><Radial~-439~-235~50~86.60254~1~0, SnowSource><2348.816><1423.078><Radial~274~-462~50~86.60254~1~0, SnowSource><3295.321><1415.563><Radial~-460~-322~50~86.60254~1~0, SnowSource><4256.831><1408.317><Radial~-546~-153~50~86.60254~1~0, SnowSource><5111.321><1385.841><Radial~-583~-329~49~-109.3975~1~0, SnowSource><3907.427><792.6862><Radial~135~662~50~86.60254~1~0, SnowSource><4316.535><335.553><Radial~-738~30~50~86.60254~1~0, SnowSource><5388.697><621.287><Radial~-574~-282~50~86.60254~1~0, SnowSource><5899.43><1357.836><Radial~-583~-161~-318~-41.39746~1~0, SnowSource><6552.116><1876.587><Radial~-336~-128~50~86.60254~1~0, SnowSource><6833.943><2234.192><Radial~-249~-135~50~86.60254~1~0, SnowSource><7372.788><2260.554><Radial~-261~-138~50~86.60254~1~0, SnowSource><7124.896><2598.579><Radial~-342~30~50~86.60254~1~0, SnowSource><6892.447><1388.283><Radial~-498~-206~-34~-15.39746~1~0, SnowSource><6799.466><380.4471><Radial~727~407~50~86.60254~1~0, SnowSource><6014.573><397.0639><Radial~269~269~50~86.60254~1~0, 
+AmbientSounds: OMNI><AM_WIN-HowlingWnd.ogg><773.5732><548.4064><0.5><1, 
+FadePalette: 33, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739, 0.4021739
+RoomSpecificScriptActive: ON
+WetTerrain: OFF
+BackgroundOffset: 0,800

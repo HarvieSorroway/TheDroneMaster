@@ -1,0 +1,170 @@
+[
+  {
+    "renderNodeIDInfo": "RenderNode.BaseNode",
+    "bindSkillNodeInfo": "SkillTree.BaseNode",
+    "posInfo": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      }
+    ],
+    "layer":0,
+    "scaleInfo": 1.5,
+    "typeInfo": "StaticNode",
+    "iconSprite":"RenderNode.Base",
+    "subRenderNodeInfo": [
+      "RenderNode.DronePortUpg",
+      "RenderNode.PackUpg",
+      "RenderNode.ReactorUpg"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DronePortUpg",
+    "bindSkillNodeInfo": "SkillTree.DronePortUpg",
+    "posInfo": [
+      {
+        "x": 200.0,
+        "y": -80.0
+      },
+      {
+        "x": 150.0,
+        "y": 600.0
+      }
+    ],
+    "layer":1,
+    "scaleInfo": 1.0,
+    "typeInfo": "BasicNode",
+    "iconSprite":"RenderNode.DronePortUpg",
+    "subRenderNodeInfo": [
+      "RenderNode.DronePortUpg.CoolDown0"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg",
+    "bindSkillNodeInfo": "SkillTree.DroneUpg",
+    "posInfo": [
+      {
+        "x": 120.0,
+        "y": -160.0
+      },
+      {
+        "x": 150.0,
+        "y": 600.0
+      }
+    ],
+    "layer":1,
+    "scaleInfo": 1.0,
+    "typeInfo": "BasicNode",
+    "subRenderNodeInfo": [
+      "RenderNode.Group.DroneUpg"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.BodyUpg",
+    "bindSkillNodeInfo": "SkillTree.BodyUpg",
+    "posInfo": [
+      {
+        "x": -120.0,
+        "y": -160.0
+      },
+      {
+        "x": 150.0,
+        "y": 600.0
+      }
+    ],
+    "layer":1,
+    "scaleInfo": 1.0,
+    "typeInfo": "BasicNode",
+    "subRenderNodeInfo": [
+      "RenderNode.BodyUpg.SpearSkill0"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg",
+    "bindSkillNodeInfo": "SkillTree.ReactorUpg",
+    "posInfo": [
+      {
+        "x": -200.0,
+        "y": -80.0
+      },
+      {
+        "x": 150.0,
+        "y": 600.0
+      }
+    ],
+    "layer":1,
+    "scaleInfo": 1.0,
+    "typeInfo": "BasicNode",
+    "subRenderNodeInfo": [
+      "RenderNode.ReactorUpg.Eff0"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.Line0",
+    "posInfo": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      },
+      {
+        "x": 80.0,
+        "y": -80.0
+      },
+      {
+        "x": 200.0,
+        "y": -80.0
+      }
+    ],
+    "layer":0,
+    "typeInfo": "LineNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.Line1",
+    "posInfo": [
+      {
+        "x": 0.0,
+        "y": -40.0
+      },
+      {
+        "x": 120.0,
+        "y": -160.0
+      }
+    ],
+    "layer":0,
+    "typeInfo": "LineNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.Line2",
+    "posInfo": [
+      {
+        "x": 0.0,
+        "y": -40.0
+      },
+      {
+        "x": -120.0,
+        "y": -160.0
+      }
+    ],
+    "layer":0,
+    "typeInfo": "LineNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.Line3",
+    "posInfo": [
+      {
+        "x": 0.0,
+        "y": 0.0
+      },
+      {
+        "x": -80.0,
+        "y": -80.0
+      },
+      {
+        "x": -200.0,
+        "y": -80.0
+      }
+    ],
+    "layer":0,
+    "typeInfo": "LineNode"
+  }
+]

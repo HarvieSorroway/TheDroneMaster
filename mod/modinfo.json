@@ -1,0 +1,11 @@
+{
+  "id": "harvie.thedronemaster",
+  "name": "The DroneMaster(WIP)",
+  "version": "1.4.5",
+  "hide_version": false,
+  "authors": "Harvie",
+  "description": "A mechanical cat with laser drones, all you need to do is killing everything that block your way.\n\nFeatures:\nYou can take up to 3 fatal injuries(drop out of room not included),metal fins will tell how many you can still recieve.\nYou need much more food to hibernate. Before you eat enough, the centipede's electric shocks can recharge you\nCount of drones will increase with your karma level, hold C to open drone control HUD\nAlso grab your drone will make you move faster\nYou can also open the gate which only Artificer can!",
+  "requirements": [ "slime-cubed.slugbase", "fisobs", "emgtx" ],
+  "requirements_names": [ "SlugBase", "Fisobs", "EmgTx" ],
+  "checksum_override_version": false
+}

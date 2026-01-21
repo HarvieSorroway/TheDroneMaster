@@ -1,0 +1,19 @@
+Template: NONE
+DangerType: Rain
+RainIntensity: 0
+WaveSpeed: 0.5
+WaveLength: 1
+WaveAmplitude: 0
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Clouds: 0
+Grime: 0.6195652
+RandomItemDensity: 0.4565217
+Palette: 30
+EffectColorA: 13
+EffectColorB: 2
+Effects: RoofTopView-1-9-32, Bloom-0.2608696-15-94, PixelShift-0.4782609-271-158, 
+PlacedObjects: LightFixture><14229.83><408.8577><RedLight~17.32051~-10~28, 
+AmbientSounds: OMNI><AM_ENV-NatWind.ogg><40.97302><510.6982><0.5><1, SPOT><AM_IND-50hz.ogg><739.3875><337.8953><0.5><1><14220.39><579.8953><-65.35535><-173.3553><0.05434782><0.4804349, SPOT><AM_ENV-WallHum.ogg><718.9324><431.6882><0.5326087><0.823913><49.93237><89.68823><80.64465><213.6447><0><0.3500001, 
+Triggers: Spot<tA>event<tB>MusicEvent<eA>songName<eB>NA_28 - Stargazer<eA>vol<eB>0.3<eA>prio<eB>0.5<eA>mxThrt<eB>1<eA>loop<eB>0<eA>droneTol<eB>0<eA>rooms<eB>-1<eA>rest<eB>5<eA>fadeIn<eB>0<eA>oneSongPerCycle<eB>0<eA>stopAtDeath<eB>0<eA>stopAtGate<eB>0<tA>multiUse<tB>0<tA>toCycle<tB>-1<tA>fromCycle<tB>0<tA>delay<tB>0<tA>panPos<tB>201.409<tB>303.9281<tA>fireChance<tB>1<tA>entrance<tB>-1<tA>karma<tB>0<tA>slugcats<tB><tA>pos<tB>14040.41<tB>239.9281<tA>handlePos<tB>-288.3553<tB>307.6447, 
+RoomSpecificScriptActive: ON

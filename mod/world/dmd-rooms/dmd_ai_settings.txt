@@ -1,0 +1,5 @@
+Template: NONE
+Palette: 79
+Effects: SunBlock-1-20-20, 
+PlacedObjects: LightSource><227.1603><622.1196><1~Environment~542~-549~-361~-348.3975~1~0~None~0~0, LightSource><763.2733><614.1986><1~Environment~-554~-550~-766~-318.3975~1~0~None~0~0, LightSource><220.4871><79.55042><1~Environment~552~527~-358~22.60254~1~0~None~0~0, LightSource><758.1432><80.33087><1~Environment~-519~555~50~86.60254~1~0~None~0~0, 
+AmbientSounds: OMNI><SO_SFX-DataTrans2.ogg><607.2552><374.3001><0.326087><0.7456522, OMNI><SO_SFX-Data5.ogg><551.8239><441.1859><0.3913043><1, OMNI><SO_SFX-DataStream.ogg><713.6898><453.437><0.4130435><1, OMNI><SO_SFX-DeepLake.ogg><720.6986><331.9765><0.2608696><1, 

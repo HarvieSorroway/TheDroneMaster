@@ -1,0 +1,35 @@
+{
+	"id": "Sleep_TheDroneMaster",
+	"scene_folder": "scenes/slugcat - thedronemaster/sleep",
+	"images": [
+		{
+			"name": "DroneMaster_Sleep_Grass3",
+			"pos": [ 360, 50 ],
+			"depth": 2.2,
+			"shader": "Basic"
+		},
+		{
+			"name": "DroneMaster_Sleep_Grass2",
+			"pos": [ 360, 70 ],
+			"depth": 2.0,
+			"shader": "Basic"
+		},
+		{
+			"name": "DroneMaster_Sleep_Slugcat",
+			"pos": [ 360, 50 ],
+			"depth": 1.8,
+			"shader": "Basic"
+		},
+		{
+			"name": "DroneMaster_Sleep_Grass1",
+			"pos": [ 360, 50 ],
+			"depth": 1.5,
+			"shader": "Basic"
+		}
+	],
+	"idle_depths": [ 1.8 ],
+	"glow_pos": [ 400, 50 ],
+	"mark_pos": [ 400, 50 ],
+	"select_menu_pos": [ 0, 0 ],
+	"slugcat_depth": 1.8
+}

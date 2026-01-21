@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.DroneUpg.DamageUpg.Lv3",
+  "cost": 20.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Drone Damage Upgrade lv.4",
+      "description": "Bring drone damage up to 2.5x"
+    },
+    "Chinese": {
+      "name": "无人机伤害提升 lv.4",
+      "description": "无人机伤害乘数提升至2.5x"
+    }
+  }
+}

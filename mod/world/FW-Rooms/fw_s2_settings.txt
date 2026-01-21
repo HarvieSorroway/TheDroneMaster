@@ -1,0 +1,7 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+FadePalette: 33, 0.6086956

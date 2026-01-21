@@ -1,0 +1,14 @@
+Template: NONE
+DangerType: Blizzard
+CeilingDrips: 0
+WaveSpeed: 0.4656002
+WaveLength: 0.9828001
+WaveAmplitude: 4.687067E-08
+SecondWaveLength: 0.1666667
+SecondWaveAmplitude: 0
+Palette: 81
+EffectColorA: 21
+EffectColorB: 9
+PlacedObjects: SeedCob><1245.597><496.5952><29.88123~125.8667~7~10, DeadSeedCob><1337.361><453.8853><, LanternOnStick><2474.67><395.815><10.67181~-79.73334, LanternOnStick><2514.697><422.0956><-4.802368~-106.9333, DataPearl><3224.784><1333.45><98.18127~-107.7334~0~0~Misc~0, DangleFruit><3392.391><1043.8><53.35938~-109.3333~2~3, DangleFruit><3425.42><1060.23><123.2602~43.20001~2~3, Mushroom><648.4708><487.5605><-226.2438~59.73328~2~3, Mushroom><672.915><489.6752><70.43439~13.86667~2~3, Mushroom><705.0493><491.9143><-98.71484~-120~2~3, 
+FadePalette: 33, 0.6059443, 0.6059443, 0.6008747, 0.6059445, 0.6008747, 0.6059445, 0.6008745, 0.6008745, 0.6008747, 0.6059443
+RoomSpecificScriptActive: ON
