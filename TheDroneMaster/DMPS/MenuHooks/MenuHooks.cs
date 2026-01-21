@@ -18,9 +18,9 @@ namespace TheDroneMaster.DMPS.MenuHooks
             On.HUD.FoodMeter.TotalWidth += FoodMeter_TotalWidth;
 
             //test
-            On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
-            On.Menu.SlugcatSelectMenu.Update += SlugcatSelectMenu_Update;
-            On.Menu.Menu.GrafUpdate += Menu_GrafUpdate;
+            //On.Menu.SlugcatSelectMenu.ctor += SlugcatSelectMenu_ctor;
+            //On.Menu.SlugcatSelectMenu.Update += SlugcatSelectMenu_Update;
+            //On.Menu.Menu.GrafUpdate += Menu_GrafUpdate;
 
         }
 

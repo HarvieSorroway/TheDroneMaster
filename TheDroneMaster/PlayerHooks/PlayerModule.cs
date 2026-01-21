@@ -94,8 +94,8 @@ namespace TheDroneMaster
         public override void ExtraGraphicsDrawSprites(PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             Color color = eyeColor;
-            if (DroneHUD.instance != null)
-                color = Color.Lerp(eyeColor, laserColor, DroneHUD.instance.alpha);
+            if (PlayerDroneHUD.instance != null)
+                color = Color.Lerp(eyeColor, laserColor, PlayerDroneHUD.instance.alpha);
 
             sLeaser.sprites[newEyeIndex].color = color;
 
