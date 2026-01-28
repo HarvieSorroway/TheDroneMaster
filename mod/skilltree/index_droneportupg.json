@@ -1,0 +1,103 @@
+[
+   {
+    "renderNodeIDInfo": "RenderNode.Group.DronePortUpg",
+    "layer":1,
+    "typeInfo": "NodeGroup",
+    "subRenderNodeInfo": [
+      "RenderNode.DronePortUpg.Cost.Lv0",
+      "RenderNode.DronePortUpg.Cost.Lv1",
+      "RenderNode.DronePortUpg.JetJump.Lv0",
+      "RenderNode.DronePortUpg.JetJump.Lv1",
+      "RenderNode.DronePortUpg.JetJump.Lv2"
+    ]
+  },
+
+
+  {
+    "renderNodeIDInfo": "RenderNode.DronePortUpg.Cost.Lv0",
+    "bindSkillNodeInfo": "Skill.DronePortUpg.Cost.Lv0",
+    "posInfo": [
+      {
+        "x": 260.0,
+        "y": -20.0
+      },
+      {
+        "x": 400.0,
+        "y": 600.0
+      }
+    ],
+    "layer":2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DronePortUpg.Cost.Lv1",
+    "bindSkillNodeInfo": "Skill.DronePortUpg.Cost.Lv1",
+    "posInfo": [
+      {
+        "x": 290.0,
+        "y": -20.0
+      },
+      {
+        "x": 540.0,
+        "y": 600.0
+      }
+    ],
+    "layer":2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+
+
+  {
+    "renderNodeIDInfo": "RenderNode.DronePortUpg.JetJump.Lv0",
+    "bindSkillNodeInfo": "Skill.DronePortUpg.JetJump.Lv0",
+    "posInfo": [
+      {
+        "x": 280.0,
+        "y": -40.0
+      },
+      {
+        "x": 480.0,
+        "y": 520.0
+      }
+    ],
+    "layer":2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DronePortUpg.JetJump.Lv1",
+    "bindSkillNodeInfo": "Skill.DronePortUpg.JetJump.Lv1",
+    "posInfo": [
+      {
+        "x": 310.0,
+        "y": -40.0
+      },
+      {
+        "x": 620.0,
+        "y": 520.0
+      }
+    ],
+    "layer":2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DronePortUpg.JetJump.Lv2",
+    "bindSkillNodeInfo": "Skill.DronePortUpg.JetJump.Lv2",
+    "posInfo": [
+      {
+        "x": 340.0,
+        "y": -40.0
+      },
+      {
+        "x": 760.0,
+        "y": 520.0
+      }
+    ],
+    "layer":2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode"
+  }
+]

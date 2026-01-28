@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.DronePortUpg.Cost.Lv0",
+  "cost": 5.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Drone Port Efficiency Upgrade Lv.1",
+      "description": "The cost of producing a new drone is reduced to 60% of the original"
+    },
+    "Chinese": {
+      "name": "无人机港能效提升 lv.1",
+      "description": "生产一个新无人机的花费降低至原先的60%"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+PauseMenu_OpenSkillMenu | 技能树
+#技能树
+SkillMenu_UpgradeButton_Upgrade | 升级
+SkillMenu_UpgradeButton_Disassembly | 拆卸
+SkillMenu_ConditionPrefix_Requrie | 前置:
+SkillMenu_ConditionPrefix_NotRequrie | 未应用:
+SkillMenu_CostLabel | 花费: {0}能量

@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.DroneUpg.Count.Lv3",
+  "cost": 35.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Drone Count Upgrade lv.4",
+      "description": "Bring drone max count up to 5"
+    },
+    "Chinese": {
+      "name": "无人机数量提升 lv.4",
+      "description": "无人机最大数量提升至5"
+    }
+  }
+}

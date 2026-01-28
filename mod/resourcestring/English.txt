@@ -1,0 +1,7 @@
+PauseMenu_OpenSkillMenu | Skills
+#SkillTree
+SkillMenu_UpgradeButton_Upgrade | Upgrade
+SkillMenu_UpgradeButton_Disassembly | Remove
+SkillMenu_ConditionPrefix_Requrie | Requires:
+SkillMenu_ConditionPrefix_NotRequrie | Must not have:
+SkillMenu_CostLabel | Cost: {0} units

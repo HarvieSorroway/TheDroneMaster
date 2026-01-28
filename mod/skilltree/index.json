@@ -5,7 +5,7 @@
     "posInfo": [
       {
         "x": 0.0,
-        "y": 0.0
+        "y": 80.0
       }
     ],
     "layer":0,
@@ -24,7 +24,7 @@
     "posInfo": [
       {
         "x": 200.0,
-        "y": -80.0
+        "y": 0.0
       },
       {
         "x": 150.0,
@@ -36,7 +36,7 @@
     "typeInfo": "BasicNode",
     "iconSprite":"RenderNode.DronePortUpg",
     "subRenderNodeInfo": [
-      "RenderNode.DronePortUpg.CoolDown0"
+      "RenderNode.Group.DronePortUpg"
     ]
   },
   {
@@ -45,7 +45,7 @@
     "posInfo": [
       {
         "x": 120.0,
-        "y": -160.0
+        "y": -80.0
       },
       {
         "x": 150.0,
@@ -55,17 +55,18 @@
     "layer":1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
+    "iconSprite":"RenderNode.DroneUpg",
     "subRenderNodeInfo": [
       "RenderNode.Group.DroneUpg"
     ]
   },
   {
-    "renderNodeIDInfo": "RenderNode.BodyUpg",
-    "bindSkillNodeInfo": "SkillTree.BodyUpg",
+    "renderNodeIDInfo": "RenderNode.TorsoUpg",
+    "bindSkillNodeInfo": "SkillTree.TorsoUpg",
     "posInfo": [
       {
         "x": -120.0,
-        "y": -160.0
+        "y": -80.0
       },
       {
         "x": 150.0,
@@ -75,8 +76,9 @@
     "layer":1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
+    "iconSprite":"RenderNode.TorsoUpg",
     "subRenderNodeInfo": [
-      "RenderNode.BodyUpg.SpearSkill0"
+      "RenderNode.Group.TorsoUpg"
     ]
   },
   {
@@ -85,7 +87,7 @@
     "posInfo": [
       {
         "x": -200.0,
-        "y": -80.0
+        "y": 0.0
       },
       {
         "x": 150.0,
@@ -95,8 +97,9 @@
     "layer":1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
+    "iconSprite":"RenderNode.ReactorUpg",
     "subRenderNodeInfo": [
-      "RenderNode.ReactorUpg.Eff0"
+      "RenderNode.Group.ReactorUpg"
     ]
   },
   {
@@ -104,15 +107,15 @@
     "posInfo": [
       {
         "x": 0.0,
-        "y": 0.0
+        "y": 80.0
       },
       {
         "x": 80.0,
-        "y": -80.0
+        "y": 0.0
       },
       {
         "x": 200.0,
-        "y": -80.0
+        "y": 0.0
       }
     ],
     "layer":0,
@@ -123,11 +126,11 @@
     "posInfo": [
       {
         "x": 0.0,
-        "y": -40.0
+        "y": 40.0
       },
       {
         "x": 120.0,
-        "y": -160.0
+        "y": -80.0
       }
     ],
     "layer":0,
@@ -138,11 +141,11 @@
     "posInfo": [
       {
         "x": 0.0,
-        "y": -40.0
+        "y": 40.0
       },
       {
         "x": -120.0,
-        "y": -160.0
+        "y": -80.0
       }
     ],
     "layer":0,
@@ -153,15 +156,15 @@
     "posInfo": [
       {
         "x": 0.0,
-        "y": 0.0
+        "y": 80.0
       },
       {
         "x": -80.0,
-        "y": -80.0
+        "y": 0.0
       },
       {
         "x": -200.0,
-        "y": -80.0
+        "y": 0.0
       }
     ],
     "layer":0,

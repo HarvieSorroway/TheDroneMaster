@@ -1,0 +1,22 @@
+{
+  "skillID": "Skill.DronePortUpg.JetJump.Lv1",
+  "cost": 10.0,
+  "conditions": 
+  [
+    {
+      "type": "SkillNode",
+      "boolType": "And",
+      "info": "Skill.DronePortUpg.JetJump.Lv0"
+    }
+  ],
+  "descriptionInfos": {
+    "English": {
+      "name": "Jet Jump Lv.2",
+      "description": "Reduce cost of each jump down to 1 unit of energy"
+    },
+    "Chinese": {
+      "name": "喷气跳跃 lv.2",
+      "description": "每次跳跃花费的能量降低至1单位"
+    }
+  }
+}

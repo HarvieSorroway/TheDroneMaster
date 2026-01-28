@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.DronePortUpg.JetJump.Lv0",
+  "cost": 10.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Jet Jump Lv.1",
+      "description": "Unlock jet jump, cost 3 unit of energy each jump."
+    },
+    "Chinese": {
+      "name": "喷气跳跃 lv.1",
+      "description": "解锁喷气跳跃，每次跳跃花费3单位能量"
+    }
+  }
+}
