@@ -207,6 +207,8 @@ namespace TheDroneMaster.DMPS.DMPSDrone.DroneWeapon
             {
                 var weapon = (graphics.graphics.drone.weapon as DefaultLaserGun);
                 var room = graphics.graphics.drone.room;
+                if (room == null)
+                    return;
 
                 float smoothSpread = Mathf.Lerp(weapon.lastCharge, weapon.charge, timeStacker) / DefaultLaserGun.chargeCounter;
                 smoothSpread = DMHelper.EaseInOutCubic(1f - smoothSpread);

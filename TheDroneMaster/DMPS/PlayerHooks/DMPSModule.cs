@@ -18,6 +18,9 @@ namespace DMPS.PlayerHooks
         //reactor energy
         public DMPSBioReactor bioReactor;
 
+        //params
+        
+
         //graphics
         public MetalGills metalGills;
         public int grillIndex = -1;

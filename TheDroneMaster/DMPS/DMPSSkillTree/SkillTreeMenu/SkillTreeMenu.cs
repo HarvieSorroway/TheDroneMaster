@@ -1,4 +1,5 @@
-﻿using Menu;
+﻿using CustomSaveTx;
+using Menu;
 using RWCustom;
 using SlugBase.DataTypes;
 using System;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.DMPSSave;
 using TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu.MenuAnim;
 using UnityEngine;
 using Vector2 = UnityEngine.Vector2;
@@ -15,9 +17,6 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 {
     internal class SkillTreeMenu : Menu.Menu
     {
-        public static Color pink = Custom.hexToColor("800029");
-
-
         public static ProcessManager.ProcessID SkillTreeID = new ProcessManager.ProcessID(nameof(SkillTreeID), true);
 
         public static SkillTreeMenu Instance;
@@ -29,11 +28,16 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         internal SkillTreeBkgEffect bkgEff;
         internal SkillInfoScreen skillInfoScreen;
 
+        //saveInfo
+        internal DMPSBasicSave skillTreeSave;
+
+        //return info
+        PauseMenu pauseMenuFrom;
+
         //layerInfo
         internal List<string>[] layerNodeLst;
 
         internal string focusingSkillTreeCatagory, focusingRenderNode;
-        internal float focusingAnimProg;
         internal bool focus;
 
         MenuAnimation anim;
@@ -42,15 +46,28 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
         internal Vector2 middleScreen;
 
+        public float Energy => skillTreeSave.Energy;
+        public int maxEnergy = 80;
+
+        public bool previewMode;
         FLabel test;
-        public SkillTreeMenu(ProcessManager manager, RainWorldGame game) : base(manager, SkillTreeID)
+
+        //anim
+        FSprite bkg;
+        public float alpha, lastAlpha;
+        public SkillTreeMenu(ProcessManager manager, RainWorldGame game, PauseMenu pauseMenuFrom, bool previewMode) : base(manager, SkillTreeID)
         {
-            container.AddChild(new FSprite("pixel")
+            this.pauseMenuFrom = pauseMenuFrom;
+            this.previewMode = previewMode;
+            skillTreeSave = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+
+            container.AddChild(bkg = new FSprite("pixel")
             {
                 scale = 2000f,
-                color =Custom.hexToColor("1C080E"),
+                color = Custom.hexToColor("1C080E"),
                 x = 500f,
-                y = 300f
+                y = 300f,
+                alpha = 0f
             });
             container.AddChild(test = new FLabel(Custom.GetDisplayFont(), "")
             {
@@ -64,7 +81,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             layerPulseCenters = new Vector2[3];
             layerPulseRads = new float[3];
 
-            for (int i = 0;i < 3;i++)
+            for (int i = 0; i < 3; i++)
             {
                 layerNodeLst[i] = new List<string>();
                 layerPulseRads[i] = 0f;
@@ -160,7 +177,6 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 lst.Clear();
 
             focus = false;
-            focusingAnimProg = 0f;
             focusingRenderNode = string.Empty;
             focusingSkillTreeCatagory = string.Empty;
 
@@ -172,10 +188,24 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             CreateRenderElement();
         }
 
+        public void SyncSkillState()
+        {
+            var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+            foreach(var item in idMapper.Values)
+            {
+                if(item is SkillTreeSkillButton skillTreeButton)
+                {
+                    skillTreeButton.SkillEnabled = save.CheckSkill(RenderNodeLoader.idMapper[skillTreeButton.id].bindSkillNodeInfo);
+                }
+            }
+            skillInfoScreen.SyncState();
+        }
+
         public override void Update()
         {
             base.Update();
-
+            lastAlpha = alpha;
+ 
             if(anim != null)
             {
                 anim.Update();
@@ -191,6 +221,11 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public override void GrafUpdate(float timeStacker)
         {
             base.GrafUpdate(timeStacker);
+
+            float a = Mathf.Lerp(lastAlpha, alpha, timeStacker);
+            bkg.alpha = a;
+            pages[0].Container.alpha = a;
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Instance = null;
@@ -204,11 +239,15 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         {
             base.ShutDownProcess();
             //Plugin.postEffect.Strength = 0f;
+            if(pauseMenuFrom != null)
+            {
+                pauseMenuFrom.SpawnExitContinueButtons();
+            }
         }
 
         public override void Singal(MenuObject sender, string message)
         {
-            if (focusingAnimProg > 0f && focusingAnimProg < 1f)
+            if (anim != null && !anim.AllowSignal)
                 return;
 
             if(message == "CLICKED")
@@ -237,10 +276,10 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             }
         }
 
-        public static void OpenSkillTree(RainWorldGame game)
+        public static void OpenSkillTree(RainWorldGame game, PauseMenu pauseMenu, bool previewMode)
         {
             if(Instance == null)
-                Instance = new SkillTreeMenu(game.manager, game);
+                Instance = new SkillTreeMenu(game.manager, game, pauseMenu, previewMode);
         }
     }
 

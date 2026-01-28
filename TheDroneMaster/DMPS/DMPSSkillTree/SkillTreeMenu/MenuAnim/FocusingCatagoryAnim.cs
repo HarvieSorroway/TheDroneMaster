@@ -9,6 +9,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu.MenuAnim
 {
     internal class FocusingCatagoryAnim : MenuAnimation
     {
+        public override bool AllowSignal => progression > 0.33f;
         public FocusingCatagoryAnim(SkillTreeMenu menu) : base(menu, 90)
         {
         }

@@ -13,6 +13,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu.MenuAnim
         float duration;
         public float progression, lastProgression;
         public bool Finished => progression == 1f;
+        public virtual bool AllowSignal => false;
 
         public MenuAnimation(SkillTreeMenu menu, int duration)
         {

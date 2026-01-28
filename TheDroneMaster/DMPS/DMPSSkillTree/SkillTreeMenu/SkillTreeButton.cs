@@ -24,8 +24,25 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         //FLabel label;
         protected FSprite icon, bkg;
         protected FSprite[,] corners;
+        protected FSprite rectLightLeft, rectLightRight;
         protected SkillTreeButtonBehaviour buttonBhv;
 
+        protected bool _skillEnabled = true;
+        public virtual bool SkillEnabled
+        {
+            get => _skillEnabled;
+            set
+            {
+                if(value != _skillEnabled)
+                {
+                    _skillEnabled = value;
+                    bkg.color = value ? StaticColors.Menu.pink : StaticColors.Menu.darkPink;
+                }
+            }
+        }
+
+        public float rectLightIntense = 0f;
+        public float RectLightAlpha => SkillEnabled ? rectLightIntense : 0f;
 
         public bool MouseOver => IsMouseOverMe;
         public Menu.Menu GetMenu => menu;
@@ -57,13 +74,31 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             };
             bkg = new FSprite("pixel", true)
             {
-                color = SkillTreeMenu.pink,
+                color = StaticColors.Menu.pink,
                 scale = 80f * scale,
                 rotation = 45f
             };
 
             Container.AddChild(bkg);
             Container.AddChild(icon);
+
+            rectLightLeft = new FSprite("DMPS_RectLightLeft", true)
+            {
+                color = StaticColors.Menu.pink,
+                shader = Custom.rainWorld.Shaders["AdditiveDefault"],
+                scale = scale,
+                anchorX = 1f,
+            };
+            rectLightRight = new FSprite("DMPS_RectLightLeft", true)
+            {
+                color = StaticColors.Menu.pink,
+                shader = Custom.rainWorld.Shaders["AdditiveDefault"],
+                scale = scale,
+                anchorX = 1f,
+                rotation = 180f,
+            };
+            Container.AddChild(rectLightLeft);
+            Container.AddChild(rectLightRight);
 
             corners = new FSprite[4, 2];
             for(int c = 0;c < 4;c++)
@@ -78,7 +113,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                         scaleX = 3f * scale,
                         rotation = r + (i > 0 ? 0f : 90f),
                         anchorY = 0f,
-                        color = SkillTreeMenu.pink,
+                        color = StaticColors.Menu.pink,
                     };
                     Container.AddChild(corners[c, i]);
                 }
@@ -106,6 +141,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public override void GrafUpdate(float timeStacker)
         {
             base.GrafUpdate(timeStacker);
+            RenderRectLight(timeStacker);
             float smoothAlpha = Mathf.Lerp(lastSetAlpha, setAlpha, timeStacker);
             float smoothScale = Mathf.Lerp(lastScale, scale, timeStacker);
 
@@ -114,8 +150,10 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             icon.scale = 1.1f * smoothScale;
 
             bkg.SetPosition(DrawPos(timeStacker));
-            bkg.alpha = FlashAlpha(smoothAlpha);
+            bkg.alpha = FlashAlpha(smoothAlpha * (SkillEnabled ? 1f : 0.5f));
             bkg.scale = smoothScale * 80f;
+
+            
 
             for (int c = 0;c < 4; c++)
             {
@@ -128,10 +166,26 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                     corners[c, i].SetPosition(anchor - dir * 1.5f * smoothScale);
                     corners[c, i].scaleX = 3 * smoothScale;
                     corners[c, i].scaleY = Mathf.Lerp(35.5f, 20f, buttonBhv.sizeBump) * smoothScale;
-                    corners[c, i].color = Color.Lerp(SkillTreeMenu.pink, Color.white, FlashAlpha(buttonBhv.sizeBump));
+                    corners[c, i].color = Color.Lerp(StaticColors.Menu.pink, Color.white, FlashAlpha(buttonBhv.sizeBump));
                     corners[c, i].alpha = FlashAlpha(smoothAlpha);
                 }
             }
+        }
+
+        protected void RenderRectLight(float timeStacker)
+        {
+            float smoothAlpha = Mathf.Lerp(lastSetAlpha, setAlpha, timeStacker);
+            float smoothScale = Mathf.Lerp(lastScale, scale, timeStacker);
+            float smoothShrink = Mathf.Lerp(lastShrink, shrink, timeStacker);
+            float rectLightAlpha = this.RectLightAlpha * FlashAlpha(smoothAlpha) * Mathf.Lerp(0.8f, 1f, Random.value) * (1f - smoothShrink);
+
+            rectLightLeft.SetPosition(DrawPos(timeStacker) + new Vector2(-15f * smoothScale, 0f));
+            rectLightLeft.scale = smoothScale * (1f - smoothShrink);
+            rectLightLeft.alpha = rectLightAlpha;
+
+            rectLightRight.SetPosition(DrawPos(timeStacker) + new Vector2(15f * smoothScale, 0f));
+            rectLightRight.scale = smoothScale * (1f - smoothShrink);
+            rectLightRight.alpha = rectLightAlpha;
         }
 
         public static float FlashAlpha(float alpha)

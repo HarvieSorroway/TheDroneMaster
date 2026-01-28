@@ -1,4 +1,5 @@
-﻿using Menu;
+﻿using CustomSaveTx;
+using Menu;
 using RWCustom;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using TheDroneMaster.DMPS.DMPShud.EnergyBar;
+using TheDroneMaster.DMPS.DMPSSave;
 using UnityEngine;
 
 namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
@@ -14,18 +17,23 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
     internal class SkillInfoScreen : PositionedMenuObject
     {
         static float SkillScreenHeigth = 200f;
+        static Vector2 holdButtonPos = new Vector2(1250f, 50f);
 
         Vector2 rPos, lastrPos;
 
+        bool currentSkillState;
         float revealProg;
         string focusingSkillID = string.Empty;
 
         FSprite bkg_bk, bkg_title, icon_bkg,icon_bkg2, icon;
-        FLabel skillNameLabel, skillDescriptionLabel;
+        FLabel skillNameLabel, skillDescriptionLabel, costLabel;
 
+        DMPSEnergyBarBase energyBar;
+
+        SkillTreeHoldButton holdButton;
         List<ConditionLabel> conditionLabels = new List<ConditionLabel>();
 
-        public SkillInfoScreen(Menu.Menu menu, MenuObject owner) : base(menu, owner, Vector2.zero)
+        public SkillInfoScreen(SkillTreeMenu menu, MenuObject owner) : base(menu, owner, Vector2.zero)
         {
             bkg_bk = new FSprite("pixel")
             {
@@ -40,7 +48,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             bkg_title = new FSprite("pixel")
             {
-                color = SkillTreeMenu.pink,
+                color = StaticColors.Menu.pink,
                 scaleX = Custom.rainWorld.options.ScreenSize.x,
                 scaleY = 10f,
                 anchorX = 0,
@@ -79,7 +87,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             skillNameLabel = new FLabel(Custom.GetDisplayFont(), "")
             {
-                color = SkillTreeMenu.pink,
+                color = StaticColors.Menu.pink,
                 anchorX = 0f,
                 scale = 1.7f,
                 shader = Custom.rainWorld.Shaders["AdditiveDefault"]
@@ -88,18 +96,35 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             skillDescriptionLabel = new FLabel(Custom.GetDisplayFont(), "")
             {
-                color = SkillTreeMenu.pink * 0.5f + Color.white * 0.5f,
+                color = StaticColors.Menu.pink * 0.5f + Color.white * 0.5f,
                 anchorX = 0f,
                 anchorY = 1f
             };
             Container.AddChild(skillDescriptionLabel);
 
-   
+            costLabel = new FLabel(Custom.GetDisplayFont(), "")
+            {
+                color = StaticColors.Menu.pink,
+            };
+            Container.AddChild(costLabel);
+
+            energyBar = new DMPSEnergyBarBase(Container)
+            {
+                anchor = new Vector2(0.5f, 0.5f),
+                alpha = 0f,
+                Show = 1f,
+                expand = 1f,
+            };
+            energyBar.TotalEnergy = menu.maxEnergy;
+
             lastrPos = rPos = Vector2.Lerp(Vector2.down * SkillScreenHeigth, Vector2.zero, DMHelper.EaseInOutCubic(revealProg));
 
-            var button = new SkillTreeHoldButton(menu, this, new Vector2(1100f, 100f), new Vector2(100f, 35f), "Upgrade", null);
-            subObjects.Add(button);
-            menu.pages[0].selectables.Add(button);
+            if (!menu.previewMode)
+            {
+                holdButton = new SkillTreeHoldButton(menu, this, new Vector2(1250f, 50f), new Vector2(100f, 35f), DMPSResourceString.Get("SkillMenu_UpgradeButton_Upgrade"), HoldButtonCallback);
+                subObjects.Add(holdButton);
+                menu.pages[0].selectables.Add(holdButton);
+            }
         }
 
         public override void Update()
@@ -118,6 +143,11 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             }
             rPos = Vector2.Lerp(Vector2.down * SkillScreenHeigth, Vector2.zero, DMHelper.EaseInOutCubic(revealProg));
             pos = (owner as PositionedMenuObject).ScreenPos + rPos;
+
+            energyBar.Update();
+            energyBar.alpha = revealProg;
+            energyBar.currentEnergy = (menu as SkillTreeMenu).Energy;
+            energyBar.pos = rPos + new Vector2(Custom.rainWorld.options.ScreenSize.x / 2f, SkillScreenHeigth + 30f);
         }
 
         public override void GrafUpdate(float timeStacker)
@@ -132,11 +162,16 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             skillNameLabel.SetPosition(smoothPos + new Vector2(150f, SkillScreenHeigth - 40f));
             skillDescriptionLabel.SetPosition(smoothPos + new Vector2(200f, SkillScreenHeigth - 80f));
+            costLabel.SetPosition(smoothPos + holdButtonPos + new Vector2(0f, 70f));
 
             foreach(var l in conditionLabels)
-            {
                 l.DrawSprites(smoothPos);
-            }
+            energyBar.GrafUpdate(timeStacker);
+        }
+
+        public void SyncState()
+        {
+            SetFocusingSkillNode(focusingSkillID, icon.element.name);
         }
 
         public void SetFocusingSkillNode(string skillID, string sprite)
@@ -146,17 +181,23 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             conditionLabels.Clear();
 
             focusingSkillID = skillID;
+            holdButton?.ClearProg();
 
             if (string.IsNullOrEmpty(skillID))
             {
                 skillNameLabel.text = "";
                 skillDescriptionLabel.text = "";
+                costLabel.text = "";
                 icon.isVisible = false;
+                holdButton?.SetAlpha(0f);
+                currentSkillState = false;
+                energyBar.ShowRed = false;
                 return;
             }
 
             if (SkillNodeLoader.loadedSkillNodes.TryGetValue(skillID, out var node))
             {
+                currentSkillState = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>().CheckSkill(skillID);
                 icon.isVisible = true;
                 if (node.TryGetDescriptionInfo(Custom.rainWorld.inGameTranslator.currentLanguage, out var res))
                 {
@@ -177,13 +218,42 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                     var conditionLabel = new ConditionLabel(this, conditionInfo, i);
                     conditionLabels.Add(conditionLabel);
                 }
+
+                energyBar.ShowRed = true;
+                energyBar.redEnergy = node.cost;
+                costLabel.text = string.Format(DMPSResourceString.Get("SkillMenu_CostLabel"), node.cost);
+
+                holdButton?.SetAlpha(currentSkillState ? (DMPSSkillTreeHelper.CheckAllConditions(node, (menu as SkillTreeMenu).skillTreeSave) ? 1f : 0f) : 1f);
+                if(holdButton != null)
+                {
+                    if (currentSkillState)
+                        holdButton.Text = DMPSResourceString.Get("SkillMenu_UpgradeButton_Disassembly");
+                    else
+                        holdButton.Text = DMPSResourceString.Get("SkillMenu_UpgradeButton_Upgrade");
+                }    
             }
             else
             {
                 skillNameLabel.text = $"{skillID} - Name";
                 skillDescriptionLabel.text = $"{skillID} - skillNodeNotFound";
+                costLabel.text = "";
                 icon.isVisible = false;
+                energyBar.ShowRed = false;
+                holdButton.SetAlpha(0f);
             }
+        }
+
+        void HoldButtonCallback()
+        {
+            if (string.IsNullOrEmpty(focusingSkillID))
+                return;
+            var skillSave = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+            if (currentSkillState)
+                skillSave.DisableSkill(focusingSkillID);
+            else
+                skillSave.EnableSkill(focusingSkillID);
+
+            (menu as SkillTreeMenu).SyncSkillState();
         }
 
         public override void RemoveSprites()
@@ -201,12 +271,14 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             foreach(var l in conditionLabels)
                 l.RemoveSprites();
             conditionLabels.Clear();
+            energyBar.RemoveSprites();
         }
 
         class ConditionLabel
         {
             SkillInfoScreen owner;
             FLabel label;
+            
             int i;
 
             public ConditionLabel(SkillInfoScreen owner, SkillNode.SKillNodeConditionInfo conditionInfo, int i)
@@ -216,7 +288,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 label = new FLabel(Custom.GetDisplayFont(), LabelText(conditionInfo, i))
                 {
                     anchorX = 0f,
-                    color = ConditionColor(CheckCondition()),
+                    color = ConditionColor(CheckCondition(conditionInfo)),
                     alpha = 0.6f,
                     shader = Custom.rainWorld.Shaders["AdditiveDefault"]
                 };
@@ -225,7 +297,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             public void DrawSprites(Vector2 ownerBasePos)
             {
-                label.SetPosition(ownerBasePos + new Vector2(600f, SkillScreenHeigth - 40f - i * 30f));
+                label.SetPosition(ownerBasePos + new Vector2(600f, SkillScreenHeigth - 50f - i * 30f));
             }
 
             public void RemoveSprites()
@@ -233,9 +305,9 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 label.RemoveFromContainer();
             }
 
-            public bool CheckCondition()
+            public bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo)
             {
-                return true;
+                return DMPSSkillTreeHelper.CheckCondition(conditionInfo, DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>());
             }
 
             public string LabelText(SkillNode.SKillNodeConditionInfo conditionInfo, int i )
@@ -244,13 +316,13 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 {
                     string prefix = "";
                     if (conditionInfo.boolType == SkillNode.ConditionBoolType.And)
-                        prefix = "Requries: ";
+                        prefix = DMPSResourceString.Get("SkillMenu_ConditionPrefix_Requrie");
                     else if (conditionInfo.boolType == SkillNode.ConditionBoolType.NotAnd)
-                        prefix = "Must not have: ";
+                        prefix = DMPSResourceString.Get("SkillMenu_ConditionPrefix_NotRequrie");
                     else if (conditionInfo.boolType == SkillNode.ConditionBoolType.Or)
-                        prefix = "Requries: ";
+                        prefix = DMPSResourceString.Get("SkillMenu_ConditionPrefix_Requrie");
                     else if (conditionInfo.boolType == SkillNode.ConditionBoolType.NotOr)
-                        prefix = "Requires not have: ";
+                        prefix = DMPSResourceString.Get("SkillMenu_ConditionPrefix_NotRequrie");
 
                     var otherNode = SkillNodeLoader.loadedSkillNodes[conditionInfo.info];
                     string name = otherNode.TryGetDescriptionInfo(Custom.rainWorld.inGameTranslator.currentLanguage, out var res) ? res.name : conditionInfo.info;

@@ -26,13 +26,13 @@ namespace TheDroneMaster.DMPS
             DMPSHUDHooks.HooksOn();
             KarmaLadderScreenHooks.HooksOn();
             MenuHooks.MenuHooks.HooksOn();
-            Save.HooksOn();
+            //Save.HooksOn();
             RenderNodeLoader.Load();
             SkillNodeLoader.Load();
             SkillTreeHooks.HooksOn();
 
-            DeathPersistentSaveDataRx.AppplyTreatment(new SkillTreeSave(null));
-
+            DeathPersistentSaveDataRx.AppplyTreatment(new DMPSBasicSave(null));
+            
             //DMPSSkillTree.SkillTreeRenderNode nodeTest = new DMPSSkillTree.SkillTreeRenderNode();
             //nodeTest.bindSkillNodeInfo = "SkillTree.TestSkill1";
             //nodeTest.renderNodeIDInfo = "RenderNode.TestSkill1";
@@ -78,7 +78,7 @@ namespace TheDroneMaster.DMPS
             //};
             //Plugin.LoggerLog(DMPSSkillTreeHelper.SerializeSkillNode(skillNodeTest));
 
-         
+
             //SkillNodeLoader.Load();
             //foreach (var id in SkillNodeLoader.loadedSkillNodes.Keys)
             //{
@@ -103,15 +103,23 @@ namespace TheDroneMaster.DMPS
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_BioReactor", LoadTexFromPath("illustrations/DMPS_BioReactor.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_BioReactorFlare", LoadTexFromPath("illustrations/DMPS_BioReactorFlare.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_PixelGradiant20", LoadTexFromPath("illustrations/DMPS_PixelGradiant20.png"), false);
-            
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_RectLightLeft", LoadTexFromPath("illustrations/rectlight_left.png"), false);
+
+
             Futile.atlasManager.LoadAtlasFromTexture("SkillScreen_IconBkg", LoadTexFromPath("illustrations/skillscreen_iconbkg.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("SkillScreen_IconBkg_2", LoadTexFromPath("illustrations/skillscreen_iconbkg_2.png"), false);
 
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.Base", LoadTexFromPath("illustrations/rendernode_base.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DronePortUpg", LoadTexFromPath("illustrations/rendernode_droneportupg.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DroneUpg", LoadTexFromPath("illustrations/rendernode_droneupg.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("RenderNode.ReactorUpg", LoadTexFromPath("illustrations/rendernode_reactorupg.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("RenderNode.TorsoUpg", LoadTexFromPath("illustrations/rendernode_torsoupg.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.PlaceHolder", LoadTexFromPath("illustrations/rendernode_placeholder.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.Esc", LoadTexFromPath("illustrations/rendernode_esc.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DroneUpg.Dmg", LoadTexFromPath("illustrations/rendernode_droneupg_dmg.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DroneUpg.Count", LoadTexFromPath("illustrations/rendernode_droneupg_count.png"), false);
+
+            DMPSResourceString.Load();
         }
 
         public static Texture2D LoadTexFromPath(string path)

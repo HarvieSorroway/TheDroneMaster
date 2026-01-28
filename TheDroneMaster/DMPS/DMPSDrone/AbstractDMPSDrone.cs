@@ -22,5 +22,10 @@ namespace TheDroneMaster.DMPS.DMPSDrone
             }
             base.Realize();
         }
+
+        public override void Abstractize(WorldCoordinate coord)
+        {
+            base.Abstractize(coord);
+        }
     }
 }

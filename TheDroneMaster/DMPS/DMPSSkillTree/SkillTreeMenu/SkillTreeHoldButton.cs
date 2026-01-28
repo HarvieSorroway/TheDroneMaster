@@ -11,6 +11,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 {
     internal class SkillTreeHoldButton : PositionedMenuObject, ISkillTreeObject, SelectableMenuObject, ButtonMenuObject, ISkillTreeButton
     {
+        Action callBack;
         Vector2 scale;
 
         public float setAlpha, lastSetAlpha;
@@ -38,13 +39,21 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public virtual bool CurrentlySelectableNonMouse => setAlpha > 0f;
         public ButtonBehavior GetButtonBehavior => null;
 
+        public string Text
+        {
+            get => label.text;
+            set => label.text = value;
+        }
+
 
         public SkillTreeHoldButton(Menu.Menu menu, MenuObject owner, Vector2 pos, Vector2 scale, string displayText, Action callBack) : base(menu, owner, pos)
         {
-            setAlpha = 1f;
-            buttonBhv = new SkillTreeButtonBehaviour(this);
             this.pos = pos;
             this.scale = scale;
+            this.callBack = callBack;
+
+            setAlpha = 0f;
+            buttonBhv = new SkillTreeButtonBehaviour(this);
 
             bkg = new FSprite("pixel", true)
             {
@@ -52,7 +61,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 scaleX = scale.x,
                 scaleY = scale.y,
                 alpha = 1f,
-                color = SkillTreeMenu.pink
+                color = StaticColors.Menu.pink
             };
             Container.AddChild(bkg);
 
@@ -61,11 +70,11 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 shader = Custom.rainWorld.Shaders["AdditiveDefault"],
                 scaleY = scale.y,
                 alpha = 0f,
-                color = SkillTreeMenu.pink * 0.5f + Color.white * 0.5f
+                color = StaticColors.Menu.pink * 0.5f + Color.white * 0.5f
             };
             Container.AddChild(fill);
-            label = new FLabel(Custom.GetDisplayFont(), "")
-            ;
+
+            label = new FLabel(Custom.GetDisplayFont(), "");
             Container.AddChild(label);
         }
 
@@ -79,6 +88,8 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             if(Selected && !buttonBhv.greyedOut && menu.holdButton)
             {
                 prog = Mathf.Clamp01(prog + 1 / 40f);
+                if (lastProg == prog && prog == 1f)
+                    callBack?.Invoke();
             }
             else if(prog > 0f)
             {
@@ -105,6 +116,9 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public override void RemoveSprites()
         {
             base.RemoveSprites();
+            bkg.RemoveFromContainer();
+            fill.RemoveFromContainer();
+            label.RemoveFromContainer();
         }
 
         public void Clicked()
@@ -115,6 +129,11 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public void SetAlpha(float alpha)
         {
             setAlpha = alpha;
+            ClearProg();
+        }
+
+        public void ClearProg()
+        {
             prog = lastProg = 0f;
         }
 

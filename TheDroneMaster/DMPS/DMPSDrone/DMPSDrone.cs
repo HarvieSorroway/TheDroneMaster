@@ -49,8 +49,8 @@ namespace TheDroneMaster.DMPS.DMPSDrone
             waterRetardationImmunity = 0.9f;
             GoThroughFloors = true;
 
-            //weapon = new DefaultLaserGun();
-            weapon = new LastPrismGun();
+            weapon = new DefaultLaserGun();
+            //weapon = new LastPrismGun();
 
             if (abstractCreature is AbstractDMPSDrone abstractDMPSDrone)
             {
@@ -228,7 +228,7 @@ namespace TheDroneMaster.DMPS.DMPSDrone
             public Vector2 targetDir;
             public float wingStretch;
 
-            public DroneAnimation(DMPSDrone drone)
+            public DroneAnimation(Room room, DMPSDrone drone)
             {
                 this.drone = drone;
             }

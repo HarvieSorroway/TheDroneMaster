@@ -93,7 +93,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
             return JsonConvert.SerializeObject(skillNode, _serializerSettings);
         }
 
-        public static bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo, SkillTreeSave save)
+        public static bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo, DMPSBasicSave save)
         {
             bool res = false;
             if (conditionInfo.type == SkillNode.ConditionType.SkillNode)
@@ -114,7 +114,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
             return res;
         }
 
-        public static bool CheckAllConditions(SkillNode node, SkillTreeSave save)
+        public static bool CheckAllConditions(SkillNode node, DMPSBasicSave save)
         {
             if(node.conditions == null || node.conditions.Count == 0)
                 return true;

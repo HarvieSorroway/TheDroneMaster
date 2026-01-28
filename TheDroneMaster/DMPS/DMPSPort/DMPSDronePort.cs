@@ -2,11 +2,14 @@
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheDroneMaster.DMPS.DMPSDrone;
 using UnityEngine;
+using static TheDroneMaster.DMPS.DMPSPort.DMPSDronePort;
 
 namespace TheDroneMaster.DMPS.DMPSPort
 {
@@ -15,8 +18,10 @@ namespace TheDroneMaster.DMPS.DMPSPort
         int counter = 360;
         int noDroneCounter = 0;
 
-        List<AbstractDMPSDrone> spawnedDrones = new List<AbstractDMPSDrone>();
-        List<AbstractDMPSDrone> animateDrones = new List<AbstractDMPSDrone>();
+        List<DroneSlate> droneSlates = new List<DroneSlate>();
+
+        //List<AbstractDMPSDrone> spawnedDrones = new List<AbstractDMPSDrone>();
+        //List<AbstractDMPSDrone> animateDrones = new List<AbstractDMPSDrone>();
 
         public float armExtend, lastArmExtend;
         public Vector2 armTipPos; //在graphics中计算并赋值
@@ -37,38 +42,43 @@ namespace TheDroneMaster.DMPS.DMPSPort
                 noDroneCounter--;
             }
 
-            if (spawnedDrones.Count < 1 && noDroneCounter == 0)
+            if (droneSlates.Count < 1 && noDroneCounter == 0)
             {
-                AbstractDMPSDrone abDrone = new AbstractDMPSDrone(player.room.world, StaticWorld.GetCreatureTemplate(DMEnums.CreatureTemplateType.DMPSDrone), null, player.coord, player.room.game.GetNewID())
-                {
-                    addByPort = true
-                };
-                player.room.abstractRoom.AddEntity(abDrone);
-                abDrone.RealizeInRoom();
+                droneSlates.Add(new DroneSlate(this, player));
+                //AbstractDMPSDrone abDrone = new AbstractDMPSDrone(player.room.world, StaticWorld.GetCreatureTemplate(DMEnums.CreatureTemplateType.DMPSDrone), null, player.coord, player.room.game.GetNewID())
+                //{
+                //    addByPort = true
+                //};
+                //player.room.abstractRoom.AddEntity(abDrone);
+                //abDrone.RealizeInRoom();
 
-                animateDrones.Add(abDrone);
-                spawnedDrones.Add(abDrone);
+                //animateDrones.Add(abDrone);
+                //spawnedDrones.Add(abDrone);
                 noDroneCounter = 200;
             }
-            if(animateDrones.Count > 0)
-            {
-                for(int i = animateDrones.Count - 1; i >= 0; i--)
-                {
-                    if(animateDrones[i].realizedCreature != null && animateDrones[i].realizedCreature.graphicsModule != null && player.graphicsModule != null)
-                    {
-                        var drone = animateDrones[i].realizedCreature as DMPSDrone.DMPSDrone;
-                        var anim = new ReleaseDroneAnim(drone, player);
-                        drone.StartAnimation(anim);
-                        player.room.AddObject(anim);
-                        animateDrones.RemoveAt(i);
-                    }
-                }
-            }
+            //if(animateDrones.Count > 0)
+            //{
+            //    for(int i = animateDrones.Count - 1; i >= 0; i--)
+            //    {
+            //        if(animateDrones[i].realizedCreature != null && animateDrones[i].realizedCreature.graphicsModule != null && player.graphicsModule != null)
+            //        {
+            //            var drone = animateDrones[i].realizedCreature as DMPSDrone.DMPSDrone;
+            //            var anim = new ReleaseDroneAnim(drone, player);
+            //            drone.StartAnimation(anim);
+            //            player.room.AddObject(anim);    
+            //            animateDrones.RemoveAt(i);
+            //        }
+            //    }
+            //}
 
-            foreach(var abDrone in spawnedDrones)
+            //foreach(var abDrone in spawnedDrones)
+            //{
+                
+    
+            //}
+            foreach(var slate in droneSlates)
             {
-                (abDrone.abstractAI.RealAI as DMPSDroneAI).ownerCoord = player.coord;
-                (abDrone.abstractAI.RealAI as DMPSDroneAI).ownerInShortcut = false;
+                slate.UpdateSlate(player);
             }
 
             //if (armExtend < 1f && Input.GetKey(KeyCode.T))
@@ -82,11 +92,17 @@ namespace TheDroneMaster.DMPS.DMPSPort
         /// <summary> 玩家进入管道时提供更快的寻路目的地 </summary>
         public void EnteringShortcut(IntVector2 intVector2, Player p)
         {
-            foreach (var abDrone in spawnedDrones)
+            foreach (var slate in droneSlates)
             {
-                (abDrone.abstractAI.RealAI as DMPSDroneAI).ownerCoord = p.room.GetWorldCoordinate(intVector2);
-                (abDrone.abstractAI.RealAI as DMPSDroneAI).ownerInShortcut = true;
+                slate.OwnerEnteringShortcut(p.room.GetWorldCoordinate(intVector2));
             }
+        }
+
+        public void TryWarpDrone(Player player, AbstractDMPSDrone abstractDMPSDrone)
+        {
+            if (player.room == null)
+                return;
+            abstractDMPSDrone.ChangeRooms(player.coord);
         }
 
         public void ThreatUpdate(Player player)
@@ -123,21 +139,100 @@ namespace TheDroneMaster.DMPS.DMPSPort
 
             if (threatList.Count == 0)
             {
-                foreach (var drone in spawnedDrones)
-                    (drone.abstractAI.RealAI as DMPSDroneAI).target = null;
+                foreach (var slate in droneSlates)
+                    slate.Target = null;
                 return;
             }
 
             threatList.Sort((x,y) => y.Value.CompareTo(x.Value));
 
             //todo 
-            foreach(var drone in spawnedDrones)
+            foreach(var slate in droneSlates)
             {
-                (drone.abstractAI.RealAI as DMPSDroneAI).target = threatList.First().Key;
+                slate.Target = threatList.First().Key;
             }
             //EmgTxCustom.Log($"DMPSDroneAI get target : {threatList.First().Key}");
         }
+
+        internal class DroneSlate
+        {
+            DMPSDronePort port;
+            AbstractDMPSDrone bindDrone;
+            bool needAnim;
+
+            public AbstractCreature Target
+            {
+                set
+                {
+                    if (bindDrone.abstractAI.RealAI != null)
+                    {
+                        (bindDrone.abstractAI.RealAI as DMPSDroneAI).target = value;
+                    }
+                }
+            }
+
+            public DroneSlate(DMPSDronePort port, Player player)
+            {
+                this.port = port;
+                SpawnDrone(player);
+            }
+
+            public void UpdateSlate(Player player)
+            {
+                if (bindDrone.slatedForDeletion)
+                {
+                    if(port.noDroneCounter == 0)
+                    {
+                        bindDrone.addByPort = false;
+                        SpawnDrone(player);
+                    }
+                    return;
+                }
+
+                if (bindDrone.abstractAI.RealAI == null)
+                {
+                    port.TryWarpDrone(player, bindDrone);
+                }
+                else
+                {
+                    (bindDrone.abstractAI.RealAI as DMPSDroneAI).ownerCoord = player.coord;
+
+                    if(bindDrone.realizedCreature.room == player.room)
+                        (bindDrone.abstractAI.RealAI as DMPSDroneAI).ownerInShortcut = false;
+                }
+            }
+
+            void SpawnDrone(Player player)
+            {
+                bindDrone = new AbstractDMPSDrone(player.room.world, StaticWorld.GetCreatureTemplate(DMEnums.CreatureTemplateType.DMPSDrone), null, player.coord, player.room.game.GetNewID())
+                {
+                    addByPort = true
+                };
+                player.room.abstractRoom.AddEntity(bindDrone);
+                bindDrone.RealizeInRoom();
+                needAnim = true;
+
+                if (bindDrone.realizedCreature != null && bindDrone.realizedCreature.graphicsModule != null && player.graphicsModule != null)
+                {
+                    var drone = bindDrone.realizedCreature as DMPSDrone.DMPSDrone;
+                    var anim = new ReleaseDroneAnim(drone, player);
+                    drone.StartAnimation(anim);
+                    player.room.AddObject(anim);
+                    needAnim = false;
+                }
+            }
+
+            public void OwnerEnteringShortcut(WorldCoordinate coordinate)
+            {
+                if (bindDrone.abstractAI.RealAI != null)
+                {
+                    (bindDrone.abstractAI.RealAI as DMPSDroneAI).ownerCoord = coordinate;
+                    (bindDrone.abstractAI.RealAI as DMPSDroneAI).ownerInShortcut = true;
+                }
+            }
+        }
     }
+
 
     internal class ReleaseDroneAnim : DMPSDrone.DMPSDrone.DroneAnimation
     {
@@ -147,7 +242,7 @@ namespace TheDroneMaster.DMPS.DMPSPort
         bool droneReleased;
 
         
-        public ReleaseDroneAnim(DMPSDrone.DMPSDrone drone, Player player) : base(drone)
+        public ReleaseDroneAnim(DMPSDrone.DMPSDrone drone, Player player) : base(player.room, drone)
         {
             this.player = player;
             drone.disableJet = true;
@@ -162,6 +257,7 @@ namespace TheDroneMaster.DMPS.DMPSPort
                 var res = PSDronePortGraphics.PortArm.GetTipNJointPosNArmLength(player, m.port.armExtend, 1f);
                 targetPos = res.tipPos;
             }
+
         }
 
         public override void Update(bool eu)
@@ -195,16 +291,24 @@ namespace TheDroneMaster.DMPS.DMPSPort
                 m.port.armExtend = f;
                 //drone.firstChunk.lastPos = drone.firstChunk.pos;//更新顺序导致需要手动更改lastPos
                 var res = PSDronePortGraphics.PortArm.GetTipNJointPosNArmLength(player, m.port.armExtend, 1f);
+
+                var tile = room.GetTile(room.GetTilePosition(res.tipPos));
+                if (tile.Solid || tile.AnyWater || tile.Terrain == Room.Tile.TerrainType.Slope)
+                {
+                    EmgReleaseDrone((targetPos - res.tipPos).normalized);
+                    return;
+                }
+
                 targetPos = res.tipPos;
                 targetDir = (res.tipPos - res.jointPos).normalized;
                 wingStretch = f;
+
+                
             }
             else if (counter == maxLife / 2)
                 ReleaseDrone(m.port.armTipDir);
             else if(counter < maxLife)
-            {
-                m.port.armExtend = DMHelper.EaseInOutCubic(1f - Mathf.InverseLerp(maxLife/2, maxLife, counter));
-            }
+                m.port.armExtend = DMHelper.EaseInOutCubic(1f - Mathf.InverseLerp(maxLife / 2, maxLife, counter));
         }
 
         void ReleaseDrone(Vector2 releaseDir)
@@ -224,6 +328,13 @@ namespace TheDroneMaster.DMPS.DMPSPort
             droneReleased = true;
 
             wingStretch = 1f;
+        }
+
+        void EmgReleaseDrone(Vector2 releaseDir)
+        {
+            ReleaseDrone(releaseDir);
+            if (PlayerPatchs.TryGetModule<DMPSModule>(player, out var m))
+                m.port.armExtend = 0f;
         }
 
         public override void Destroy()

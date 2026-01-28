@@ -49,7 +49,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 lines[i] = new FSprite("pixel")
                 {
                     scaleX = 4f,
-                    color = SkillTreeMenu.pink,
+                    color = StaticColors.Menu.pink,
                     shader = Custom.rainWorld.Shaders["AdditiveDefault"]
                 };
                 Container.AddChild(lines[i]);

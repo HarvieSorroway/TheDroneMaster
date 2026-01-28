@@ -9,6 +9,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu.MenuAnim
 {
     internal class UnfocusingCatagoryAnim : MenuAnimation
     {
+        public override bool AllowSignal => progression > 0.5f;
         public UnfocusingCatagoryAnim(SkillTreeMenu menu) : base(menu, 60)
         {
             menu.skillInfoScreen.SetFocusingSkillNode(string.Empty, "RenderNode.PlaceHolder");

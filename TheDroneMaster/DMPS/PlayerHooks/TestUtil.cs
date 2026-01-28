@@ -14,12 +14,12 @@ namespace TheDroneMaster.DMPS.PlayerHooks
         public override void Update(Player player)
         {
             base.Update(player);
-            bool Gdown = Input.GetKey(KeyCode.G);
-            if(lastGdown != Gdown && Gdown && player.room != null)
-            {
-                SkillTreeMenu.OpenSkillTree(player.room.game);
-            }
-            lastGdown = Gdown;
+            //bool Gdown = Input.GetKey(KeyCode.G);
+            //if(lastGdown != Gdown && Gdown && player.room != null)
+            //{
+            //    SkillTreeMenu.OpenSkillTree(player.room.game);
+            //}
+            //lastGdown = Gdown;
         }
     }
 }

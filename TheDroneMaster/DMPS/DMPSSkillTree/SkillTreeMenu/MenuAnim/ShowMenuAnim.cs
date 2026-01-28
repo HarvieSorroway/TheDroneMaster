@@ -16,6 +16,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu.MenuAnim
         {
             base.Update();
             menu.layerPulseRads[0] = DMHelper.LerpEase(progression) * 800f;
+            menu.alpha = DMHelper.EaseInOutCubic(progression);
         }
     }
 }

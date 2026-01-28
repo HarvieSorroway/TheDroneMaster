@@ -89,7 +89,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                     line = new FSprite("DMPS_PixelGradiant20")
                     {
                         shader = Custom.rainWorld.Shaders["AdditiveDefault"],
-                        color = SkillTreeMenu.pink,
+                        color = StaticColors.Menu.pink,
                         rotation = (reverse ? 180f : 0f),
                         scaleX = Custom.rainWorld.options.ScreenSize.x,
                         anchorY = 1f
@@ -100,7 +100,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                     line = new FSprite("DMPS_PixelGradiant20")
                     {
                         shader = Custom.rainWorld.Shaders["AdditiveDefault"],
-                        color = SkillTreeMenu.pink,
+                        color = StaticColors.Menu.pink,
                         rotation = 90f + (reverse ? 180f : 0f),
                         scaleY = Custom.rainWorld.options.ScreenSize.y
                     };
@@ -134,7 +134,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 float r = Random.value;
 
                 line.alpha = flashAlpha * 0.6f * smoothAlpha + eff.extraAlpha * smoothAlpha;
-                line.color = Color.Lerp(SkillTreeMenu.pink, Color.white, r < eff.extraAlpha * smoothAlpha * 0.1f ? 0.2f : 0f);
+                line.color = Color.Lerp(StaticColors.Menu.pink, Color.white, r < eff.extraAlpha * smoothAlpha * 0.1f ? 0.2f : 0f);
                 line.SetPosition(Vector2.Lerp(lastPos, pos, timeStacker));
 
                 if (horizontal)

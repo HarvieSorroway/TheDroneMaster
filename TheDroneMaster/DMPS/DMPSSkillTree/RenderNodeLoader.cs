@@ -18,9 +18,15 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
             renderNodes.Clear();
             idMapper.Clear();
 
-            List<string> indexPathLst = new List<string>();
-            indexPathLst.Add(AssetManager.ResolveFilePath("skilltree/index.json"));
-            indexPathLst.Add(AssetManager.ResolveFilePath("skilltree/index_droneupg.json"));
+            List<string> indexPathLst = new List<string>
+            {
+                AssetManager.ResolveFilePath("skilltree/index.json"),
+                AssetManager.ResolveFilePath("skilltree/index_droneupg.json"),
+                AssetManager.ResolveFilePath("skilltree/index_droneportupg.json"),
+                AssetManager.ResolveFilePath("skilltree/index_reactorupg.json"),
+                AssetManager.ResolveFilePath("skilltree/index_torsoupg.json"),
+            };
+
 
             foreach(var indexPath in indexPathLst)
             {
