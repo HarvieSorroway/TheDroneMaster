@@ -1,2 +1,5 @@
 [ADD]Data_Humming : dataHumming1A/vol=0.2
 [ADD]DataWaveShock : dataWaveShock1A/vol=0.4
+[ADD]DMPS_JetJump : dmpsJetJump/vol=0.4
+[ADD]DMPS_DroneAttack_Default : dmpsDroneAttackDefault/vol=0.4
+[ADD]DMPS_DroneMoveLoop : dmpsDroneMove/vol = 0.4

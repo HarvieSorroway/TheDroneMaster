@@ -129,6 +129,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public void SetAlpha(float alpha)
         {
             setAlpha = alpha;
+            buttonBhv.greyedOut = (alpha == 0f);
             ClearProg();
         }
 

@@ -46,7 +46,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks
         {
             throw new Exception();
             Plugin.Log($"RainWorldGame_Win orig malnourished {malnourished}, play as {self.GetStorySession.saveState.progression.PlayingAsSlugcat}");
-            if (self.GetStorySession.saveState.progression.PlayingAsSlugcat == DMEnums.SlugStateName.DMPS)
+            if (self.GetStorySession.saveState.progression.PlayingAsSlugcat == DMEnums.DMPS.SlugStateName.DMPS)
             {
                 orig.Invoke(self, false, false);
                 Plugin.Log("RainWorldGame_Win no malnourished");
@@ -99,7 +99,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks
         private static void Player_UpdateAnimation(On.Player.orig_UpdateAnimation orig, Player self)
         {
             orig.Invoke(self);
-            if (self.animation == DMEnums.PlayerAnimationIndex.DMFlip)
+            if (self.animation == DMEnums.DMPS.PlayerAnimationIndex.DMFlip)
             {
                 self.bodyMode = Player.BodyModeIndex.Default;
                 Vector2 vector5 = -Custom.PerpendicularVector(self.bodyChunks[1].pos, self.bodyChunks[0].pos);

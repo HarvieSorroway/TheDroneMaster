@@ -24,7 +24,6 @@ namespace TheDroneMaster.DMPS
         {
             DMPSPlayerHooks.HooksOn();
             DMPSHUDHooks.HooksOn();
-            KarmaLadderScreenHooks.HooksOn();
             MenuHooks.MenuHooks.HooksOn();
             //Save.HooksOn();
             RenderNodeLoader.Load();

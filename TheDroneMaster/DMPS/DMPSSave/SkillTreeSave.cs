@@ -40,6 +40,8 @@ namespace TheDroneMaster.DMPS.DMPSSave
             Energy = float.Parse(items[0]);
             activeDroneCount = int.Parse(items[1]);
             enabledSkills = JsonConvert.DeserializeObject<HashSet<string>>(items[2]);
+
+            Plugin.LoggerLog($"LoadDatas : Energy={Energy}, activeDroneCount={activeDroneCount}, enabledSkills={string.Join(",", enabledSkills)}");
         }
 
         public override string SaveToString(bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)

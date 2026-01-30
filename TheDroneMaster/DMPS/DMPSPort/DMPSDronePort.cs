@@ -45,46 +45,15 @@ namespace TheDroneMaster.DMPS.DMPSPort
             if (droneSlates.Count < 1 && noDroneCounter == 0)
             {
                 droneSlates.Add(new DroneSlate(this, player));
-                //AbstractDMPSDrone abDrone = new AbstractDMPSDrone(player.room.world, StaticWorld.GetCreatureTemplate(DMEnums.CreatureTemplateType.DMPSDrone), null, player.coord, player.room.game.GetNewID())
-                //{
-                //    addByPort = true
-                //};
-                //player.room.abstractRoom.AddEntity(abDrone);
-                //abDrone.RealizeInRoom();
 
-                //animateDrones.Add(abDrone);
-                //spawnedDrones.Add(abDrone);
                 noDroneCounter = 200;
             }
-            //if(animateDrones.Count > 0)
-            //{
-            //    for(int i = animateDrones.Count - 1; i >= 0; i--)
-            //    {
-            //        if(animateDrones[i].realizedCreature != null && animateDrones[i].realizedCreature.graphicsModule != null && player.graphicsModule != null)
-            //        {
-            //            var drone = animateDrones[i].realizedCreature as DMPSDrone.DMPSDrone;
-            //            var anim = new ReleaseDroneAnim(drone, player);
-            //            drone.StartAnimation(anim);
-            //            player.room.AddObject(anim);    
-            //            animateDrones.RemoveAt(i);
-            //        }
-            //    }
-            //}
 
-            //foreach(var abDrone in spawnedDrones)
-            //{
-                
-    
-            //}
             foreach(var slate in droneSlates)
             {
                 slate.UpdateSlate(player);
             }
 
-            //if (armExtend < 1f && Input.GetKey(KeyCode.T))
-            //    armExtend = Mathf.Min(1f, armExtend + 1 / 40f);
-            //else if (armExtend > 0f && !Input.GetKey(KeyCode.T))
-            //    armExtend = Mathf.Max(0f, armExtend - 1 / 40f);
             ThreatUpdate(player);
             base.Update(player);
         }
@@ -204,7 +173,7 @@ namespace TheDroneMaster.DMPS.DMPSPort
 
             void SpawnDrone(Player player)
             {
-                bindDrone = new AbstractDMPSDrone(player.room.world, StaticWorld.GetCreatureTemplate(DMEnums.CreatureTemplateType.DMPSDrone), null, player.coord, player.room.game.GetNewID())
+                bindDrone = new AbstractDMPSDrone(player.room.world, StaticWorld.GetCreatureTemplate(DMEnums.DMPS.CreatureTemplateType.DMPSDrone), null, player.coord, player.room.game.GetNewID())
                 {
                     addByPort = true
                 };

@@ -244,7 +244,7 @@ namespace TheDroneMaster
             {
                 modules.Add(self, new DroneMasterModule(self));
             }
-            else if(self.slugcatStats.name == DMEnums.SlugStateName.DMPS)
+            else if(self.slugcatStats.name == DMEnums.DMPS.SlugStateName.DMPS)
             {
                 modules.Add(self, new DMPSModule(self));
             }

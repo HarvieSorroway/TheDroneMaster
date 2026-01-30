@@ -14,8 +14,8 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
     {
         public static void HooksOn()
         {
-            On.RainWorldGame.GrafUpdate += RainWorldGame_GrafUpdate;
-            On.RainWorldGame.Update += RainWorldGame_Update;
+            //On.RainWorldGame.GrafUpdate += RainWorldGame_GrafUpdate;
+            //On.RainWorldGame.Update += RainWorldGame_Update;
             On.RainWorldGame.ShutDownProcess += RainWorldGame_ShutDownProcess;
 
             On.Menu.PauseMenu.SpawnExitContinueButtons += PauseMenu_SpawnExitContinueButtons;
@@ -35,7 +35,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
             orig.Invoke(self, sender, message);
             if(message == "DMPS_SKILLS")
             {
-                SkillTreeMenu.SkillTreeMenu.OpenSkillTree(self.game, self, true);
+                SkillTreeMenu.SkillTreeMenu.OpenSkillTree(self.game.rainWorld.processManager, self, true);
                 self.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
 
                 if (self.continueButton != null)
@@ -58,7 +58,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
         private static void PauseMenu_SpawnExitContinueButtons(On.Menu.PauseMenu.orig_SpawnExitContinueButtons orig, Menu.PauseMenu self)
         {
             orig.Invoke(self);
-            if (self.game.session is StoryGameSession storySession && Custom.rainWorld.inGameSlugCat == DMEnums.SlugStateName.DMPS)
+            if (self.game.session is StoryGameSession storySession && Custom.rainWorld.inGameSlugCat == DMEnums.DMPS.SlugStateName.DMPS)
             {
                 var skillTreeButton = new SimpleButton(self, self.pages[0], 
                     DMPSResourceString.Get("PauseMenu_OpenSkillMenu"), 

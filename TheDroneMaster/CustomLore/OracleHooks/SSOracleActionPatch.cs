@@ -25,7 +25,7 @@ namespace TheDroneMaster
             orig.Invoke(self);
             int extralingerfactor = self.owner.rainWorld.inGameTranslator.currentLanguage == InGameTranslator.LanguageID.Chinese ? 1 : 0;
 
-            if(self.id == DroneMasterEnums.Pebbles_DroneMaster_FirstMeet)
+            if(self.id == DMEnums.Pebbles_DroneMaster_FirstMeet)
             {
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate(".  .  ."), 0));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A little animal, on the floor of my chamber, is this reaching you?"), extralingerfactor * 80));
@@ -39,7 +39,7 @@ namespace TheDroneMaster
                 self.events.Add(new Conversation.WaitEvent(self, 40));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have to get back to work, and I hope you gather the ideal information."), extralingerfactor * 80));
             }
-            else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_AfterMet)
+            else if(self.id == DMEnums.Pebbles_DroneMaster_AfterMet)
             {
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh, you're back, little creature."), extralingerfactor * 40));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("How was your journey?"), extralingerfactor * 40)); 
@@ -48,7 +48,7 @@ namespace TheDroneMaster
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("If you can keep quiet, I may allow you to stop for a little longer."), extralingerfactor * 60));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("But now I have to keep working."), extralingerfactor * 40));
             }
-            else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_ExplainPackage)
+            else if(self.id == DMEnums.Pebbles_DroneMaster_ExplainPackage)
             {
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Oh you're back again, little creature."), extralingerfactor * 60));
                 self.events.Add(new Conversation.WaitEvent(self, 40));
@@ -58,7 +58,7 @@ namespace TheDroneMaster
                 self.events.Add(new Conversation.WaitEvent(self, 50));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Good luck then, I'll have to get back to my work."), extralingerfactor * 60));
             }
-            else if(self.id == DroneMasterEnums.Pebbles_DroneMaster_ExplainPackageFirstMeet)
+            else if(self.id == DMEnums.Pebbles_DroneMaster_ExplainPackageFirstMeet)
             {
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate(".  .  ."), 0));
                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A little animal, on the floor of my chamber, is this reaching you?"), extralingerfactor * 80));
@@ -87,7 +87,7 @@ namespace TheDroneMaster
 
             if(module != null)
             {
-                if (self.action != DroneMasterEnums.MeetDroneMaster)
+                if (self.action != DMEnums.MeetDroneMaster)
                 {
                     if (self.timeSinceSeenPlayer < 0)
                     {
@@ -95,7 +95,7 @@ namespace TheDroneMaster
                     }
 
                     self.SlugcatEnterRoomReaction();
-                    self.NewAction(DroneMasterEnums.MeetDroneMaster);
+                    self.NewAction(DMEnums.MeetDroneMaster);
                 }
             }
             else
@@ -106,9 +106,9 @@ namespace TheDroneMaster
 
         private static void SSOracleBehavior_NewAction(On.SSOracleBehavior.orig_NewAction orig, SSOracleBehavior self, SSOracleBehavior.Action nextAction)
         {
-            if(nextAction == DroneMasterEnums.MeetDroneMaster)
+            if(nextAction == DMEnums.MeetDroneMaster)
             {
-                if (self.currSubBehavior.ID == DroneMasterEnums.Meet_DroneMaster) return;
+                if (self.currSubBehavior.ID == DMEnums.Meet_DroneMaster) return;
 
                 self.inActionCounter = 0;
                 self.action = nextAction;
@@ -116,7 +116,7 @@ namespace TheDroneMaster
                 SSOracleBehavior.SubBehavior subBehavior = null;
                 for (int i = 0; i < self.allSubBehaviors.Count; i++)
                 {
-                    if (self.allSubBehaviors[i].ID == DroneMasterEnums.Meet_DroneMaster)
+                    if (self.allSubBehaviors[i].ID == DMEnums.Meet_DroneMaster)
                     {
                         subBehavior = self.allSubBehaviors[i];
                         break;
@@ -143,7 +143,7 @@ namespace TheDroneMaster
             public bool initMessage = false;
             public PlayerModule Module => PlayerPatchs.modules.TryGetValue(player, out var module) ? module : null;
 
-            public SSOracleMeetDroneMaster(SSOracleBehavior owner) : base(owner, DroneMasterEnums.Meet_DroneMaster, DroneMasterEnums.Pebbles_DroneMaster_FirstMeet)
+            public SSOracleMeetDroneMaster(SSOracleBehavior owner) : base(owner, DMEnums.Meet_DroneMaster, DMEnums.Pebbles_DroneMaster_FirstMeet)
             {
             }
 
@@ -161,20 +161,20 @@ namespace TheDroneMaster
                         if (scannedSaveUnit.KingScanned && !pebbleConvSaveUnit.explainPackage)
                         {
                             pebbleConvSaveUnit.explainPackage = true;
-                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_ExplainPackageFirstMeet, this);
+                            owner.InitateConversation(DMEnums.Pebbles_DroneMaster_ExplainPackageFirstMeet, this);
                         }
                         else
-                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_FirstMeet, this);
+                            owner.InitateConversation(DMEnums.Pebbles_DroneMaster_FirstMeet, this);
                     }
                     else
                     {
                         if(scannedSaveUnit.KingScanned && !pebbleConvSaveUnit.explainPackage)
                         {
                             pebbleConvSaveUnit.explainPackage = true;
-                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_ExplainPackage, this);
+                            owner.InitateConversation(DMEnums.Pebbles_DroneMaster_ExplainPackage, this);
                         }
                         else
-                            owner.InitateConversation(DroneMasterEnums.Pebbles_DroneMaster_AfterMet, this);
+                            owner.InitateConversation(DMEnums.Pebbles_DroneMaster_AfterMet, this);
                     }
 
                     oracle.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad++;

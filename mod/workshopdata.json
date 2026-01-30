@@ -1,0 +1,14 @@
+{
+  "Title": "The DroneMaster(WIP)",
+  "Description": "A mechanical cat with laser drones, all you need to do is killing everything that block your way.\r\n\r\nFeatures:\r\nYou can take up to 3 fatal injuries(drop out of room not included),metal fins will tell how many you can still recieve.\r\nYou need much more food to hibernate. Before you eat enough, the centipede\u0027s electric shocks can recharge you\r\nCount of drones will increase with your karma level, hold C to open drone control HUD\r\nAlso grab your drone will make you move faster\r\nYou can also open the gate which only Artificer can!\r\nFor more configurations, see the Remix Config menu\r\nA new custom ending now added.\r\n\r\nKnown issues : Currently it is interfering with Friends to Friends\r\n                         If you cant grab your drones, that may be because of the conflict with Everyone Can Maul.\r\n\r\n\r\nps.This is my first slugcat character mod ever, thus it may have may bugs that i still havent found yet.If you find one, please let me know ,thank you very much!\r\nAlso there are some ideas that fail to materialize, like better CGs and pebble conversation, or bettle drone AI. So I guess I will continue to update this mod in the future.\r\nApologies for possible bugs and hope you can enjoy my creation!",
+  "ID": "harvie.thedronemaster",
+  "Version": "1.4.4",
+  "TargetGameVersion": "v1.9.06",
+  "Requirements": "slime-cubed.slugbase,fisobs",
+  "RequirementNames": "SlugBase,Fisobs",
+  "Authors": "Harvie",
+  "Visibility": "Public",
+  "Tags": [],
+  "WorkshopID": 2947594650,
+  "UploadFilesOnly": true
+}

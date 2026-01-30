@@ -55,7 +55,7 @@ namespace TheDroneMaster.DMPS
         private static void SaveState_ctor(On.SaveState.orig_ctor orig, SaveState self, SlugcatStats.Name saveStateNumber, PlayerProgression progression)
         {
             orig.Invoke(self, saveStateNumber, progression);
-            if(saveStateNumber == DMEnums.SlugStateName.DMPS)
+            if(saveStateNumber == DMEnums.DMPS.SlugStateName.DMPS)
                 saveStateMapper.Add(self, new DMPSSaveState());
         }
 

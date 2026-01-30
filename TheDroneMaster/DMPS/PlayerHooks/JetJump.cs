@@ -78,9 +78,9 @@ namespace TheDroneMaster.DMPS.PlayerHooks
 
 
 
-                if (player.animation != DMEnums.PlayerAnimationIndex.DMFlip)
+                if (player.animation != DMEnums.DMPS.PlayerAnimationIndex.DMFlip)
                 {
-                    player.animation = DMEnums.PlayerAnimationIndex.DMFlip;
+                    player.animation = DMEnums.DMPS.PlayerAnimationIndex.DMFlip;
                 }
             }
         }

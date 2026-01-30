@@ -55,7 +55,9 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         //anim
         FSprite bkg;
         public float alpha, lastAlpha;
-        public SkillTreeMenu(ProcessManager manager, RainWorldGame game, PauseMenu pauseMenuFrom, bool previewMode) : base(manager, SkillTreeID)
+        bool quitTriggered;
+
+        public SkillTreeMenu(ProcessManager manager, PauseMenu pauseMenuFrom, bool previewMode) : base(manager, SkillTreeID)
         {
             this.pauseMenuFrom = pauseMenuFrom;
             this.previewMode = previewMode;
@@ -151,6 +153,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             pages[0].subObjects.Add(skillInfoScreen = new SkillInfoScreen(this, pages[0]));
 
             anim = new ShowMenuAnim(this);
+            SyncSkillState();
         }
 
         void Reload()
@@ -190,12 +193,11 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
         public void SyncSkillState()
         {
-            var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
             foreach(var item in idMapper.Values)
             {
                 if(item is SkillTreeSkillButton skillTreeButton)
                 {
-                    skillTreeButton.SkillEnabled = save.CheckSkill(RenderNodeLoader.idMapper[skillTreeButton.id].bindSkillNodeInfo);
+                    skillTreeButton.SkillEnabled = skillTreeSave.CheckSkill(RenderNodeLoader.idMapper[skillTreeButton.id].bindSkillNodeInfo);
                 }
             }
             skillInfoScreen.SyncState();
@@ -226,23 +228,32 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             bkg.alpha = a;
             pages[0].Container.alpha = a;
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) && !quitTriggered)
             {
-                Instance = null;
-                ShutDownProcess();
+                anim = new QuitMenuAnim(this);
+                quitTriggered = true;
             }
             if (Input.GetKeyDown(KeyCode.R))
                 Reload();
         }
 
+        public void QuitSkillTreeMenu()
+        {
+            Instance = null;
+            ShutDownProcess();
+        }
+
         public override void ShutDownProcess()
         {
             base.ShutDownProcess();
+            Instance = null;
             //Plugin.postEffect.Strength = 0f;
-            if(pauseMenuFrom != null)
+            if (pauseMenuFrom != null)
             {
                 pauseMenuFrom.SpawnExitContinueButtons();
             }
+
+            manager.sideProcesses.Remove(this);
         }
 
         public override void Singal(MenuObject sender, string message)
@@ -276,10 +287,16 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             }
         }
 
-        public static void OpenSkillTree(RainWorldGame game, PauseMenu pauseMenu, bool previewMode)
+        public void Save()
+        {
+            Custom.rainWorld.progression.SaveDeathPersistentDataOfCurrentState(false, false);
+        }
+
+        public static void OpenSkillTree(ProcessManager manager, PauseMenu pauseMenu, bool previewMode)
         {
             if(Instance == null)
-                Instance = new SkillTreeMenu(game.manager, game, pauseMenu, previewMode);
+                Instance = new SkillTreeMenu(manager, pauseMenu, previewMode);
+            manager.sideProcesses.Add(Instance);
         }
     }
 

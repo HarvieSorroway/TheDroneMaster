@@ -17,6 +17,8 @@ namespace TheDroneMaster.DMPS.MenuHooks
         public static void HooksOn()
         {
             ContinueSlugPageHooks.HooksOn();
+            KarmaLadderScreenHooks.KarmaLadderScreenHooks.HooksOn();
         }
+
     }
 }

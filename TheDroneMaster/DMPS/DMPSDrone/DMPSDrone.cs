@@ -36,6 +36,10 @@ namespace TheDroneMaster.DMPS.DMPSDrone
         public Vector2 weaponTargetDir, lastWeaponTargetDir;
         public BaseDroneWeapon weapon;
 
+        //sound
+        public ChunkSoundEmitter movementSoundEmitter;
+        float volParam;
+
         public DMPSDrone(AbstractCreature abstractCreature, World world) : base(abstractCreature, world)
         {
             bodyChunks = new BodyChunk[1];
@@ -69,8 +73,10 @@ namespace TheDroneMaster.DMPS.DMPSDrone
         public override void Update(bool eu)
         {
             base.Update(eu);
-            if(room != null) 
-                Act(); 
+            if(room != null)
+            {
+                Act();         
+            }
         }
 
         public void Act()
@@ -89,7 +95,33 @@ namespace TheDroneMaster.DMPS.DMPSDrone
                 MovementUpdate();
 
             }
+
             weapon.Update(this);
+            ActSound();
+        }
+
+        public void ActSound()
+        {
+            if (movementSoundEmitter != null)
+            {
+                if (movementSoundEmitter.slatedForDeletetion)
+                {
+                    movementSoundEmitter = null;
+                    return;
+                }
+
+                float targetVolParam = Mathf.InverseLerp(0f, maxVelocity, firstChunk.vel.magnitude);
+                if (weapon.weaponEnable)
+                    targetVolParam = 1f;
+
+                volParam = Mathf.Lerp(volParam, targetVolParam, 0.1f);
+
+
+                movementSoundEmitter.pitch = Mathf.Lerp(0.2f, 1f, volParam);
+                movementSoundEmitter.volume = Mathf.Lerp(0f, 0.2f, Mathf.Clamp01(volParam - 0.1f));
+            }
+            else
+                movementSoundEmitter = room.PlaySound(DMEnums.DMPS.Sound.DMPS_DroneMoveLoop, firstChunk, true, 0f, 1f);
         }
 
         void ActAnimation()

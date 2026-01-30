@@ -1,4 +1,5 @@
-﻿using RWCustom;
+﻿using IL.Menu;
+using RWCustom;
 using SlugBase.DataTypes;
 using System;
 using System.Collections.Generic;
@@ -67,16 +68,16 @@ namespace TheDroneMaster.DMPS.DMPSDrone.DroneWeapon
                 (result.chunk.owner as Creature).Violence(drone.firstChunk, drone.weaponTargetDir, result.chunk, result.onAppendagePos, Creature.DamageType.Electric, 0.5f, 1f);
                 FireWeapon(drone);
 
-                drone.room.PlaySound(SoundID.Bomb_Explode, pos, 1f, 5f);
-                drone.room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, pos, 0.5f, 3f);
-
+                //drone.room.PlaySound(SoundID.Bomb_Explode, pos, 1f, 5f);
+                //drone.room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, pos, 0.5f, 3f);
+                drone.room.PlaySound(DMEnums.DMPS.Sound.DMPS_DroneAttack_Default, pos, 1f, 1f);
 
                 drone.room.AddObject(new Explosion.ExplosionLight(pos, 280f, 1f, 7, LaserDroneGraphics.defaultLaserColor));
             }
 
             return res;
         }
-
+        
         public override void FireWeapon(DMPSDrone drone)
         {
             base.FireWeapon(drone);

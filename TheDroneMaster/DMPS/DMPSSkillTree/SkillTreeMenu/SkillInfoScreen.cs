@@ -182,6 +182,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             focusingSkillID = skillID;
             holdButton?.ClearProg();
+            energyBar.currentEnergy = (menu as SkillTreeMenu).Energy;
 
             if (string.IsNullOrEmpty(skillID))
             {
@@ -223,7 +224,10 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 energyBar.redEnergy = node.cost;
                 costLabel.text = string.Format(DMPSResourceString.Get("SkillMenu_CostLabel"), node.cost);
 
-                holdButton?.SetAlpha(currentSkillState ? (DMPSSkillTreeHelper.CheckAllConditions(node, (menu as SkillTreeMenu).skillTreeSave) ? 1f : 0f) : 1f);
+                float conditionAlpha = currentSkillState ? (DMPSSkillTreeHelper.CheckAllConditions(node, (menu as SkillTreeMenu).skillTreeSave) ? 1f : 0f) : 1f;
+                float costAlpha = (menu as SkillTreeMenu).Energy - node.cost >= 0 ? 1f : 0f;
+
+                holdButton?.SetAlpha(costAlpha * conditionAlpha);
                 if(holdButton != null)
                 {
                     if (currentSkillState)
@@ -247,11 +251,15 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         {
             if (string.IsNullOrEmpty(focusingSkillID))
                 return;
-            var skillSave = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+           
             if (currentSkillState)
-                skillSave.DisableSkill(focusingSkillID);
-            else
-                skillSave.EnableSkill(focusingSkillID);
+                (menu as SkillTreeMenu).skillTreeSave.DisableSkill(focusingSkillID);
+            else if(SkillNodeLoader.loadedSkillNodes.TryGetValue(focusingSkillID, out var node))
+            {
+                (menu as SkillTreeMenu).skillTreeSave.EnableSkill(focusingSkillID);
+                (menu as SkillTreeMenu).skillTreeSave.Energy -= node.cost;
+            }
+            (menu as SkillTreeMenu).Save();
 
             (menu as SkillTreeMenu).SyncSkillState();
         }

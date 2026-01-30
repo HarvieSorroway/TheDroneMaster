@@ -30,7 +30,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
         {
             if (self.slugcatNumber == new SlugcatStats.Name(Plugin.DroneMasterName))
             {
-                var sceneID = DroneMasterEnums.TheDroneMaster_AltEndScene;
+                var sceneID = DMEnums.TheDroneMaster_AltEndScene;
                 self.imagePos = new Vector2(683f, 484f);
                 self.slugcatDepth = 2f;
                 self.sceneOffset = new Vector2(10f, 75f);
@@ -47,7 +47,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
         {
             orig.Invoke(self, menu, owner, folderName, fileName, pos, depth, shader);
             MenuScene scene = owner as MenuScene;
-            if(scene != null && scene.sceneID == DroneMasterEnums.TheDroneMaster_Outro1 || scene.sceneID == DroneMasterEnums.TheDroneMaster_Outro2 || scene.sceneID == DroneMasterEnums.TheDroneMaster_Outro3 || scene.sceneID == DroneMasterEnums.TheDroneMaster_AltEndScene)
+            if(scene != null && scene.sceneID == DMEnums.TheDroneMaster_Outro1 || scene.sceneID == DMEnums.TheDroneMaster_Outro2 || scene.sceneID == DMEnums.TheDroneMaster_Outro3 || scene.sceneID == DMEnums.TheDroneMaster_AltEndScene)
             {
                 float scale = Custom.rainWorld.screenSize.x / 1920f;
                 self.sprite.scaleX *= scale;
@@ -58,7 +58,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
         private static void MenuScene_BuildScene(On.Menu.MenuScene.orig_BuildScene orig, MenuScene self)
         {
             orig.Invoke(self);
-            if (self.sceneID == DroneMasterEnums.TheDroneMaster_Outro1)
+            if (self.sceneID == DMEnums.TheDroneMaster_Outro1)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar + "slugcat - thedronemaster" + Path.DirectorySeparatorChar + "outro1";
 
@@ -67,7 +67,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "dronemaster-outro-1-pearl"     , Vector2.left * 500f + Vector2.down * 200f, 2f,   MenuDepthIllustration.MenuShader.Normal));
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "dronemaster-outro-1-ai"        , Vector2.left * 500f + Vector2.down * 200f, 3f, MenuDepthIllustration.MenuShader.Normal));
             }
-            else if(self.sceneID == DroneMasterEnums.TheDroneMaster_Outro2)
+            else if(self.sceneID == DMEnums.TheDroneMaster_Outro2)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar + "slugcat - thedronemaster" + Path.DirectorySeparatorChar + "outro2";
 
@@ -90,7 +90,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                     self.AddCrossfade(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "dronemaster-outro-2-" + i.ToString() + "-pearls", Vector2.zero, 5f, MenuDepthIllustration.MenuShader.Normal));
                 }
             }
-            else if(self.sceneID == DroneMasterEnums.TheDroneMaster_Outro3)
+            else if(self.sceneID == DMEnums.TheDroneMaster_Outro3)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar + "slugcat - thedronemaster" + Path.DirectorySeparatorChar + "outro3";
 
@@ -99,7 +99,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "dronemaster-outro-3-ai", Vector2.left * 500f + Vector2.down * 200f, 2f, MenuDepthIllustration.MenuShader.Normal));
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "dronemaster-outro-3-screen", Vector2.left * 500f + Vector2.down * 200f, 100f, MenuDepthIllustration.MenuShader.Normal));
             }
-            else if(self.sceneID == DroneMasterEnums.TheDroneMaster_AltEndScene)
+            else if(self.sceneID == DMEnums.TheDroneMaster_AltEndScene)
             {
                 self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar + "slugcat - thedronemaster" + Path.DirectorySeparatorChar + "altend";
 
@@ -114,7 +114,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
         {
             orig.Invoke(self, manager, slideShowID);
             Plugin.LoggerLog(string.Format("{0}",slideShowID));
-            if(slideShowID == DroneMasterEnums.DroneMasterAltEnd)
+            if(slideShowID == DMEnums.DroneMasterAltEnd)
             {
                 self.playList = new List<Menu.SlideShow.Scene>();
 
@@ -127,11 +127,11 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                 }
 
                 self.playList.Add(new SlideShow.Scene(MenuScene.SceneID.Empty, 0f, 0f, 0f));
-                self.playList.Add(new SlideShow.Scene(DroneMasterEnums.TheDroneMaster_Outro1, self.ConvertTime(0, 1, 20), self.ConvertTime(0, 4, 26), self.ConvertTime(0, 15, 0)));
+                self.playList.Add(new SlideShow.Scene(DMEnums.TheDroneMaster_Outro1, self.ConvertTime(0, 1, 20), self.ConvertTime(0, 4, 26), self.ConvertTime(0, 15, 0)));
 
                 //self.playList.Add(new SlideShow.Scene(MenuScene.SceneID.Empty, self.ConvertTime(0, 7, 0), 0f, 0f));
 
-                SlideShow.Scene scene = new SlideShow.Scene(DroneMasterEnums.TheDroneMaster_Outro2, self.ConvertTime(0, 16, 15), self.ConvertTime(0, 19, 15), self.ConvertTime(0, 30, 0));
+                SlideShow.Scene scene = new SlideShow.Scene(DMEnums.TheDroneMaster_Outro2, self.ConvertTime(0, 16, 15), self.ConvertTime(0, 19, 15), self.ConvertTime(0, 30, 0));
                 scene.AddCrossFade(self.ConvertTime(0, 20, 15), 15);
                 scene.AddCrossFade(self.ConvertTime(0, 21, 65), 15);
                 scene.AddCrossFade(self.ConvertTime(0, 23, 15), 15);
@@ -139,7 +139,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                 self.playList.Add(scene);
 
                 //self.playList.Add(new SlideShow.Scene(MenuScene.SceneID.Empty, self.ConvertTime(0, 30, 0), 0f, 0f));
-                self.playList.Add(new SlideShow.Scene(DroneMasterEnums.TheDroneMaster_Outro3, self.ConvertTime(0, 31, 20), self.ConvertTime(0, 34, 26), self.ConvertTime(0, 42, 0)));
+                self.playList.Add(new SlideShow.Scene(DMEnums.TheDroneMaster_Outro3, self.ConvertTime(0, 31, 20), self.ConvertTime(0, 34, 26), self.ConvertTime(0, 42, 0)));
                 self.playList.Add(new SlideShow.Scene(MenuScene.SceneID.Empty, self.ConvertTime(0, 45, 0), 0f, 0f));
 
                 for (int num5 = 1; num5 < self.playList.Count; num5++)
@@ -179,7 +179,7 @@ namespace TheDroneMaster.CustomLore.CustomEnding
                 self.GetStorySession.saveState.SessionEnded(self, true, false);
 
                 self.manager.statsAfterCredits = true;
-                self.manager.nextSlideshow = DroneMasterEnums.DroneMasterAltEnd;
+                self.manager.nextSlideshow = DMEnums.DroneMasterAltEnd;
                 self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.SlideShow);
                 return;
             }

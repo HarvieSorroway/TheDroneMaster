@@ -38,7 +38,7 @@ namespace TheDroneMaster.DMPS.MenuHooks
         private static void SlugcatPageContinue_ctor(On.Menu.SlugcatSelectMenu.SlugcatPageContinue.orig_ctor orig, Menu.SlugcatSelectMenu.SlugcatPageContinue self, Menu.Menu menu, Menu.MenuObject owner, int pageIndex, SlugcatStats.Name slugcatNumber)
         {
             orig.Invoke(self, menu, owner, pageIndex, slugcatNumber);
-            if (slugcatNumber == DMEnums.SlugStateName.DMPS)
+            if (slugcatNumber == DMEnums.DMPS.SlugStateName.DMPS)
             {
                 var energyBarHudPart = new ContinueSlugPageEnergyBar(self.hud, self);
                 self.hud.AddPart(energyBarHudPart);
@@ -54,7 +54,7 @@ namespace TheDroneMaster.DMPS.MenuHooks
         {
             var data = orig.Invoke(manager, slugcat);
             
-            if (!manager.rainWorld.progression.IsThereASavedGame(slugcat) || slugcat != DMEnums.SlugStateName.DMPS)
+            if (!manager.rainWorld.progression.IsThereASavedGame(slugcat) || slugcat != DMEnums.DMPS.SlugStateName.DMPS)
             {
                 return data;
             }
@@ -79,7 +79,7 @@ namespace TheDroneMaster.DMPS.MenuHooks
                 return data;
             }
 
-            dmpsSave = new DMPSBasicSave(DMEnums.SlugStateName.DMPS);
+            dmpsSave = new DMPSBasicSave(DMEnums.DMPS.SlugStateName.DMPS);
             string header = DeathPersistentSaveDataRx.TotalHeader + dmpsSave.header;
             foreach (var progLine in progLinesFromMemory)
             {

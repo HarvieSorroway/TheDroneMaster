@@ -106,6 +106,8 @@ namespace TheDroneMaster
 
             try
             {
+                DMEnums.RegisterValues();
+
                 PlayerPatchs.Patch();
                 PlayerGraphicsPatch.Patch();
                 HUDPatch.Patch();
@@ -127,7 +129,6 @@ namespace TheDroneMaster
                 DeathPersistentSaveDataRx.AppplyTreatment(new SSConversationStateSaveUnit(null));
                 CustomDreamRx.ApplyTreatment(new DroneMasterDream());
                 CustomOracleTx.CustomOracleRx.ApplyTreatment(new MIFOracleTx());
-                DroneMasterEnums.RegisterValues();
 
                 foreach (var mod in ModManager.ActiveMods)
                 {
@@ -260,87 +261,6 @@ namespace TheDroneMaster
         {
             if(!LogOutPut) return;
             UnityEngine.Debug.Log("[DroneMaster]" + string.Format(pattern, objects));
-        }
-    }
-
-    public class DroneMasterEnums
-    {
-        public static bool registed = false;
-        public static SSOracleBehavior.Action MeetDroneMaster;
-        public static SSOracleBehavior.SubBehavior.SubBehavID Meet_DroneMaster;
-
-        //Conversation.ID
-        public static Conversation.ID Pebbles_DroneMaster_FirstMeet;
-        public static Conversation.ID Pebbles_DroneMaster_AfterMet;
-
-        public static Conversation.ID Pebbles_DroneMaster_ExplainPackage;
-        public static Conversation.ID Pebbles_DroneMaster_ExplainPackageFirstMeet;
-
-        //Ending
-        public static SlideShow.SlideShowID DroneMasterAltEnd;
-        public static SlideShow.SlideShowID DroneMasterIntro;
-
-        //Scene
-        public static MenuScene.SceneID TheDroneMaster_Outro1;
-        public static MenuScene.SceneID TheDroneMaster_Outro2;
-        public static MenuScene.SceneID TheDroneMaster_Outro3;
-        public static MenuScene.SceneID TheDroneMaster_AltEndScene;
-
-        //Sound
-        public static SoundID DataHumming;
-        public static SoundID DataWaveShock;
-
-        public static void RegisterValues()
-        {
-            if (registed) return;
-            MeetDroneMaster = new SSOracleBehavior.Action("MeetDroneMaster", true);
-            Meet_DroneMaster = new SSOracleBehavior.SubBehavior.SubBehavID("Meet_DroneMaster", true);
-
-            Pebbles_DroneMaster_FirstMeet = new Conversation.ID("Pebbles_DroneMaster_FirstMeet", true);
-            Pebbles_DroneMaster_AfterMet = new Conversation.ID("Pebbles_DroneMaster_AfterMet", true);
-            Pebbles_DroneMaster_ExplainPackage = new Conversation.ID("Pebbles_DroneMaster_ExplainPackage", true);
-            Pebbles_DroneMaster_ExplainPackageFirstMeet = new Conversation.ID("Pebbles_DroneMaster_ExplainPackageFirstMeet", true);
-
-
-            DroneMasterAltEnd = new SlideShow.SlideShowID("DroneMasterAltEnd", true);
-            DroneMasterIntro = new SlideShow.SlideShowID("DroneMasterIntro", true);
-
-            TheDroneMaster_Outro1 = new MenuScene.SceneID("TheDroneMaster_Outro1", true);
-            TheDroneMaster_Outro2 = new MenuScene.SceneID("TheDroneMaster_Outro2", true);
-            TheDroneMaster_Outro3 = new MenuScene.SceneID("TheDroneMaster_Outro3", true);
-            TheDroneMaster_AltEndScene = new MenuScene.SceneID("TheDroneMaster_AltEndScene", true);
-
-            DataHumming = new SoundID("Data_Humming", true);
-            DataWaveShock = new SoundID("DataWaveShock", true);
-            registed = true;
-        }
-
-        public static void UnregisterValues()
-        {
-            if(registed)
-            {
-                MeetDroneMaster.Unregister();
-                MeetDroneMaster = null;
-
-                Meet_DroneMaster.Unregister();
-                Meet_DroneMaster = null;
-
-                Pebbles_DroneMaster_FirstMeet.Unregister();
-                Pebbles_DroneMaster_FirstMeet = null;
-
-                Pebbles_DroneMaster_AfterMet.Unregister();
-                Pebbles_DroneMaster_AfterMet = null;
-
-                Pebbles_DroneMaster_ExplainPackage.Unregister();
-                Pebbles_DroneMaster_ExplainPackage = null;
-
-                DroneMasterAltEnd.Unregister();
-                DroneMasterAltEnd = null;
-
-                DroneMasterIntro.Unregister();
-                DroneMasterIntro = null;
-                registed = false;
-            }
         }
     }
 }

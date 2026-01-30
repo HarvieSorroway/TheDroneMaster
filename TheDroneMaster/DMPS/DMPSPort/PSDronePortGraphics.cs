@@ -414,8 +414,8 @@ namespace TheDroneMaster.DMPS.DMPSPort
         {
             targetJet = 1f;
             jetLerpParam = 0.25f;
-            sound = Player.room.PlaySound(Watcher.WatcherEnums.WatcherSoundID.Box_Worm_Spitting_Steam_LOOP, Player.mainBodyChunk);
-            sound.pitch = 4f;
+            sound = Player.room.PlaySound(DMEnums.DMPS.Sound.JetJump, Player.mainBodyChunk);
+            sound.pitch = 1f;
         }
 
         public void ExitJetMode()

@@ -61,7 +61,7 @@ namespace TheDroneMaster.GameHooks
             scales = new float[RECT_COUNT];
 
             positionedSoundEmitter = new PositionedSoundEmitter(centerPos, 1f, 1f);
-            room.PlaySound(DroneMasterEnums.DataHumming, positionedSoundEmitter, true, 1f, 1f, false);
+            room.PlaySound(DMEnums.DataHumming, positionedSoundEmitter, true, 1f, 1f, false);
 
             if (player.realizedCreature != null 
                 && Plugin.OwnLaserDrone.TryGet(player.realizedCreature as Player, out bool ownLaserDrone) 
@@ -213,7 +213,7 @@ namespace TheDroneMaster.GameHooks
                 {
                     endingCounter = 10000;
                     room.AddObject(dataWave = new DataWave(room,centerPos,200f,40f,200,20f));
-                    room.PlaySound(DroneMasterEnums.DataWaveShock, centerPos, 1f, 1f);
+                    room.PlaySound(DMEnums.DataWaveShock, centerPos, 1f, 1f);
                 }
 
                 room.game.cameras[0].hardLevelGfxOffset.y = Mathf.Lerp(room.game.cameras[0].hardLevelGfxOffset.y, 300, 0.02f);

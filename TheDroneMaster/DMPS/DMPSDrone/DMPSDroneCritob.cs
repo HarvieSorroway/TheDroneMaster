@@ -13,7 +13,7 @@ namespace TheDroneMaster.DMPS.DMPSDrone
 {
     internal class DMPSDroneCritob : Critob
     {
-        public DMPSDroneCritob() : base(DMEnums.CreatureTemplateType.DMPSDrone)
+        public DMPSDroneCritob() : base(DMEnums.DMPS.CreatureTemplateType.DMPSDrone)
         {
             LoadedPerformanceCost = 100;
             SandboxPerformanceCost = new SandboxPerformanceCost(linear: 0.6f, exponential: 0.9f);
@@ -89,7 +89,7 @@ namespace TheDroneMaster.DMPS.DMPSDrone
 
         public override void EstablishRelationships()
         {
-            Relationships self = new Relationships(DMEnums.CreatureTemplateType.DMPSDrone);
+            Relationships self = new Relationships(DMEnums.DMPS.CreatureTemplateType.DMPSDrone);
 
             foreach (var template in StaticWorld.creatureTemplates)
             {
