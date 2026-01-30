@@ -1,60 +1,68 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
+	<LangVersion>12</LangVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="FakesAssemblies\**" />
+    <EmbeddedResource Remove="FakesAssemblies\**" />
+    <None Remove="FakesAssemblies\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="BepInEx">
-      <HintPath>..\..\..\source\repos\DistancedLand\includings\BepInEx.dll</HintPath>
+      <HintPath>..\includes\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="EmgTx">
-      <HintPath>..\..\..\source\repos\EmgTx\EmgTx\bin\Debug\EmgTx.dll</HintPath>
+      <HintPath>..\includes\EmgTx.dll</HintPath>
     </Reference>
-    <Reference Include="Fisobs, Version=4.0.6.0, Culture=neutral, PublicKeyToken=null">
-	  <SpecificVersion>True</SpecificVersion>
-      <HintPath>E:\Steam\steamapps\workshop\content\312520\2920541687\newest\plugins\Fisobs.dll</HintPath>
+    <Reference Include="Fisobs">
+      <HintPath>..\includes\Fisobs.dll</HintPath>
+    </Reference>
+    <Reference Include="HarmonyXInterop">
+      <HintPath>..\includes\HarmonyXInterop.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\HOOKS-Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\PUBLIC-Assembly-CSharp.dll</HintPath>
+      <HintPath>..\includes\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\Mono.Cecil.dll</HintPath>
+      <HintPath>..\includes\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\MonoMod.dll</HintPath>
+      <HintPath>..\includes\MonoMod.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\MonoMod.RuntimeDetour.dll</HintPath>
+      <HintPath>..\includes\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.Utils">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\MonoMod.Utils.dll</HintPath>
+      <HintPath>..\includes\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\includes\PUBLIC-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="SlugBase">
-      <HintPath>E:\Steam\steamapps\workshop\content\312520\2933196558\newest\plugins\SlugBase.dll</HintPath>
+      <HintPath>..\includes\SlugBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Unity.Mathematics">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\Unity.Mathematics.dll</HintPath>
+      <HintPath>..\includes\Unity.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.dll</HintPath>
+      <HintPath>..\includes\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>..\includes\UnityEngine.AssetBundleModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\includes\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\..\..\source\repos\v1.10.0_include\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>..\includes\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>..\..\..\source\repos\ShadedCanopy\includings\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>..\includes\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
