@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.DMPShud.EnergyBar;
 using TheDroneMaster.DMPS.MenuHooks;
 using UnityEngine;
 
-namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
+namespace TheDroneMaster.DMPS.DMPShud
 {
     internal class ContinueSlugPageEnergyBar : HUD.HudPart
     {

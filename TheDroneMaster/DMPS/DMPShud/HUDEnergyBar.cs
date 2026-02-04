@@ -1,17 +1,23 @@
-﻿using DMPS.PlayerHooks;
+﻿using CustomSaveTx;
+using DMPS.PlayerHooks;
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.DMPShud.EnergyBar;
+using TheDroneMaster.DMPS.DMPSSave;
+using TheDroneMaster.DMPS.PlayerHooks.BioReactors;
 using UnityEngine;
 
-namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
+namespace TheDroneMaster.DMPS.DMPShud
 {
     internal class HUDEnergyBar : HUD.HudPart
     {
         DMPSEnergyBarBase energyBar;
+        DMPSBasicSave.BioReactorType barMode;
 
         Vector2 pos, lastPos;
         float downInCorner, fade, lastFade;
@@ -23,10 +29,19 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
         {
             lastPos = pos = new Vector2(Mathf.Max(50f, hud.rainWorld.options.SafeScreenOffset.x + 5.5f), Mathf.Max(25f, hud.rainWorld.options.SafeScreenOffset.y + 17.25f));
 
-            energyBar = new DMPSEnergyBarBase(hud.fContainers[1]);
+            
             if (PlayerPatchs.TryGetModule<DMPSModule>((hud.owner as Player), out var module))
             {
-                energyBar.TotalEnergy = module.bioReactor.maxReactorEnergy;
+                var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+
+                barMode = save.ReactorType;
+                energyBar = save.ReactorType switch
+                {
+                    DMPSBasicSave.BioReactorType.Default => new DMPSEnergyBarBase(hud.fContainers[1]),
+                    DMPSBasicSave.BioReactorType.OverDrive => new OverDriveBar(hud.fContainers[1]),
+                    _ => new DMPSEnergyBarBase(hud.fContainers[1])
+                };
+
             }
         }
 
@@ -35,19 +50,32 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
             base.Update();
             GameUpdate();
 
-            pos = Vector2.Lerp(new Vector2(Mathf.Max(50f, hud.rainWorld.options.SafeScreenOffset.x + 5.5f), Mathf.Max(25f, hud.rainWorld.options.SafeScreenOffset.y + 17.25f)), hud.karmaMeter.pos + Custom.DegToVec(Mathf.Lerp(90f, 135f, downInCorner)) * (hud.karmaMeter.Radius + 22f + Custom.SCurve(Mathf.Pow(hud.rainMeter.fade, 0.4f), 0.5f) * 8f), Custom.SCurve(1f - downInCorner, 0.5f));
+            //pos = Vector2.Lerp(
+            //    new Vector2(Mathf.Max(50f, hud.rainWorld.options.SafeScreenOffset.x + 5.5f), Mathf.Max(25f, hud.rainWorld.options.SafeScreenOffset.y + 17.25f)), 
+            //    hud.karmaMeter.pos + Custom.DegToVec(Mathf.Lerp(90f, 135f, downInCorner)) * (hud.karmaMeter.Radius + 22f + Custom.SCurve(Mathf.Pow(hud.rainMeter.fade, 0.4f), 0.5f) * 8f), 
+            //    Custom.SCurve(1f - downInCorner, 0.5f));
+
+            pos = hud.karmaMeter.pos + Vector2.right * (hud.karmaMeter.Radius + 22f + Custom.SCurve(Mathf.Pow(hud.rainMeter.fade, 0.4f), 0.5f) * 8f)  /*+ Custom.DegToVec(Mathf.Lerp(90f, 135f, downInCorner)) * */;
+
             if (PlayerPatchs.modules.TryGetValue((hud.owner as Player), out var m) && m is DMPSModule module)
             {
-                if (Mathf.Abs(energy - module.bioReactor.reactorEnergy) > 1f)
+                if (Mathf.Abs(energy - module.energyBarMessage.currentEnergy) > 1f)
                     remainShowCount = Mathf.Max(remainShowCount, 80);
-                if (fade > .8f)
-                    energy = Mathf.Lerp(energy, module.bioReactor.reactorEnergy, 0.25f);
+                energy = Mathf.Lerp(energy, module.energyBarMessage.currentEnergy, 0.25f);
+                energyBar.TotalEnergy = module.energyBarMessage.totalEnergy;
+
+                switch (barMode)
+                {
+                    case DMPSBasicSave.BioReactorType.OverDrive:
+                        (energyBar as OverDriveBar).setOverDriveEnergy = (module.energyBarMessage as OverDriveMessage).overDriveEnergy;
+                        break;
+                }
             }
             energyBar.currentEnergy = energy;
             energyBar.pos = pos;
-            energyBar.Show = fade;
-            energyBar.expand = expand ? 1f : 0f;
-            energyBar.alpha = fade;
+            energyBar.Show = 1f;
+            energyBar.expand = 1f;
+            energyBar.alpha = 1f;
 
             energyBar.Update();
         }
@@ -57,8 +85,6 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
             if (remainShowCount > 0)
                 remainShowCount--;
 
-
-            lastFade = fade;
             if (hud.owner.RevealMap || hud.showKarmaFoodRain || remainShowCount > 0)
             {
                 if (hud.owner.RevealMap || hud.showKarmaFoodRain)

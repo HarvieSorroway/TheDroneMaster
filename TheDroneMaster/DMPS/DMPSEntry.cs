@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.DMPSDynamicParams;
 using TheDroneMaster.DMPS.DMPShud;
 using TheDroneMaster.DMPS.DMPSSave;
 using TheDroneMaster.DMPS.DMPSSkillTree;
@@ -26,6 +27,7 @@ namespace TheDroneMaster.DMPS
             DMPSHUDHooks.HooksOn();
             MenuHooks.MenuHooks.HooksOn();
             //Save.HooksOn();
+            DMPSDynamicParamHooks.HooksOn();
             RenderNodeLoader.Load();
             SkillNodeLoader.Load();
             SkillTreeHooks.HooksOn();
@@ -118,7 +120,23 @@ namespace TheDroneMaster.DMPS
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DroneUpg.Dmg", LoadTexFromPath("illustrations/rendernode_droneupg_dmg.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DroneUpg.Count", LoadTexFromPath("illustrations/rendernode_droneupg_count.png"), false);
 
+            LoadOverDriveBarResources();
             DMPSResourceString.Load();
+        }
+
+        public static void LoadOverDriveBarResources()
+        {
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_Left", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_Left.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_Left_HighLightMask", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_Left_HighLightMask.png"), false);
+
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_Right", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_Right.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_Right_HighLightMask", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_Right_HighLightMask.png"), false);
+
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_Frame", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_Frame.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_Frame_HighLightMask", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_Frame_HighLightMask.png"), false);
+
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_PipHighLight", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_PipHighLight.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_BarHighLight", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_BarHighLight.png"), false);
         }
 
         public static Texture2D LoadTexFromPath(string path)

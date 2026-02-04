@@ -1,15 +1,17 @@
 ﻿using CustomSaveTx;
+using DMPS.PlayerHooks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.DMPSDynamicParams;
 using TheDroneMaster.DMPS.DMPSSave;
 using UnityEngine;
 
-namespace TheDroneMaster.DMPS.PlayerHooks
+namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
 {
-    public class DMPSBioReactor
+    internal class DMPSBioReactor : PlayerModule.PlayerModuleUtil
     {
         DMPSBasicSave save;
 
@@ -27,34 +29,46 @@ namespace TheDroneMaster.DMPS.PlayerHooks
         public float EnergyPercentage => Mathf.InverseLerp(0f, lowEnergyLim, reactorEnergy);
         public bool Chargeable => reactorEnergy < maxReactorEnergy;
 
-        public DMPSBioReactor(Player player)
+        protected DMPShud.EnergyBar.EnergyBarMessage message;
+
+        public DMPSBioReactor(Player player, DMPSModule module)
         {
             save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
-   
+
+            SetMessage(module);
             //reactorEnergy = save.Energy;
             lowEnergyLim = Mathf.CeilToInt(maxReactorEnergy * 0.3f);
         }
 
-        public void HypothermiaUpdate(Player player)
+        public virtual void SetMessage(DMPSModule module)
         {
-            if (player.Hypothermia > 0f && reactorEnergy > 0f)
-            {
-                reactorEnergy = Mathf.Max(0f, reactorEnergy - player.Hypothermia * hypothermia2energyRatio);
-                player.Hypothermia = 0f;
-            }
+            message = module.energyBarMessage = new DMPShud.EnergyBar.EnergyBarMessage();
         }
 
-        public bool TrySpendEnergy(float spent)
+        public override void Update(Player player)
+        {
+            base.Update(player);
+            message.totalEnergy = maxReactorEnergy;
+            message.currentEnergy = reactorEnergy;
+        }
+
+        public virtual void HypothermiaUpdate(Player player)
+        {
+            if (player.Hypothermia > 0f && TrySpendEnergy(player.Hypothermia * hypothermia2energyRatio))
+                player.Hypothermia = 0f;
+        }
+
+        public virtual bool TrySpendEnergy(float spent)
         {
             if(reactorEnergy > spent)
             {
-                reactorEnergy = Mathf.Max(0, reactorEnergy - spent);
+                reactorEnergy = Mathf.Max(0, reactorEnergy - spent * DMPSDynamicParams.DMPSDynamicParams.DynamicParamInstance.CostMultiplier);
                 return true;
             }
             return false;
         }
 
-        public void Charge(float charge)
+        public virtual void Charge(float charge)
         {
             reactorEnergy = Mathf.Min(maxReactorEnergy, reactorEnergy + charge);
         }

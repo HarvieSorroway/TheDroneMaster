@@ -137,6 +137,22 @@ namespace TheDroneMaster.DMPS.DMPSSave
                 //    return 1.0f;
             }
         }
+
+        public BioReactorType ReactorType
+        {
+            get
+            {
+                return BioReactorType.OverDrive;
+            }
+        }
+
+        public enum BioReactorType
+        {
+            Default,
+            OverDrive,
+            ThunderBolt,
+            Feedback,
+        }
     }
 
     /// <summary>

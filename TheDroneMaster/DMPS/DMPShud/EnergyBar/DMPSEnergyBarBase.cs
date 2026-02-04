@@ -15,7 +15,6 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
 
         public static float pipGap = 1f;
 
-
         public FContainer Container { get; private set; }
         public Vector2 pos, lastPos,anchorBias, lastAnchorBias;
         public Vector2 anchor = new Vector2(0f, 0.5f);
@@ -119,19 +118,28 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
                 pip.Update();
         }
 
+        protected Vector2 LeftDrawPos(float timeStacker)
+        {
+            return Vector2.Lerp(lastPos, pos, timeStacker) + Vector2.Lerp(lastAnchorBias, anchorBias, timeStacker);
+        }
+
+        protected Vector2 RightDrawPos(float timeStacker)
+        {
+            return LeftDrawPos(timeStacker) + new Vector2(TotalWidth - pipSizeFull.x, 0f);
+        }
+
         public virtual void GrafUpdate(float timeStacker)
         {
             float smoothAlpha = Mathf.Lerp(lastAlpha, alpha, timeStacker);
             float smoothRedShow = Mathf.Lerp(lastShowRedProg, showRedProg, timeStacker);
             float smoothGreenShow = Mathf.Lerp(lastShowGreenProg, showGreenProg, timeStacker);
 
-            Vector2 smoothPos = Vector2.Lerp(lastPos, pos, timeStacker);
-            Vector2 smoothAnchorBias = Vector2.Lerp(lastAnchorBias, anchorBias, timeStacker);
+            Vector2 leftDrawPos = LeftDrawPos(timeStacker);
 
             foreach (var pip in pips)
-                pip.DrawSprites(timeStacker, smoothPos + smoothAnchorBias, smoothAlpha, smoothRedShow, smoothGreenShow);
+                pip.DrawSprites(timeStacker, leftDrawPos, smoothAlpha, smoothRedShow, smoothGreenShow);
             foreach (var pip in greenPips)
-                pip.DrawSprites(timeStacker, smoothPos + smoothAnchorBias, smoothAlpha, smoothRedShow, smoothGreenShow);
+                pip.DrawSprites(timeStacker, leftDrawPos, smoothAlpha, smoothRedShow, smoothGreenShow);
         }
 
         public virtual void RemoveSprites()
@@ -193,7 +201,7 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
                     scaleX = DMPSEnergyBarBase.pipSizeFull.x,
                     scaleY = DMPSEnergyBarBase.pipSizeFull.y,
                     color = green ? Color.green * 0.7f : StaticColors.Menu.darkPink,
-                    shader = Custom.rainWorld.Shaders["AdditiveDefault"],
+                    //shader = Custom.rainWorld.Shaders["AdditiveDefault"],
                     alpha = 1f,
                     isVisible = true
                 };
@@ -267,5 +275,11 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
                 owner.Container.RemoveChild(redMark);
             }
         }
+    }
+
+    public class EnergyBarMessage
+    {
+        public int totalEnergy;
+        public float currentEnergy;
     }
 }

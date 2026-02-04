@@ -1,11 +1,15 @@
-﻿using System;
+﻿using CustomSaveTx;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheDroneMaster;
+using TheDroneMaster.DMPS.DMPShud.EnergyBar;
 using TheDroneMaster.DMPS.DMPSPort;
+using TheDroneMaster.DMPS.DMPSSave;
 using TheDroneMaster.DMPS.PlayerHooks;
+using TheDroneMaster.DMPS.PlayerHooks.BioReactors;
 using UnityEngine;
 
 namespace DMPS.PlayerHooks
@@ -17,7 +21,7 @@ namespace DMPS.PlayerHooks
 
         //reactor energy
         public DMPSBioReactor bioReactor;
-
+        public EnergyBarMessage energyBarMessage;
         //params
         
 
@@ -33,9 +37,20 @@ namespace DMPS.PlayerHooks
 
         public DMPSModule(Player player) : base(player)
         {
+            var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+
+            bioReactor = save.ReactorType switch
+            {
+                DMPSBasicSave.BioReactorType.Default => new DMPSBioReactor(player, this),
+                DMPSBasicSave.BioReactorType.OverDrive => new OverDriveReactor(player, this),
+                DMPSBasicSave.BioReactorType.ThunderBolt => new ThunderBoltReactor(player, this),
+                DMPSBasicSave.BioReactorType.Feedback => new FeedbackReactor(player, this),
+                _ => throw new ArgumentOutOfRangeException($"Illeagal reactor type :{save.ReactorType}")
+            };
+            AddUtil(bioReactor);
+
             jetJumpModule = AddUtil(new JetJump());
             port = AddUtil(new DMPSDronePort());
-            bioReactor = new DMPSBioReactor(player);
             AddUtil(new TestUtil());
         }
 

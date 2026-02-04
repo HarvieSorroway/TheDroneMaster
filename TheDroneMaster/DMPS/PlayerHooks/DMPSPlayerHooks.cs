@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.PlayerHooks.BioReactors;
 using UnityEngine;
 
 namespace TheDroneMaster.DMPS.PlayerHooks
