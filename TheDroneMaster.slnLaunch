@@ -1,0 +1,12 @@
+[
+  {
+    "Name": "SkillTreeEditor",
+    "Projects": [
+      {
+        "Path": "Tools\\SkillTreeEditor\\SkillTreeEditor.csproj",
+        "Action": "Start",
+        "DebugTarget": "SkillTreeEditor"
+      }
+    ]
+  }
+]

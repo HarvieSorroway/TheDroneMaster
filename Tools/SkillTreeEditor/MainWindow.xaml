@@ -1,0 +1,494 @@
+﻿<Window x:Class="SkillTreeEditor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:SkillTreeEditor.ViewModels"
+        mc:Ignorable="d"
+        Title="SkillTreeEditor" Height="900" Width="1350"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button Padding="10,4" Click="Open_Click">打开 skilltree…</Button>
+            <Button Padding="10,4" Margin="8,0,0,0" Click="Save_Click">保存</Button>
+            <Button Padding="10,4" Margin="8,0,0,0" Click="AddNode_Click">新增节点</Button>
+            <Button Padding="10,4" Margin="8,0,0,0" Click="DeleteNode_Click">删除节点</Button>
+            <Separator/>
+            <TextBlock VerticalAlignment="Center" Margin="6,0,6,0">视图：</TextBlock>
+            <ComboBox Width="120" SelectedValue="{Binding ViewMode}" SelectedValuePath="Tag">
+                <ComboBoxItem Content="Fold" Tag="{x:Static vm:LayoutViewMode.Fold}"/>
+                <ComboBoxItem Content="Expand" Tag="{x:Static vm:LayoutViewMode.Expand}"/>
+            </ComboBox>
+            <Separator/>
+            <TextBlock VerticalAlignment="Center" Margin="6,0,6,0">缩放：</TextBlock>
+            <TextBlock VerticalAlignment="Center" Text="{Binding ZoomPercentText}" Margin="0,0,6,0"/>
+            <Button Padding="10,4" Click="ResetZoom_Click">恢复100%缩放</Button>
+            <Separator/>
+            <CheckBox Content="对齐网格(10px)" IsChecked="{Binding SnapToGrid}" Margin="8,0,0,0"/>
+            <Separator/>
+            <TextBlock Foreground="#7FDFFF" VerticalAlignment="Center" Margin="6,0,0,0"
+                       Text="Line：左树选中后，双击空白追加点；拖橙点移动；右键橙点删除；8方向吸附"/>
+        </ToolBar>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Text="{Binding Status}" />
+        </StatusBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350" MinWidth="240" MaxWidth="650"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="380" MinWidth="280" MaxWidth="700"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Tree -->
+            <Border Grid.Column="0" BorderThickness="1" BorderBrush="#333333" Background="#121212">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="结构树" FontSize="13" FontWeight="SemiBold" Foreground="#F2F2F2" Margin="10,8,10,6"/>
+                    <TreeView x:Name="NodeTreeView"
+                              ItemsSource="{Binding TreeNodes}"
+                              Background="#121212"
+                              BorderThickness="0"
+                              FontSize="11"
+                              Foreground="#F2F2F2"
+                              AllowDrop="True"
+                              PreviewMouseLeftButtonDown="NodeTreeView_PreviewMouseLeftButtonDown"
+                              MouseMove="NodeTreeView_MouseMove"
+                              DragOver="NodeTreeView_DragOver"
+                              Drop="NodeTreeView_Drop"
+                              SelectedItemChanged="NodeTreeView_SelectedItemChanged">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type vm:TreeNodeItemVM}" ItemsSource="{Binding Children}">
+                                <Border x:Name="TreeRowBorder" BorderBrush="Transparent" BorderThickness="2" CornerRadius="3" Padding="3,1" Background="#121212">
+                                    <DockPanel LastChildFill="True">
+                                        <Button DockPanel.Dock="Right"
+                                                Width="22" Height="18" Margin="4,0,0,0" Padding="0"
+                                                FontSize="10"
+                                                Foreground="#F2F2F2" Background="#262626" BorderBrush="#666666"
+                                                Content="{Binding VisibilityIcon}"
+                                                Tag="{Binding}"
+                                                ToolTip="显示/隐藏此节点"
+                                                Click="TreeVisibility_Click"/>
+                                        <TextBlock Text="{Binding Header}" Foreground="#F2F2F2" FontSize="11" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    </DockPanel>
+                                </Border>
+                                <HierarchicalDataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter TargetName="TreeRowBorder" Property="BorderBrush" Value="#39B7FF"/>
+                                        <Setter TargetName="TreeRowBorder" Property="Background" Value="#181818"/>
+                                    </DataTrigger>
+                                </HierarchicalDataTemplate.Triggers>
+                            </HierarchicalDataTemplate>
+                            <ContextMenu x:Key="TreeNodeContextMenu">
+                                <MenuItem Header="仅显示此节点及其子节点（不影响连线）" Click="ShowOnlySelectedBranch_Click"/>
+                                <MenuItem Header="显示全部节点" Click="ShowAllNodes_Click"/>
+                            </ContextMenu>
+                            <Style TargetType="TreeViewItem">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                                <Setter Property="ContextMenu" Value="{StaticResource TreeNodeContextMenu}"/>
+                                <EventSetter Event="PreviewMouseRightButtonDown" Handler="TreeItem_PreviewMouseRightButtonDown"/>
+                                <Setter Property="Foreground" Value="#E8E8E8"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Padding" Value="2,3"/>
+                                <Setter Property="Margin" Value="0,1"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#1B1B1B"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TreeView.Resources>
+                    </TreeView>
+                </DockPanel>
+            </Border>
+
+            <GridSplitter Grid.Column="1"
+                          Width="6"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          Background="#242424"
+                          ResizeDirection="Columns"
+                          ResizeBehavior="PreviousAndNext"
+                          Cursor="SizeWE"/>
+
+            <!-- Workspace -->
+            <Border Grid.Column="2" BorderThickness="1" BorderBrush="#2A2A2A" Background="#111">
+                <ScrollViewer x:Name="WorkspaceScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#111">
+                    <Grid x:Name="WorkspaceGrid" Width="1600" Height="1100" Background="#111"
+                          MouseWheel="WorkspaceGrid_MouseWheel"
+                          MouseLeftButtonDown="WorkspaceGrid_MouseLeftButtonDown"
+                          MouseLeftButtonUp="WorkspaceGrid_MouseLeftButtonUp"
+                          MouseMove="WorkspaceGrid_MouseMove"
+                          MouseRightButtonDown="WorkspaceGrid_MouseRightButtonDown">
+                        <!-- Lines -->
+                        <ItemsControl ItemsSource="{Binding Lines}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas Width="1600" Height="1100"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:LineVM}">
+                                    <Polyline Points="{Binding Points}"
+                                              Stroke="{Binding Stroke}"
+                                              StrokeThickness="{Binding Thickness}"
+                                              Opacity="{Binding Opacity}">
+                                        <Polyline.Style>
+                                            <Style TargetType="Polyline">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Polyline.Style>
+                                    </Polyline>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Nodes -->
+                        <ItemsControl ItemsSource="{Binding Nodes}" ClipToBounds="False" Panel.ZIndex="10">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas Width="1600" Height="1100"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding CanvasX}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding CanvasY}"/>
+                                    <Setter Property="Panel.ZIndex" Value="1"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                            <Setter Property="Panel.ZIndex" Value="50"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:RenderNodeVM}">
+                                    <Grid Tag="{Binding}"
+                                          Width="280" Height="96"
+                                          MouseLeftButtonDown="Node_MouseLeftButtonDown"
+                                          MouseLeftButtonUp="Node_MouseLeftButtonUp"
+                                          MouseMove="Node_MouseMove"
+                                          Cursor="Hand">
+                                        <Grid.Style>
+                                            <Style TargetType="Grid">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
+                                        <!-- 菱形锚点到预览卡片的引导线 -->
+                                        <Line X1="0" Y1="0" X2="24" Y2="22"
+                                              StrokeThickness="1"
+                                              IsHitTestVisible="False"
+                                              SnapsToDevicePixels="True">
+                                            <Line.Style>
+                                                <Style TargetType="Line">
+                                                    <Setter Property="Stroke" Value="#A0A0A0"/>
+                                                    <Setter Property="Opacity" Value="0.75"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="Stroke" Value="#39BFFF"/>
+                                                            <Setter Property="Opacity" Value="1"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Line.Style>
+                                        </Line>
+
+                                        <!-- JSON 坐标的精确锚点：菱形中心位于 CanvasX/CanvasY -->
+                                        <Polygon Points="0,8 8,0 16,8 8,16"
+                                                 Width="16" Height="16"
+                                                 HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                 Margin="-8,-8,0,0"
+                                                 Fill="#111111" Stroke="#FFFFFF" StrokeThickness="2">
+                                            <Polygon.Style>
+                                                <Style TargetType="Polygon">
+                                                    <Setter Property="Fill" Value="#111111"/>
+                                                    <Setter Property="Stroke" Value="#FFFFFF"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="Fill" Value="#00AEEF"/>
+                                                            <Setter Property="Stroke" Value="#FFFFFF"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Polygon.Style>
+                                        </Polygon>
+
+                                        <!-- 右下偏移的等比例图标与描述预览 -->
+                                        <Border Margin="24,22,0,0"
+                                                Padding="6"
+                                                CornerRadius="7"
+                                                BorderThickness="2"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#E61C1C1C"/>
+                                                    <Setter Property="BorderBrush" Value="#505050"/>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                            <Setter Property="BorderBrush" Value="#00B2FF"/>
+                                                            <Setter Property="Background" Value="#E6202734"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Border Width="38" Height="38" CornerRadius="5" Background="#0E0E0E" BorderBrush="#444" BorderThickness="1">
+                                                    <Image Source="{Binding IconImage}" Stretch="Uniform" Margin="3"/>
+                                                </Border>
+                                                <StackPanel Margin="8,0,0,0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding DisplayLabel}" Foreground="#F0F0F0" FontSize="11" FontWeight="SemiBold" MaxWidth="190" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding BindSkillId}" Foreground="#A8A8A8" FontSize="9" MaxWidth="190" TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- 独立选中范围覆盖层：不参与节点模板布局，也不拦截鼠标 -->
+                        <Canvas Width="1600" Height="1100" IsHitTestVisible="False" ClipToBounds="False" Panel.ZIndex="40">
+                            <Polygon x:Name="SelectedNodeGameRange"
+                                     Stroke="#FFFFFF" StrokeThickness="1.5"
+                                     Fill="#08FFFFFF" Opacity="0.95"
+                                     Visibility="Collapsed"/>
+                        </Canvas>
+
+                        <!-- 选中的 Line 编辑层：青蓝高亮，橙色控制点 -->
+                        <Canvas x:Name="LineEditCanvas" Width="1600" Height="1100" Panel.ZIndex="20">
+                            <Polyline x:Name="SelectedLineGlow" Stroke="#003A4D" StrokeThickness="10" Opacity="0.75"/>
+                            <Polyline x:Name="SelectedLineHighlight" Stroke="#00D9FF" StrokeThickness="4" Opacity="1"/>
+                        </Canvas>
+
+                        <!-- cross hair for 0,0 -->
+                        <Canvas IsHitTestVisible="False">
+                            <Line x:Name="CenterVerticalLine" X1="600" Y1="0" X2="600" Y2="1100" Stroke="#222" StrokeThickness="1"/>
+                            <Line x:Name="CenterHorizontalLine" X1="0" Y1="400" X2="1600" Y2="400" Stroke="#222" StrokeThickness="1"/>
+                        </Canvas>
+                    </Grid>
+                </ScrollViewer>
+            </Border>
+
+            <GridSplitter Grid.Column="3"
+                          Width="6"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Stretch"
+                          Background="#242424"
+                          ResizeDirection="Columns"
+                          ResizeBehavior="PreviousAndNext"
+                          Cursor="SizeWE"/>
+
+            <!-- Inspector -->
+            <Border Grid.Column="4" BorderThickness="1,0,0,0" BorderBrush="#2A2A2A" Background="#161616" Padding="12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="属性" FontSize="16" FontWeight="SemiBold" Foreground="#EDEDED"/>
+                        <TextBlock Text="选择左侧节点后可编辑。拖拽节点可改坐标。保存会直接写回 mod/skilltree。" Margin="0,6,0,10" Foreground="#9E9E9E" TextWrapping="Wrap"/>
+
+                        <GroupBox Header="RenderNode (UI)">
+                            <StackPanel Margin="8">
+                                <TextBlock Text="renderNodeIDInfo" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedNode.NodeId, Mode=OneWay}" IsReadOnly="True" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="typeInfo" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedNode.NodeType, Mode=OneWay}" IsReadOnly="True" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="layer（动画显示层）" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedNode.Layer, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Margin="0,2,0,4"/>
+                                <TextBlock Text="常用：0=总览线，1=总览节点，2=分类内部节点/线"
+                                           Foreground="#888888" FontSize="11" Margin="0,0,0,8" TextWrapping="Wrap"/>
+
+                                <TextBlock Text="bindSkillNodeInfo (skillID)" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedNode.BindSkillId, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="iconSprite" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedNode.IconSprite, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="scaleInfo" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedNode.ScaleInfo}" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="pos (game coords)" Foreground="#B0B0B0"/>
+                                <WrapPanel>
+                                    <StackPanel Width="160">
+                                        <TextBlock Text="X"/>
+                                        <TextBox Text="{Binding SelectedNode.GameX}" Margin="0,2,10,0"/>
+                                    </StackPanel>
+                                    <StackPanel Width="160">
+                                        <TextBlock Text="Y"/>
+                                        <TextBox Text="{Binding SelectedNode.GameY}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                </WrapPanel>
+
+                                <StackPanel x:Name="LineExtConditionsPanel" Margin="0,12,0,0">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SelectedNode.NodeType}" Value="LineNode">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="Line extConditions（优先级：Hide ＞ Show ＞ Pre）" Foreground="#D8D8D8" FontWeight="SemiBold"/>
+                                    <TextBlock Text="每组新增时自动写入对应 type；逻辑支持 And / Or / NotAnd / NotOr。" Foreground="#8E8E8E" FontSize="11" Margin="0,3,0,8"/>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock DockPanel.Dock="Left" Text="Pre（闪烁）" Foreground="#55C8FF" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Content="删除" Tag="Pre" Padding="7,2" Margin="5,0,0,0" Click="DeleteRenderExtCondition_Click"/>
+                                        <Button DockPanel.Dock="Right" Content="新增" Tag="Pre" Padding="7,2" Click="AddRenderExtCondition_Click"/>
+                                    </DockPanel>
+                                    <DataGrid ItemsSource="{Binding SelectedNode.PreExtConditions}" SelectedItem="{Binding SelectedPreExtCondition, Mode=TwoWay}"
+                                              AutoGenerateColumns="False" CanUserAddRows="False" Height="105" Margin="0,4,0,10" Background="#F7F7F7" Foreground="#111" GridLinesVisibility="All">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="条件类型" Binding="{Binding ConditionType, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
+                                            <DataGridTextColumn Header="逻辑" Binding="{Binding BoolType, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                            <DataGridTextColumn Header="info（SkillID / 物品ID）" Binding="{Binding Info, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock DockPanel.Dock="Left" Text="Show（常驻）" Foreground="#62D98B" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Content="删除" Tag="Show" Padding="7,2" Margin="5,0,0,0" Click="DeleteRenderExtCondition_Click"/>
+                                        <Button DockPanel.Dock="Right" Content="新增" Tag="Show" Padding="7,2" Click="AddRenderExtCondition_Click"/>
+                                    </DockPanel>
+                                    <DataGrid ItemsSource="{Binding SelectedNode.ShowExtConditions}" SelectedItem="{Binding SelectedShowExtCondition, Mode=TwoWay}"
+                                              AutoGenerateColumns="False" CanUserAddRows="False" Height="105" Margin="0,4,0,10" Background="#F7F7F7" Foreground="#111" GridLinesVisibility="All">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="条件类型" Binding="{Binding ConditionType, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
+                                            <DataGridTextColumn Header="逻辑" Binding="{Binding BoolType, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                            <DataGridTextColumn Header="info（SkillID / 物品ID）" Binding="{Binding Info, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <DockPanel LastChildFill="False">
+                                        <TextBlock DockPanel.Dock="Left" Text="Hide（隐藏）" Foreground="#FF7474" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Content="删除" Tag="Hide" Padding="7,2" Margin="5,0,0,0" Click="DeleteRenderExtCondition_Click"/>
+                                        <Button DockPanel.Dock="Right" Content="新增" Tag="Hide" Padding="7,2" Click="AddRenderExtCondition_Click"/>
+                                    </DockPanel>
+                                    <DataGrid ItemsSource="{Binding SelectedNode.HideExtConditions}" SelectedItem="{Binding SelectedHideExtCondition, Mode=TwoWay}"
+                                              AutoGenerateColumns="False" CanUserAddRows="False" Height="105" Margin="0,4,0,0" Background="#F7F7F7" Foreground="#111" GridLinesVisibility="All">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="条件类型" Binding="{Binding ConditionType, UpdateSourceTrigger=PropertyChanged}" Width="95"/>
+                                            <DataGridTextColumn Header="逻辑" Binding="{Binding BoolType, UpdateSourceTrigger=PropertyChanged}" Width="90"/>
+                                            <DataGridTextColumn Header="info（SkillID / 物品ID）" Binding="{Binding Info, UpdateSourceTrigger=PropertyChanged}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <GroupBox Header="SkillNode (Data)" Margin="0,10,0,0">
+                            <StackPanel Margin="8">
+                                <TextBlock Text="skillID" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedSkill.SkillId, Mode=OneWay}" IsReadOnly="True" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="cost" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedSkill.Cost}" Margin="0,2,0,8"/>
+
+                                <TextBlock Text="中文 name / description" Foreground="#B0B0B0"/>
+                                <TextBox Text="{Binding SelectedSkill.ChineseName, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6"/>
+                                <TextBox Text="{Binding SelectedSkill.ChineseDescription, UpdateSourceTrigger=PropertyChanged}" Height="70" TextWrapping="Wrap" AcceptsReturn="True"/>
+
+                                <TextBlock Text="English name / description" Foreground="#B0B0B0" Margin="0,8,0,0"/>
+                                <TextBox Text="{Binding SelectedSkill.EnglishName, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,6"/>
+                                <TextBox Text="{Binding SelectedSkill.EnglishDescription, UpdateSourceTrigger=PropertyChanged}" Height="70" TextWrapping="Wrap" AcceptsReturn="True"/>
+
+                                <Separator Margin="0,12,0,10"/>
+                                <DockPanel LastChildFill="False">
+                                    <TextBlock DockPanel.Dock="Left" Text="前置条件 conditions" Foreground="#D8D8D8" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right" Content="删除条件" Padding="8,3" Margin="6,0,0,0" Click="DeleteCondition_Click"/>
+                                    <Button DockPanel.Dock="Right" Content="新增条件" Padding="8,3" Click="AddCondition_Click"/>
+                                </DockPanel>
+                                <TextBlock Text="type: SkillNode/Item；boolType: And/Or/NotAnd/NotOr；info 为 SkillID 或物品ID。"
+                                           Foreground="#8E8E8E" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,6"/>
+                                <DataGrid ItemsSource="{Binding SelectedSkill.Conditions}"
+                                          SelectedItem="{Binding SelectedCondition, Mode=TwoWay}"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          HeadersVisibility="Column"
+                                          MinHeight="130" MaxHeight="260"
+                                          Background="#F7F7F7" Foreground="#111111"
+                                          RowBackground="#FFFFFF" AlternatingRowBackground="#F1F1F1"
+                                          BorderBrush="#777777" GridLinesVisibility="All">
+                                    <DataGrid.Resources>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="Foreground" Value="#111111"/>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="BorderBrush" Value="#CCCCCC"/>
+                                        </Style>
+                                        <Style TargetType="DataGridColumnHeader">
+                                            <Setter Property="Foreground" Value="#111111"/>
+                                            <Setter Property="Background" Value="#E6E6E6"/>
+                                        </Style>
+                                    </DataGrid.Resources>
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn Header="类型" Width="90">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox SelectedValue="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              SelectedValuePath="Content" Foreground="#111111" Background="#FFFFFF">
+                                                        <ComboBoxItem Content="SkillNode"/>
+                                                        <ComboBoxItem Content="Item"/>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="逻辑" Width="90">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox SelectedValue="{Binding BoolType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              SelectedValuePath="Content" Foreground="#111111" Background="#FFFFFF">
+                                                        <ComboBoxItem Content="And"/>
+                                                        <ComboBoxItem Content="Or"/>
+                                                        <ComboBoxItem Content="NotAnd"/>
+                                                        <ComboBoxItem Content="NotOr"/>
+                                                    </ComboBox>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTemplateColumn Header="info（SkillID / 物品ID）" Width="*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox IsEditable="True"
+                                                              Text="{Binding Info, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              ItemsSource="{Binding DataContext.AvailableSkillIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                              Foreground="#111111" Background="#FFFFFF"/>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>
