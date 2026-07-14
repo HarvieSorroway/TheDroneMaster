@@ -1,8 +1,12 @@
 [
-   {
+  {
     "renderNodeIDInfo": "RenderNode.Group.DronePortUpg",
-    "layer":1,
+    "bindSkillNodeInfo": null,
+    "posInfo": null,
+    "layer": 1,
+    "scaleInfo": 1.0,
     "typeInfo": "NodeGroup",
+    "iconSprite": null,
     "subRenderNodeInfo": [
       "RenderNode.DronePortUpg.Cost.Lv0",
       "RenderNode.DronePortUpg.Cost.Lv1",
@@ -11,8 +15,6 @@
       "RenderNode.DronePortUpg.JetJump.Lv2"
     ]
   },
-
-
   {
     "renderNodeIDInfo": "RenderNode.DronePortUpg.Cost.Lv0",
     "bindSkillNodeInfo": "Skill.DronePortUpg.Cost.Lv0",
@@ -26,9 +28,11 @@
         "y": 600.0
       }
     ],
-    "layer":2,
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DronePortUpg.Cost.Lv1",
@@ -43,12 +47,12 @@
         "y": 600.0
       }
     ],
-    "layer":2,
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
-
-
   {
     "renderNodeIDInfo": "RenderNode.DronePortUpg.JetJump.Lv0",
     "bindSkillNodeInfo": "Skill.DronePortUpg.JetJump.Lv0",
@@ -62,9 +66,11 @@
         "y": 520.0
       }
     ],
-    "layer":2,
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DronePortUpg.JetJump.Lv1",
@@ -79,9 +85,11 @@
         "y": 520.0
       }
     ],
-    "layer":2,
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DronePortUpg.JetJump.Lv2",
@@ -96,8 +104,10 @@
         "y": 520.0
       }
     ],
-    "layer":2,
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   }
 ]

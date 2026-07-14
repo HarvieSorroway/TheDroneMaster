@@ -103,7 +103,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             {
                 if (renderNode.typeInfo == SkillTreeRenderType.LineNode)
                 {
-                    var newobj = new SkillTreeLineRenderer(this, pages[0], renderNode.posInfo, renderNode.layer);
+                    var newobj = new SkillTreeLineRenderer(this, pages[0], renderNode.posInfo, renderNode.layer, renderNode.renderNodeIDInfo);
                     pages[0].subObjects.Add(newobj);
 
                     idMapper.Add(renderNode.renderNodeIDInfo, newobj);
@@ -199,7 +199,73 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 {
                     skillTreeButton.SkillEnabled = skillTreeSave.CheckSkill(RenderNodeLoader.idMapper[skillTreeButton.id].bindSkillNodeInfo);
                 }
+                if(item is SkillTreeLineRenderer skillTreeLineRenderer)
+                {
+                    //Plugin.Log($"Sync for {skillTreeLineRenderer.id}");
+                    var conditions = RenderNodeLoader.idMapper[skillTreeLineRenderer.id].extConditions;
+                    if(conditions != null && conditions.Length > 0)
+                    {
+                        bool goHide = false, goPreview = false, goShow = false;
+
+                        foreach (var condition in conditions)
+                        {
+                            if (condition.conditionType != SkillNode.ConditionType.SkillNode)
+                                continue;
+                            var res = DMPSSkillTreeHelper.CheckCondition(new SkillNode.SKillNodeConditionInfo()
+                            {
+                                boolType = condition.boolType,
+                                info = condition.info,
+                                type = SkillNode.ConditionType.SkillNode
+                            }, skillTreeSave);
+
+                            if (condition.boolType == SkillNode.ConditionBoolType.Or || condition.boolType == SkillNode.ConditionBoolType.NotOr)
+                            {
+                                switch (condition.type)
+                                {
+                                    case SkillTreeRenderNodeExtConditionType.Pre:
+                                        goPreview = goPreview || res;
+                                        break;
+                                    case SkillTreeRenderNodeExtConditionType.Show:
+                                        goShow = goShow || res; 
+                                        break;
+                                    case SkillTreeRenderNodeExtConditionType.Hide:
+                                        goHide = goHide || res;
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                switch (condition.type)
+                                {
+                                    case SkillTreeRenderNodeExtConditionType.Pre:
+                                        goPreview = goPreview && res;
+                                        break;
+                                    case SkillTreeRenderNodeExtConditionType.Show:
+                                        goShow = goShow && res;
+                                        break;
+                                    case SkillTreeRenderNodeExtConditionType.Hide:
+                                        goHide = goHide && res;
+                                        break;
+                                }
+                            }
+
+                            //Plugin.Log($"Checking : {condition.boolType} ,{condition.type}, {condition.info}, pre: {goPreview}, hide: {goHide}, show: {goShow}");
+                        }
+
+                        if (goHide)
+                            skillTreeLineRenderer.RenderMode = SkillTreeLineRenderer.LineRenderMode.Hide;
+                        else if(goShow)
+                            skillTreeLineRenderer.RenderMode = SkillTreeLineRenderer.LineRenderMode.Show;
+                        else if (goPreview)
+                            skillTreeLineRenderer.RenderMode = SkillTreeLineRenderer.LineRenderMode.Preview;
+                        else
+                            skillTreeLineRenderer.RenderMode = SkillTreeLineRenderer.LineRenderMode.Hide;
+                    }
+                    else
+                        skillTreeLineRenderer.RenderMode = SkillTreeLineRenderer.LineRenderMode.Show;
+                }
             }
+
             skillInfoScreen.SyncState();
         }
 

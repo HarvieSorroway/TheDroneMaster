@@ -1,3 +1,153 @@
 [
-  
+  {
+    "renderNodeIDInfo": "RenderNode.Group.ReactorUpg",
+    "bindSkillNodeInfo": null,
+    "posInfo": null,
+    "layer": 1,
+    "scaleInfo": 1.0,
+    "typeInfo": "NodeGroup",
+    "iconSprite": null,
+    "subRenderNodeInfo": [
+      "RenderNode.ReactorUpg.Efficiency.Lv0",
+      "RenderNode.ReactorUpg.Efficiency.Lv1",
+      "RenderNode.ReactorUpg.Efficiency.Lv2",
+      "RenderNode.ReactorUpg.OverDriveReactor",
+      "RenderNode.ReactorUpg.ThunderboltReactor",
+      "RenderNode.ReactorUpg.FeedbackReactor",
+      "RenderNode.ReactorUpg.TuningReactor"
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.Efficiency.Lv0",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.Efficiency.Lv0",
+    "posInfo": [
+      {
+        "x": -260.0,
+        "y": -20.0
+      },
+      {
+        "x": 400.0,
+        "y": 600.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.Efficiency.Lv1",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.Efficiency.Lv1",
+    "posInfo": [
+      {
+        "x": -290.0,
+        "y": -20.0
+      },
+      {
+        "x": 540.0,
+        "y": 600.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.Efficiency.Lv2",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.Efficiency.Lv2",
+    "posInfo": [
+      {
+        "x": -320.0,
+        "y": -20.0
+      },
+      {
+        "x": 680.0,
+        "y": 600.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 0.8,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.OverDriveReactor",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.OverDriveReactor",
+    "posInfo": [
+      {
+        "x": -200.0,
+        "y": 80.0
+      },
+      {
+        "x": 400.0,
+        "y": 350.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.ThunderboltReactor",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.ThunderboltReactor",
+    "posInfo": [
+      {
+        "x": -200.0,
+        "y": 80.0
+      },
+      {
+        "x": 588.67,
+        "y": 350.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.FeedbackReactor",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.FeedbackReactor",
+    "posInfo": [
+      {
+        "x": -200.0,
+        "y": 80.0
+      },
+      {
+        "x": 777.34,
+        "y": 350.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.ReactorUpg.TuningReactor",
+    "bindSkillNodeInfo": "Skill.ReactorUpg.TuningReactor",
+    "posInfo": [
+      {
+        "x": -200.0,
+        "y": 80.0
+      },
+      {
+        "x": 966.0,
+        "y": 350.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "SubBasicNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
+  }
 ]

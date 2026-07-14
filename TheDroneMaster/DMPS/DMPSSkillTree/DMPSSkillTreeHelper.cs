@@ -93,6 +93,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
             return JsonConvert.SerializeObject(skillNode, _serializerSettings);
         }
 
+        //识别前置条件，根据not信息自动反转布尔值
         public static bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo, DMPSBasicSave save)
         {
             bool res = false;

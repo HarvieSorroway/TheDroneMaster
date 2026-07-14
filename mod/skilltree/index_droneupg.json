@@ -1,8 +1,12 @@
 [
   {
     "renderNodeIDInfo": "RenderNode.Group.DroneUpg",
-    "layer":1,
+    "bindSkillNodeInfo": null,
+    "posInfo": null,
+    "layer": 1,
+    "scaleInfo": 1.0,
     "typeInfo": "NodeGroup",
+    "iconSprite": null,
     "subRenderNodeInfo": [
       "RenderNode.DroneUpg.DamageUpg.Lv0",
       "RenderNode.DroneUpg.DamageUpg.Lv1",
@@ -12,12 +16,20 @@
       "RenderNode.DroneUpg.Count.Lv1",
       "RenderNode.DroneUpg.Count.Lv2",
       "RenderNode.DroneUpg.Count.Lv3",
-      "RenderNode.DroneUpg.Line0",
-      "RenderNode.DroneUpg.Line1"
+      "RenderNode.DroneUpg.Line.0",
+      "RenderNode.DroneUpg.Line.0-Dmg0",
+      "RenderNode.DroneUpg.Line.0-Cnt0",
+      "RenderNode.DroneUpg.Line.Dmg0-Cnt1",
+      "RenderNode.DroneUpg.Line.Dmg0-Dmg1",
+      "RenderNode.DroneUpg.Line.Cnt0-Cnt1",
+      "RenderNode.DroneUpg.Line.Cnt0-Dmg1",
+      "RenderNode.DroneUpg.Line.Dmg1-Cnt2",
+      "RenderNode.DroneUpg.Line.Dmg1-Dmg2",
+      "RenderNode.DroneUpg.Line.Cnt1-Cnt2",
+      "RenderNode.DroneUpg.Line.Cnt1-Dmg2",
+      "RenderNode.DroneUpg.Line.Cnt2-Cnt3"
     ]
   },
-
-
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv0",
     "bindSkillNodeInfo": "Skill.DroneUpg.DamageUpg.Lv0",
@@ -31,10 +43,11 @@
         "y": 530.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Dmg",
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv1",
@@ -49,10 +62,11 @@
         "y": 530.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Dmg",
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv2",
@@ -67,10 +81,11 @@
         "y": 530.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Dmg",
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.DamageUpg.Lv3",
@@ -85,13 +100,12 @@
         "y": 530.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Dmg",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Dmg",
+    "subRenderNodeInfo": null
   },
-  
-
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.Count.Lv0",
     "bindSkillNodeInfo": "Skill.DroneUpg.Count.Lv0",
@@ -105,10 +119,11 @@
         "y": 430.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Count",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Count",
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.Count.Lv1",
@@ -123,10 +138,11 @@
         "y": 430.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Count",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Count",
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.Count.Lv2",
@@ -141,10 +157,11 @@
         "y": 430.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Count",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Count",
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.DroneUpg.Count.Lv3",
@@ -159,24 +176,202 @@
         "y": 430.0
       }
     ],
-    "layer":2,
-    "iconSprite":"RenderNode.DroneUpg.Count",
+    "layer": 2,
     "scaleInfo": 0.8,
-    "typeInfo": "SubBasicNode"
+    "typeInfo": "SubBasicNode",
+    "iconSprite": "RenderNode.DroneUpg.Count",
+    "subRenderNodeInfo": null
   },
-
-
   {
-    "renderNodeIDInfo": "RenderNode.DroneUpg.Line0",
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.0",
+    "bindSkillNodeInfo": null,
     "posInfo": [
       {
-        "x": 200.0,
-        "y": 580.0
+        "x": 150.0,
+        "y": 600.0
       },
       {
-        "x": 250.0,
+        "x": 270.0,
+        "y": 480.0
+      },
+      {
+        "x": 350.0,
+        "y": 480.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"NotOr",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"NotOr",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Show"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.0-Dmg0",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 350.0,
+        "y": 480.0
+      },
+      {
+        "x": 400.0,
+        "y": 530.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"NotOr",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"NotOr",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.0-Cnt0",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 350.0,
+        "y": 480.0
+      },
+      {
+        "x": 400.0,
+        "y": 430.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"NotOr",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"NotOr",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Dmg0-Cnt1",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 400.0,
         "y": 530.0
       },
+      {
+        "x": 420.0,
+        "y": 530.0
+      },
+      {
+        "x": 520.0,
+        "y": 430.0
+      },
+      {
+        "x": 540.0,
+        "y": 430.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Dmg0-Dmg1",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
       {
         "x": 400.0,
         "y": 530.0
@@ -184,30 +379,97 @@
       {
         "x": 540.0,
         "y": 530.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Pre"
       },
       {
-        "x": 680.0,
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv0",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Cnt0-Dmg1",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 400.0,
+        "y": 430.0
+      },
+      {
+        "x": 420.0,
+        "y": 430.0
+      },
+      {
+        "x": 520.0,
         "y": 530.0
       },
       {
-        "x": 820.0,
+        "x": 540.0,
         "y": 530.0
       }
     ],
-    "layer":2,
-    "typeInfo": "LineNode"
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Hide"
+      }
+    ]
   },
   {
-    "renderNodeIDInfo": "RenderNode.DroneUpg.Line1",
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Cnt0-Cnt1",
+    "bindSkillNodeInfo": null,
     "posInfo": [
-      {
-        "x": 180.0,
-        "y": 580.0
-      },
-      {
-        "x": 320.0,
-        "y": 430.0
-      },
       {
         "x": 400.0,
         "y": 430.0
@@ -215,17 +477,287 @@
       {
         "x": 540.0,
         "y": 430.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Pre"
       },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv0",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Dmg1-Cnt2",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 540.0,
+        "y": 530.0
+      },
+      {
+        "x": 560.0,
+        "y": 530.0
+      },
+      {
+        "x": 660.0,
+        "y": 430.0
+      },
+      {
+        "x": 680.0,
+        "y": 430.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.Count.Lv2",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv2",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Dmg1-Dmg2",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 540.0,
+        "y": 530.0
+      },
+      {
+        "x": 680.0,
+        "y": 530.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.DamageUpg.Lv2",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv2",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Cnt1-Dmg2",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 540.0,
+        "y": 430.0
+      },
+      {
+        "x": 560.0,
+        "y": 430.0
+      },
+      {
+        "x": 660.0,
+        "y": 530.0
+      },
+      {
+        "x": 680.0,
+        "y": 530.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Pre"
+      },
+       {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.DamageUpg.Lv2",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv2",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Cnt1-Cnt2",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
+      {
+        "x": 540.0,
+        "y": 430.0
+      },
+      {
+        "x": 680.0,
+        "y": 430.0
+      }
+    ],
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv1",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.Count.Lv2",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv2",
+        "type": "Hide"
+      }
+    ]
+  },
+  {
+    "renderNodeIDInfo": "RenderNode.DroneUpg.Line.Cnt2-Cnt3",
+    "bindSkillNodeInfo": null,
+    "posInfo": [
       {
         "x": 680.0,
         "y": 430.0
       },
       {
-        "x": 820.0,
+        "x": 700.0,
         "y": 430.0
+      },
+      {
+        "x": 800.0,
+        "y": 530.0
+      },
+      {
+        "x": 820.0,
+        "y": 530.0
       }
     ],
-    "layer":2,
-    "typeInfo": "LineNode"
+    "layer": 2,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null,
+    "extConditions": [
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv2",
+        "type": "Pre"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.Count.Lv2",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"And",
+        "info": "Skill.DroneUpg.Count.Lv3",
+        "type": "Show"
+      },
+      {
+        "conditionType":"SkillNode",
+        "boolType":"Or",
+        "info": "Skill.DroneUpg.DamageUpg.Lv3",
+        "type": "Hide"
+      }
+    ]
   }
 ]

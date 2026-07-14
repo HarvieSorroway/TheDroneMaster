@@ -8,10 +8,10 @@
         "y": 80.0
       }
     ],
-    "layer":0,
+    "layer": 0,
     "scaleInfo": 1.5,
     "typeInfo": "StaticNode",
-    "iconSprite":"RenderNode.Base",
+    "iconSprite": "RenderNode.Base",
     "subRenderNodeInfo": [
       "RenderNode.DronePortUpg",
       "RenderNode.PackUpg",
@@ -31,10 +31,10 @@
         "y": 600.0
       }
     ],
-    "layer":1,
+    "layer": 1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
-    "iconSprite":"RenderNode.DronePortUpg",
+    "iconSprite": "RenderNode.DronePortUpg",
     "subRenderNodeInfo": [
       "RenderNode.Group.DronePortUpg"
     ]
@@ -52,10 +52,10 @@
         "y": 600.0
       }
     ],
-    "layer":1,
+    "layer": 1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
-    "iconSprite":"RenderNode.DroneUpg",
+    "iconSprite": "RenderNode.DroneUpg",
     "subRenderNodeInfo": [
       "RenderNode.Group.DroneUpg"
     ]
@@ -73,10 +73,10 @@
         "y": 600.0
       }
     ],
-    "layer":1,
+    "layer": 1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
-    "iconSprite":"RenderNode.TorsoUpg",
+    "iconSprite": "RenderNode.TorsoUpg",
     "subRenderNodeInfo": [
       "RenderNode.Group.TorsoUpg"
     ]
@@ -94,16 +94,17 @@
         "y": 600.0
       }
     ],
-    "layer":1,
+    "layer": 1,
     "scaleInfo": 1.0,
     "typeInfo": "BasicNode",
-    "iconSprite":"RenderNode.ReactorUpg",
+    "iconSprite": "RenderNode.ReactorUpg",
     "subRenderNodeInfo": [
       "RenderNode.Group.ReactorUpg"
     ]
   },
   {
     "renderNodeIDInfo": "RenderNode.Line0",
+    "bindSkillNodeInfo": null,
     "posInfo": [
       {
         "x": 0.0,
@@ -118,11 +119,15 @@
         "y": 0.0
       }
     ],
-    "layer":0,
-    "typeInfo": "LineNode"
+    "layer": 0,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.Line1",
+    "bindSkillNodeInfo": null,
     "posInfo": [
       {
         "x": 0.0,
@@ -133,11 +138,15 @@
         "y": -80.0
       }
     ],
-    "layer":0,
-    "typeInfo": "LineNode"
+    "layer": 0,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.Line2",
+    "bindSkillNodeInfo": null,
     "posInfo": [
       {
         "x": 0.0,
@@ -148,11 +157,15 @@
         "y": -80.0
       }
     ],
-    "layer":0,
-    "typeInfo": "LineNode"
+    "layer": 0,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   },
   {
     "renderNodeIDInfo": "RenderNode.Line3",
+    "bindSkillNodeInfo": null,
     "posInfo": [
       {
         "x": 0.0,
@@ -167,7 +180,10 @@
         "y": 0.0
       }
     ],
-    "layer":0,
-    "typeInfo": "LineNode"
+    "layer": 0,
+    "scaleInfo": 1.0,
+    "typeInfo": "LineNode",
+    "iconSprite": null,
+    "subRenderNodeInfo": null
   }
 ]

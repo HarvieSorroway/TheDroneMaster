@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static TheDroneMaster.DMPS.DMPSSkillTree.SkillNode;
 
 namespace TheDroneMaster.DMPS.DMPSSkillTree
 {
@@ -17,6 +18,26 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
 
         public string[] subRenderNodeInfo;
         public int layer;
+
+        public SkillTreeRenderNodeExtCondition[] extConditions;
+    }
+
+    internal struct SkillTreeRenderNodeExtCondition
+    {
+        public SkillTreeRenderNodeExtConditionType type;
+        public ConditionBoolType boolType;
+        public ConditionType conditionType;
+        public string info;
+    }
+
+    /// <summary>
+    /// 渲染节点的额外条件控制，主要用于渲染连线节点
+    /// </summary>
+    internal enum SkillTreeRenderNodeExtConditionType
+    {
+        Pre,
+        Show,
+        Hide,
     }
 
     internal enum SkillTreeRenderType
