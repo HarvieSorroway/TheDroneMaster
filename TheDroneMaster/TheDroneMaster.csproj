@@ -65,4 +65,13 @@
       <HintPath>..\includes\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <Target Name="CopyBuildOutputToNewestPlugins" AfterTargets="Build">
+    <PropertyGroup>
+      <NewestPluginsDir>$(MSBuildProjectDirectory)\..\mod\newest\plugins</NewestPluginsDir>
+      <TargetPdbPath>$(TargetDir)$(TargetName).pdb</TargetPdbPath>
+    </PropertyGroup>
+    <MakeDir Directories="$(NewestPluginsDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(NewestPluginsDir)" />
+    <Copy SourceFiles="$(TargetPdbPath)" DestinationFolder="$(NewestPluginsDir)" Condition="Exists('$(TargetPdbPath)')" />
+  </Target>
 </Project>
