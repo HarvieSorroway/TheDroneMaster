@@ -84,7 +84,7 @@
                                 </HierarchicalDataTemplate.Triggers>
                             </HierarchicalDataTemplate>
                             <ContextMenu x:Key="TreeNodeContextMenu">
-                                <MenuItem Header="仅显示此节点及其子节点（不影响连线）" Click="ShowOnlySelectedBranch_Click"/>
+                                <MenuItem Header="仅显示此节点及其子节点" Click="ShowOnlySelectedBranch_Click"/>
                                 <MenuItem Header="显示全部节点" Click="ShowAllNodes_Click"/>
                             </ContextMenu>
                             <Style TargetType="TreeViewItem">
@@ -129,6 +129,14 @@
                           MouseLeftButtonUp="WorkspaceGrid_MouseLeftButtonUp"
                           MouseMove="WorkspaceGrid_MouseMove"
                           MouseRightButtonDown="WorkspaceGrid_MouseRightButtonDown">
+                        <!-- 游戏技能树可见范围：Fold 以 0,0 为中心，Expand 以 0,0 为左下角 -->
+                        <Canvas Width="1600" Height="1100" IsHitTestVisible="False" Panel.ZIndex="0">
+                            <Rectangle x:Name="GameViewportFrame"
+                                       Stroke="#52A8D8" StrokeThickness="1.5"
+                                       StrokeDashArray="8,4"
+                                       Fill="#0552A8D8"/>
+                        </Canvas>
+
                         <!-- Lines -->
                         <ItemsControl ItemsSource="{Binding Lines}">
                             <ItemsControl.ItemsPanel>
@@ -336,11 +344,11 @@
                                 <WrapPanel>
                                     <StackPanel Width="160">
                                         <TextBlock Text="X"/>
-                                        <TextBox Text="{Binding SelectedNode.GameX}" Margin="0,2,10,0"/>
+                                        <TextBox Text="{Binding SelectedNode.GameX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,10,0"/>
                                     </StackPanel>
                                     <StackPanel Width="160">
                                         <TextBlock Text="Y"/>
-                                        <TextBox Text="{Binding SelectedNode.GameY}" Margin="0,2,0,0"/>
+                                        <TextBox Text="{Binding SelectedNode.GameY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,0"/>
                                     </StackPanel>
                                 </WrapPanel>
 

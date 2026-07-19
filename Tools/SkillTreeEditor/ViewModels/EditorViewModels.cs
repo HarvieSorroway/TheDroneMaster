@@ -216,6 +216,8 @@ public sealed class TreeNodeItemVM : BindableBase
     public string Header { get; set; } = "";
     public SkillTreeRenderNode? Model { get; set; }
     public RenderNodeVM? CanvasNode { get; set; }
+    public string? MissingRenderNodeId { get; set; }
+    public bool IsMissing => Model == null && !string.IsNullOrWhiteSpace(MissingRenderNodeId);
     public TreeNodeItemVM? Parent { get; set; }
     public ObservableCollection<TreeNodeItemVM> Children { get; } = new();
 

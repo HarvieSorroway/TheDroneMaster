@@ -38,6 +38,7 @@ public partial class AddNodeWindow : Window
     private bool IsSelectedParentGroup =>
         _parentType?.Equals("NodeGroup", StringComparison.OrdinalIgnoreCase) == true;
     private string? _lastAutoPrefix;
+    private string? _previousNodeType;
 
     public AddNodeWindow(IEnumerable<string> indexFiles, string? suggestedIndexFile = null, string? parentRenderNodeId = null, string? parentType = null)
     {
@@ -64,9 +65,17 @@ public partial class AddNodeWindow : Window
         ApplyTypeRules();
 
         var type = ((TypeBox?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "SubBasicNode").Trim();
-        ApplyAutoNodeIdPrefix(
-            forceIfEmpty: true,
-            forceReplace: type.Equals("NodeGroup", StringComparison.OrdinalIgnoreCase));
+        var wasGroup = _previousNodeType?.Equals("NodeGroup", StringComparison.OrdinalIgnoreCase) == true;
+        var isGroup = type.Equals("NodeGroup", StringComparison.OrdinalIgnoreCase);
+        var crossedGroupBoundary = _previousNodeType != null && wasGroup != isGroup;
+
+        // 普通节点类型之间切换时保留用户输入；只有进入或离开 Group 时重建默认 ID。
+        if (_previousNodeType == null)
+            ApplyAutoNodeIdPrefix(forceIfEmpty: true);
+        else if (crossedGroupBoundary)
+            ApplyAutoNodeIdPrefix(forceIfEmpty: true, forceReplace: true);
+
+        _previousNodeType = type;
     }
 
     private void RenderNodeIdBox_TextChanged(object sender, TextChangedEventArgs e)

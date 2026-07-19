@@ -60,6 +60,19 @@ public partial class MainWindow : Window
             {
                 foreach (var n in _vm.Nodes)
                     n.ApplyViewMode(_vm.ViewMode);
+
+                // 切换布局时默认聚焦对应的 1366×768 游戏可见范围中心，并保留当前缩放。
+                if (_vm.ViewMode == LayoutViewMode.Expand)
+                {
+                    _vm.PanX = -683.0 * _vm.Zoom;
+                    _vm.PanY = 384.0 * _vm.Zoom;
+                }
+                else
+                {
+                    _vm.PanX = 0;
+                    _vm.PanY = 0;
+                }
+
                 ApplyViewportToNodes();
                 RebuildLines();
                 RefreshLineEditor();
@@ -235,7 +248,12 @@ public partial class MainWindow : Window
                     }
                     else
                     {
-                        item.Children.Add(new TreeNodeItemVM { Header = childId + "  [missing]", Parent = item });
+                        item.Children.Add(new TreeNodeItemVM
+                        {
+                            Header = childId + "  [missing]",
+                            MissingRenderNodeId = childId,
+                            Parent = item
+                        });
                     }
                 }
             }
@@ -614,6 +632,25 @@ public partial class MainWindow : Window
 
         CenterHorizontalLine.Y1 = centerY;
         CenterHorizontalLine.Y2 = centerY;
+
+        RefreshGameViewportFrame();
+    }
+
+    private void RefreshGameViewportFrame()
+    {
+        if (GameViewportFrame == null)
+            return;
+
+        const double gameWidth = 1366.0;
+        const double gameHeight = 768.0;
+        var left = _vm.ViewMode == LayoutViewMode.Fold ? -gameWidth / 2.0 : 0.0;
+        var bottom = _vm.ViewMode == LayoutViewMode.Fold ? -gameHeight / 2.0 : 0.0;
+        var topLeft = GameToCanvas(new Vec2((float)left, (float)(bottom + gameHeight)));
+
+        Canvas.SetLeft(GameViewportFrame, topLeft.X);
+        Canvas.SetTop(GameViewportFrame, topLeft.Y);
+        GameViewportFrame.Width = gameWidth * _vm.Zoom;
+        GameViewportFrame.Height = gameHeight * _vm.Zoom;
     }
 
     private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -1101,7 +1138,9 @@ public partial class MainWindow : Window
         foreach (var root in _vm.TreeNodes)
             ApplyOnlyBranchVisibility(root, keepVisible);
 
-        _vm.Status = $"仅显示：{selected.Model?.renderNodeIDInfo ?? selected.Header} 及其子节点（连线未改变）";
+        RebuildLines();
+        RefreshLineEditor();
+        _vm.Status = $"仅显示：{selected.Model?.renderNodeIDInfo ?? selected.Header} 及其子节点（包含 LineNode）";
     }
 
     private static void CollectBranch(TreeNodeItemVM item, HashSet<TreeNodeItemVM> result)
@@ -1113,9 +1152,7 @@ public partial class MainWindow : Window
 
     private void ApplyOnlyBranchVisibility(TreeNodeItemVM item, HashSet<TreeNodeItemVM> keepVisible)
     {
-        var isLine = item.Model?.typeInfo?.Equals("LineNode", StringComparison.OrdinalIgnoreCase) == true;
-        if (!isLine)
-            SetSingleTreeItemVisibility(item, keepVisible.Contains(item));
+        SetSingleTreeItemVisibility(item, keepVisible.Contains(item));
 
         foreach (var child in item.Children)
             ApplyOnlyBranchVisibility(child, keepVisible);
@@ -1291,6 +1328,22 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (_selectedTreeItem?.IsMissing == true &&
+            _selectedTreeItem.Parent?.Model != null &&
+            !string.IsNullOrWhiteSpace(_selectedTreeItem.MissingRenderNodeId))
+        {
+            var missingId = _selectedTreeItem.MissingRenderNodeId!;
+            var removed = _selectedTreeItem.Parent.Model.subRenderNodeInfo?.RemoveAll(id =>
+                string.Equals(id, missingId, StringComparison.OrdinalIgnoreCase)) ?? 0;
+            if (removed > 0)
+            {
+                ClearMoveUndo();
+                RebuildViewModel();
+                _vm.Status = $"已清除缺失节点引用：{missingId}";
+            }
+            return;
+        }
+
         // 优先删画布选中的节点，否则删树选中的节点（可能是 Group/Line）
         var model = _vm.SelectedNode?.Model ?? _selectedTreeItem?.Model;
         if (model == null || string.IsNullOrWhiteSpace(model.renderNodeIDInfo))
@@ -1392,7 +1445,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private static SkillTreeRenderNode CreateRenderNodeFromRequest(AddNodeRequest req, string targetIndexPath)
+    private SkillTreeRenderNode CreateRenderNodeFromRequest(AddNodeRequest req, string targetIndexPath)
     {
         var node = new SkillTreeRenderNode
         {
@@ -1419,7 +1472,15 @@ public partial class MainWindow : Window
                 node.posInfo = new List<Vec2> { new(0, 0), new(180, 0) };
                 break;
             case "LineNode":
-                node.posInfo = new List<Vec2> { new(0, 0), new(100, 0) };
+                if (_vm.ViewMode == LayoutViewMode.Expand)
+                {
+                    // Expand 的 1366×768 可见范围以 0,0 为左下角；新线放在范围中心附近。
+                    node.posInfo = new List<Vec2> { new(633, 384), new(733, 384) };
+                }
+                else
+                {
+                    node.posInfo = new List<Vec2> { new(-50, 0), new(50, 0) };
+                }
                 break;
             case "NodeGroup":
                 node.subRenderNodeInfo = new List<string>();
