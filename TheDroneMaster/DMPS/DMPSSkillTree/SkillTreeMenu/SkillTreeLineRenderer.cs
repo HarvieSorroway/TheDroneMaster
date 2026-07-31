@@ -53,6 +53,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
         public SkillTreeLineRenderer(Menu.Menu menu, MenuObject owner, Vector2[] linePos, int layer, string id) : base(menu, owner, linePos[0])
         {
+            shrink = lastShrink = setShrink = 1f;
             this.linePos = new Vector2[linePos.Length];
             this.layer = layer;
             this.id = id;
