@@ -1,0 +1,69 @@
+﻿<Window x:Class="SkillTreeEditor.AddNodeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="新增节点" Height="700" Width="520"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanMinimize">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="节点类型" />
+                <ComboBox x:Name="TypeBox" Margin="0,4,0,10" SelectedIndex="2" SelectionChanged="TypeBox_SelectionChanged">
+                    <ComboBoxItem Content="SubBasicNode"/>
+                    <ComboBoxItem Content="BasicNode"/>
+                    <ComboBoxItem Content="StaticNode"/>
+                    <ComboBoxItem Content="LineNode"/>
+                    <ComboBoxItem Content="NodeGroup"/>
+                </ComboBox>
+
+                <TextBlock Text="RenderNode ID" />
+                <TextBox x:Name="RenderNodeIdBox" Margin="0,4,0,10" TextChanged="RenderNodeIdBox_TextChanged"/>
+
+                <TextBlock Text="写入哪个 index 文件" />
+                <ComboBox x:Name="IndexFileBox" Margin="0,4,0,10"/>
+
+                <TextBlock Text="bindSkillNodeInfo / skillID（可空）" />
+                <TextBox x:Name="BindSkillIdBox" Margin="0,4,0,10"/>
+
+                <TextBlock Text="iconSprite（可空）" />
+                <TextBox x:Name="IconSpriteBox" Margin="0,4,0,10"/>
+
+                <TextBlock Text="scaleInfo" />
+                <TextBox x:Name="ScaleBox" Text="0.8" Margin="0,4,0,10"/>
+
+                <CheckBox x:Name="AttachToSelectedParentBox" IsChecked="True" Content="挂到当前选中节点/组的 subRenderNodeInfo 下（如果可用）" Margin="0,0,0,10"/>
+
+                <Separator Margin="0,6,0,10"/>
+                <CheckBox x:Name="CreateSkillBox" IsChecked="True" Content="同时创建 SkillNode 数据文件" Margin="0,0,0,10"/>
+
+                <TextBlock Text="skills 子目录（例如 Drone / DronePort / custom）" />
+                <TextBox x:Name="SkillFolderBox" Text="custom" Margin="0,4,0,10"/>
+
+                <TextBlock Text="cost" />
+                <TextBox x:Name="CostBox" Text="10" Margin="0,4,0,10"/>
+
+                <TextBlock Text="中文名称" />
+                <TextBox x:Name="ChineseNameBox" Margin="0,4,0,10"/>
+
+                <TextBlock Text="中文描述" />
+                <TextBox x:Name="ChineseDescBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,4,0,10"/>
+
+                <TextBlock Text="English name" />
+                <TextBox x:Name="EnglishNameBox" Margin="0,4,0,10"/>
+
+                <TextBlock Text="English description" />
+                <TextBox x:Name="EnglishDescBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,4,0,10"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="90" Margin="0,12,8,0" Click="Ok_Click">确定</Button>
+            <Button Width="90" Margin="0,12,0,0" IsCancel="True">取消</Button>
+        </StackPanel>
+    </Grid>
+</Window>
