@@ -1,8 +1,7 @@
 {
   "skillID": "Skill.DroneUpg.DamageUpg.Lv1",
   "cost": 10.0,
-  "conditions": 
-  [
+  "conditions": [
     {
       "type": "SkillNode",
       "boolType": "And",

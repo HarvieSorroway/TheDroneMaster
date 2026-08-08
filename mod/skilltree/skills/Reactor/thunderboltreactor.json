@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.ReactorUpg.ThunderboltReactor",
+  "cost": 25.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Thunderbolt Reactor Modification",
+      "description": "Give reactor ability to charge a thunder strike."
+    },
+    "Chinese": {
+      "name": "雷霆反应堆改装",
+      "description": "给予反应堆激发电击的能力"
+    }
+  }
+}

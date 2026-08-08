@@ -1,0 +1,10 @@
+{
+  "treeId": "TorsoUpg",
+  "positions": {
+    "RenderNode.TorsoUpg": {
+      "folded": { "x": -120.0, "y": -80.0 },
+      "expanded": { "x": 150.0, "y": 600.0 }
+    }
+  },
+  "lineOverrides": {}
+}

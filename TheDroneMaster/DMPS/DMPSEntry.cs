@@ -121,6 +121,7 @@ namespace TheDroneMaster.DMPS
             Futile.atlasManager.LoadAtlasFromTexture("RenderNode.DroneUpg.Count", LoadTexFromPath("illustrations/rendernode_droneupg_count.png"), false);
 
             LoadOverDriveBarResources();
+            LoadFeedBackBarResources();
             DMPSResourceString.Load();
         }
 
@@ -137,6 +138,16 @@ namespace TheDroneMaster.DMPS
 
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_PipHighLight", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_PipHighLight.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_OverDriveBar_BarHighLight", LoadTexFromPath("illustrations/ReactorUI/OverDrive/DMPS_OverDriveBar_BarHighLight.png"), false);
+        }
+
+        public static void LoadFeedBackBarResources()
+        {
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Base", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Base.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Mask", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Mask.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Light", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Light.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Fan_Light", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Fan_Light.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Bar", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Bar.png"), false);
+
         }
 
         public static Texture2D LoadTexFromPath(string path)

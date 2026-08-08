@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.ReactorUpg.FeedbackReactor",
+  "cost": 25.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "FeedbackReactor Reactor Modification",
+      "description": "Feed back energy base on cost in a short period."
+    },
+    "Chinese": {
+      "name": "反馈反应堆改装",
+      "description": "基于短时间内的花费来回馈能量"
+    }
+  }
+}

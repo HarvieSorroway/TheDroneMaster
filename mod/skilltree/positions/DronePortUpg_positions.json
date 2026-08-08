@@ -1,0 +1,30 @@
+{
+  "treeId": "DronePortUpg",
+  "positions": {
+    "RenderNode.DronePortUpg": {
+      "folded": { "x": 200.0, "y": 0.0 },
+      "expanded": { "x": 150.0, "y": 600.0 }
+    },
+    "RenderNode.DronePortUpg.Cost.Lv0": {
+      "folded": { "x": 260.0, "y": -20.0 },
+      "expanded": { "x": 400.0, "y": 600.0 }
+    },
+    "RenderNode.DronePortUpg.Cost.Lv1": {
+      "folded": { "x": 290.0, "y": -20.0 },
+      "expanded": { "x": 540.0, "y": 600.0 }
+    },
+    "RenderNode.DronePortUpg.JetJump.Lv0": {
+      "folded": { "x": 280.0, "y": -40.0 },
+      "expanded": { "x": 480.0, "y": 520.0 }
+    },
+    "RenderNode.DronePortUpg.JetJump.Lv1": {
+      "folded": { "x": 310.0, "y": -40.0 },
+      "expanded": { "x": 620.0, "y": 520.0 }
+    },
+    "RenderNode.DronePortUpg.JetJump.Lv2": {
+      "folded": { "x": 340.0, "y": -40.0 },
+      "expanded": { "x": 760.0, "y": 520.0 }
+    }
+  },
+  "lineOverrides": {}
+}

@@ -366,3 +366,4 @@ FodyWeavers.xsd
 TheDroneMaster.csproj
 .vscode/settings.json
 /includes
+/Tools

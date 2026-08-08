@@ -3,3 +3,4 @@
 [ADD]DMPS_JetJump : dmpsJetJump/vol=0.4
 [ADD]DMPS_DroneAttack_Default : dmpsDroneAttackDefault/vol=0.4
 [ADD]DMPS_DroneMoveLoop : dmpsDroneMove/vol = 0.4
+[ADD]DMPS_ShootFuse : shootFuse/vol = 0.1

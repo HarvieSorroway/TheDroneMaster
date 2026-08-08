@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.ReactorUpg.Efficiency.Lv0",
+  "cost": 10.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Energy Efficienty Upgrade Lv.1",
+      "description": "All energy cost decrease by +5%"
+    },
+    "Chinese": {
+      "name": "能量效率升级 lv.1",
+      "description": "所有能量花费减少 +5%"
+    }
+  }
+}

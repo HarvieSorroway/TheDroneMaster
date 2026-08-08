@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.ReactorUpg.OverDriveReactor",
+  "cost": 25.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "OverDrive Reactor Modification",
+      "description": "Give reactor ability to overdrive, raise movbiliy and overall damage."
+    },
+    "Chinese": {
+      "name": "超载反应堆改装",
+      "description": "给予反应堆超载的能力，提升机动性和总体伤害"
+    }
+  }
+}

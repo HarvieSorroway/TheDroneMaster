@@ -1,0 +1,42 @@
+{
+  "treeId": "DroneUpg",
+  "positions": {
+    "RenderNode.DroneUpg": {
+      "folded": { "x": 120.0, "y": -80.0 },
+      "expanded": { "x": 150.0, "y": 600.0 }
+    },
+    "RenderNode.DroneUpg.DamageUpg.Lv0": {
+      "folded": { "x": 180.0, "y": -100.0 },
+      "expanded": { "x": 400.0, "y": 530.0 }
+    },
+    "RenderNode.DroneUpg.DamageUpg.Lv1": {
+      "folded": { "x": 210.0, "y": -100.0 },
+      "expanded": { "x": 540.0, "y": 530.0 }
+    },
+    "RenderNode.DroneUpg.DamageUpg.Lv2": {
+      "folded": { "x": 240.0, "y": -100.0 },
+      "expanded": { "x": 680.0, "y": 530.0 }
+    },
+    "RenderNode.DroneUpg.DamageUpg.Lv3": {
+      "folded": { "x": 270.0, "y": -100.0 },
+      "expanded": { "x": 820.0, "y": 530.0 }
+    },
+    "RenderNode.DroneUpg.Count.Lv0": {
+      "folded": { "x": 200.0, "y": -120.0 },
+      "expanded": { "x": 400.0, "y": 430.0 }
+    },
+    "RenderNode.DroneUpg.Count.Lv1": {
+      "folded": { "x": 230.0, "y": -120.0 },
+      "expanded": { "x": 540.0, "y": 430.0 }
+    },
+    "RenderNode.DroneUpg.Count.Lv2": {
+      "folded": { "x": 260.0, "y": -120.0 },
+      "expanded": { "x": 680.0, "y": 430.0 }
+    },
+    "RenderNode.DroneUpg.Count.Lv3": {
+      "folded": { "x": 290.0, "y": -120.0 },
+      "expanded": { "x": 820.0, "y": 430.0 }
+    }
+  },
+  "lineOverrides": {}
+}

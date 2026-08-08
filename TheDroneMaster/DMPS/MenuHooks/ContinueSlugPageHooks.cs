@@ -55,9 +55,8 @@ namespace TheDroneMaster.DMPS.MenuHooks
             var data = orig.Invoke(manager, slugcat);
             
             if (!manager.rainWorld.progression.IsThereASavedGame(slugcat) || slugcat != DMEnums.DMPS.SlugStateName.DMPS)
-            {
                 return data;
-            }
+
             DMPSBasicSave dmpsSave;
             if (manager.rainWorld.progression.currentSaveState != null && manager.rainWorld.progression.currentSaveState.saveStateNumber == slugcat)
             {
@@ -67,17 +66,18 @@ namespace TheDroneMaster.DMPS.MenuHooks
                     energy = dmpsSave.Energy,
                     maxEnergy = dmpsSave.MaxEnergy,
                 };
+
+                if (dmpsDataTable.TryGetValue(data, out _))
+                    dmpsDataTable.Remove(data);
+
                 dmpsDataTable.Add(data, dmpsData);
             }
             if (!manager.rainWorld.progression.HasSaveData)
-            {
                 return data;
-            }
+
             string[] progLinesFromMemory = manager.rainWorld.progression.GetProgLinesFromMemory();
             if (progLinesFromMemory.Length == 0)
-            {
                 return data;
-            }
 
             dmpsSave = new DMPSBasicSave(DMEnums.DMPS.SlugStateName.DMPS);
             string header = DeathPersistentSaveDataRx.TotalHeader + dmpsSave.header;
@@ -98,6 +98,10 @@ namespace TheDroneMaster.DMPS.MenuHooks
                             energy = dmpsSave.Energy,
                             maxEnergy = dmpsSave.MaxEnergy,
                         };
+
+                        if (dmpsDataTable.TryGetValue(data, out _))
+                            dmpsDataTable.Remove(data);
+
                         dmpsDataTable.Add(data, dmpsData);
                         break;
                     }

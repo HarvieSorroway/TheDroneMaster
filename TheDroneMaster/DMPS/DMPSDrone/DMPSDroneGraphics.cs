@@ -85,8 +85,6 @@ namespace TheDroneMaster.DMPS.DMPSDrone
             {
                 wings[i] = new DroneWing(this, droneWingStartIndex + i, 360f * i / (float)wings.Length);
             }
-
-            
         }
 
         public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)

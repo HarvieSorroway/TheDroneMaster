@@ -83,7 +83,7 @@ namespace TheDroneMaster.DMPS.DMPSDrone.DroneWeapon
         {
             base.FireWeapon(drone);
             lastCharge = charge = 0;
-            chargeCD = afterFireCD; 
+            chargeCD = afterFireCD;
         }
     }
 

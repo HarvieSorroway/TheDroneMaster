@@ -34,6 +34,8 @@ namespace TheDroneMaster
         public static SoundID DataHumming;
         public static SoundID DataWaveShock;
 
+        
+
         public static class SlugStateName
         {
             public static SlugcatStats.Name DroneMaster = new SlugcatStats.Name("thedronemaster");
@@ -47,6 +49,7 @@ namespace TheDroneMaster
             DMPS.Sound.JetJump = new SoundID("DMPS_JetJump", true);
             DMPS.Sound.DMPS_DroneAttack_Default = new SoundID("DMPS_DroneAttack_Default", true);
             DMPS.Sound.DMPS_DroneMoveLoop = new SoundID("DMPS_DroneMoveLoop", true);
+            DMPS.Sound.DMPS_ShootFuse = new SoundID("DMPS_ShootFuse", true);
         }
 
         public static class DMPS
@@ -70,6 +73,8 @@ namespace TheDroneMaster
                 public static SoundID JetJump;
                 public static SoundID DMPS_DroneAttack_Default;
                 public static SoundID DMPS_DroneMoveLoop;
+
+                public static SoundID DMPS_ShootFuse;
             }
 
         }

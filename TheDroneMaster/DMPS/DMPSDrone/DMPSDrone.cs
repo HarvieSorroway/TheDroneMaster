@@ -53,8 +53,9 @@ namespace TheDroneMaster.DMPS.DMPSDrone
             waterRetardationImmunity = 0.9f;
             GoThroughFloors = true;
 
-            weapon = new DefaultLaserGun();
+            //weapon = new DefaultLaserGun();
             //weapon = new LastPrismGun();
+            weapon = new ShockTrainGun();
 
             if (abstractCreature is AbstractDMPSDrone abstractDMPSDrone)
             {

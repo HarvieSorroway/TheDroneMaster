@@ -39,6 +39,7 @@ namespace TheDroneMaster.DMPS.DMPShud
                 {
                     DMPSBasicSave.BioReactorType.Default => new DMPSEnergyBarBase(hud.fContainers[1]),
                     DMPSBasicSave.BioReactorType.OverDrive => new OverDriveBar(hud.fContainers[1]),
+                    DMPSBasicSave.BioReactorType.Feedback => new FeedBackBar(hud.fContainers[1]),
                     _ => new DMPSEnergyBarBase(hud.fContainers[1])
                 };
 
@@ -68,6 +69,10 @@ namespace TheDroneMaster.DMPS.DMPShud
                 {
                     case DMPSBasicSave.BioReactorType.OverDrive:
                         (energyBar as OverDriveBar).setOverDriveEnergy = (module.energyBarMessage as OverDriveMessage).overDriveEnergy;
+                        break;
+                    case DMPSBasicSave.BioReactorType.Feedback:
+                        (energyBar as FeedBackBar).setFeedBackEfficiency = (module.energyBarMessage as FeedBackMessage).feedBackEfficiency;
+                        (energyBar as FeedBackBar).Pluse((module.energyBarMessage as FeedBackMessage).pluseStack);
                         break;
                 }
             }

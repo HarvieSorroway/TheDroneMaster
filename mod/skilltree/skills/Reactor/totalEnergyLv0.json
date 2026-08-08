@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.ReactorUpg.TotalEnergy.Lv0",
+  "cost": 10.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Total Energy Upgrade Lv.1",
+      "description": "Total energy added by 20"
+    },
+    "Chinese": {
+      "name": "总能量升级 lv.1",
+      "description": "总能量提升20"
+    }
+  }
+}

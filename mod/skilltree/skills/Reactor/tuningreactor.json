@@ -1,0 +1,15 @@
+{
+  "skillID": "Skill.ReactorUpg.TuningReactor",
+  "cost": 25.0,
+  "conditions": [],
+  "descriptionInfos": {
+    "English": {
+      "name": "Tuning Reactor Modification",
+      "description": "Give reactor ability to tune with data pearls, each gives reactor different buff."
+    },
+    "Chinese": {
+      "name": "调谐反应堆改装",
+      "description": "给予反应堆调谐珍珠的能力，每个珍珠都会给予反应堆不同类型的buff"
+    }
+  }
+}
