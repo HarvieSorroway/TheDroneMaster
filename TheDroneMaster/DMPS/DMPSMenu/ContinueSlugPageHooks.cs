@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -79,33 +80,51 @@ namespace TheDroneMaster.DMPS.MenuHooks
             if (progLinesFromMemory.Length == 0)
                 return data;
 
-            dmpsSave = new DMPSBasicSave(DMEnums.DMPS.SlugStateName.DMPS);
-            string header = DeathPersistentSaveDataRx.TotalHeader + dmpsSave.header;
+            string header = DeathPersistentSaveDataRx.TotalHeader + DMPSBasicSave.Header;
             foreach (var progLine in progLinesFromMemory)
             {
-                if (!progLine.Contains(header))
-                    continue;
-                string[] array = Regex.Split(progLine, "<dpA>");
-
-                foreach(var line in array)
+                string[] array = Regex.Split(progLine, "<progDivB>");
+                if (array.Length != 2 || !(array[0] == "SAVE STATE") || !(BackwardsCompatibilityRemix.ParseSaveNumber(array[1]) == slugcat))
                 {
-                    if (line.Contains(header))
+                    continue;
+                }
+                var dataLine = Regex.Split(array[1],"<dpA>");
+                foreach (var l in dataLine)
+                {
+                    if (l.Contains(header) && DeathPersistentSaveDataRx.TryCreateTreatmentFromString<DMPSBasicSave>(l, DMEnums.DMPS.SlugStateName.DMPS, out var save))
                     {
-                        string[] array2 = Regex.Split(line, "<dpB>");
-                        dmpsSave.LoadDatas(array2[1]);
                         var dmpsData = new DMPSSaveGameData()
                         {
-                            energy = dmpsSave.Energy,
-                            maxEnergy = dmpsSave.MaxEnergy,
+                            energy = save.Energy,
+                            maxEnergy = save.MaxEnergy,
                         };
-
                         if (dmpsDataTable.TryGetValue(data, out _))
                             dmpsDataTable.Remove(data);
 
                         dmpsDataTable.Add(data, dmpsData);
-                        break;
                     }
+                    //Plugin.Log($"progDivB lines: {l}");
                 }
+          
+                //string[] array = Regex.Split(progLine, "<dpA>");
+
+                //foreach(var sav in array)
+                //{
+                //    if (!sav.Contains(header))
+                //        continue;
+                //    if (DeathPersistentSaveDataRx.TryCreateTreatmentFromString<DMPSBasicSave>(sav, DMEnums.DMPS.SlugStateName.DMPS, out var save))
+                //    {
+                //        var dmpsData = new DMPSSaveGameData()
+                //        {
+                //            energy = save.Energy,
+                //            maxEnergy = save.MaxEnergy,
+                //        };
+                //        if (dmpsDataTable.TryGetValue(data, out _))
+                //            dmpsDataTable.Remove(data);
+
+                //        dmpsDataTable.Add(data, dmpsData);
+                //    }
+                //}
             }
 
             return data;
