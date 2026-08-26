@@ -42,7 +42,7 @@ namespace TheDroneMaster.DMPS.DMPSDrone.DroneWeapon
             base.FireWeapon(drone);
             for(int i = 0;i < 2; i++)
             {
-                drone.room.AddObject(new ShockObject(drone.room, drone.firstChunk.pos, Custom.VecToDeg(drone.dir), 80f, 5f, 0.4f));
+                drone.room.AddObject(new ShockObject(drone.room, drone.firstChunk.pos, Custom.VecToDeg(drone.dir), 80f, 5f, 0.4f, source: drone));
             }
             drone.room.PlaySound(DMEnums.DMPS.Sound.DMPS_ShootFuse, drone.firstChunk, false, 0.2f, 1f + Random.value * 0.1f);
 
