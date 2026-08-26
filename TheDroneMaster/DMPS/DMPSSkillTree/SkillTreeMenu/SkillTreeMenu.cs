@@ -30,6 +30,12 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
         //saveInfo
         internal DMPSBasicSave skillTreeSave;
+        readonly SaveState saveStateFrom;
+        readonly HashSet<string> enabledSkills = new HashSet<string>();
+        float currentEnergy;
+        bool hasPendingChanges;
+
+        public bool HasPendingChanges => hasPendingChanges;
 
         //return info
         PauseMenu pauseMenuFrom;
@@ -46,7 +52,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
         internal Vector2 middleScreen;
 
-        public float Energy => skillTreeSave.Energy;
+        public float Energy => currentEnergy;
         public int maxEnergy = 80;
 
         public bool previewMode;
@@ -57,11 +63,13 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         public float alpha, lastAlpha;
         bool quitTriggered;
 
-        public SkillTreeMenu(ProcessManager manager, PauseMenu pauseMenuFrom, bool previewMode) : base(manager, SkillTreeID)
+        public SkillTreeMenu(ProcessManager manager, PauseMenu pauseMenuFrom, bool previewMode, SaveState saveState = null) : base(manager, SkillTreeID)
         {
             this.pauseMenuFrom = pauseMenuFrom;
             this.previewMode = previewMode;
+            saveStateFrom = saveState;
             skillTreeSave = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
+            LoadSkillStateFromSave();
 
             container.AddChild(bkg = new FSprite("pixel")
             {
@@ -153,7 +161,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             pages[0].subObjects.Add(skillInfoScreen = new SkillInfoScreen(this, pages[0]));
 
             anim = new ShowMenuAnim(this);
-            SyncSkillState();
+            RefreshSkillState();
         }
 
         void Reload()
@@ -191,13 +199,20 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             CreateRenderElement();
         }
 
-        public void SyncSkillState()
+        void LoadSkillStateFromSave()
+        {
+            enabledSkills.Clear();
+            enabledSkills.UnionWith(skillTreeSave.GetEnabledSkillsSnapshot());
+            currentEnergy = skillTreeSave.Energy;
+        }
+
+        void RefreshSkillState()
         {
             foreach(var item in idMapper.Values)
             {
                 if(item is SkillTreeSkillButton skillTreeButton)
                 {
-                    skillTreeButton.SkillEnabled = skillTreeSave.CheckSkill(RenderNodeLoader.idMapper[skillTreeButton.id].bindSkillNodeInfo);
+                    skillTreeButton.SkillEnabled = CheckSkill(RenderNodeLoader.idMapper[skillTreeButton.id].bindSkillNodeInfo);
                 }
                 if(item is SkillTreeLineRenderer skillTreeLineRenderer)
                 {
@@ -211,12 +226,12 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                         {
                             if (condition.conditionType != SkillNode.ConditionType.SkillNode)
                                 continue;
-                            var res = DMPSSkillTreeHelper.CheckCondition(new SkillNode.SKillNodeConditionInfo()
+                            var res = CheckCondition(new SkillNode.SKillNodeConditionInfo()
                             {
                                 boolType = condition.boolType,
                                 info = condition.info,
                                 type = SkillNode.ConditionType.SkillNode
-                            }, skillTreeSave);
+                            });
 
                             if (condition.boolType == SkillNode.ConditionBoolType.Or || condition.boolType == SkillNode.ConditionBoolType.NotOr)
                             {
@@ -269,6 +284,67 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             skillInfoScreen.SyncState();
         }
 
+        internal bool CheckSkill(string id)
+        {
+            return enabledSkills.Contains(id);
+        }
+
+        internal bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo)
+        {
+            return DMPSSkillTreeHelper.CheckCondition(conditionInfo, CheckSkill);
+        }
+
+        internal bool CheckAllConditions(SkillNode node)
+        {
+            return DMPSSkillTreeHelper.CheckAllConditions(node, CheckSkill);
+        }
+
+        internal void EnableSkill(string id, float cost)
+        {
+            if (!enabledSkills.Add(id))
+                return;
+
+            currentEnergy = Mathf.Max(0f, currentEnergy - cost);
+            SkillStateChanged();
+        }
+
+        internal void DisableSkill(string id)
+        {
+            var nextCheck = new Queue<string>();
+            var queuedSkills = new HashSet<string>();
+            nextCheck.Enqueue(id);
+            queuedSkills.Add(id);
+
+            bool stateChanged = false;
+            while (nextCheck.Count > 0)
+            {
+                string removedSkill = nextCheck.Dequeue();
+                if (!enabledSkills.Remove(removedSkill))
+                    continue;
+
+                stateChanged = true;
+                foreach (var enabledSkill in enabledSkills.ToArray())
+                {
+                    if (queuedSkills.Contains(enabledSkill))
+                        continue;
+                    if (SkillNodeLoader.loadedSkillNodes.TryGetValue(enabledSkill, out var skillInfo) && !CheckAllConditions(skillInfo))
+                    {
+                        queuedSkills.Add(enabledSkill);
+                        nextCheck.Enqueue(enabledSkill);
+                    }
+                }
+            }
+
+            if (stateChanged)
+                SkillStateChanged();
+        }
+
+        void SkillStateChanged()
+        {
+            hasPendingChanges = true;
+            RefreshSkillState();
+        }
+
         public override void Update()
         {
             base.Update();
@@ -311,6 +387,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
         public override void ShutDownProcess()
         {
+            CommitAndSaveChanges();
             base.ShutDownProcess();
             Instance = null;
             //Plugin.postEffect.Strength = 0f;
@@ -353,15 +430,55 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
             }
         }
 
-        public void Save()
+        /// <summary>
+        /// Commits all pending in-memory skill tree changes to the current save at once.
+        /// This method is public so callers can choose an earlier save point when needed.
+        /// </summary>
+        public bool CommitAndSaveChanges()
         {
-            Custom.rainWorld.progression.SaveDeathPersistentDataOfCurrentState(false, false);
+            if (!hasPendingChanges)
+                return true;
+            if (previewMode)
+                return false;
+
+            var progression = Custom.rainWorld.progression;
+            SaveState saveState = saveStateFrom;
+            if (saveState == null || saveState.saveStateNumber != DMEnums.DMPS.SlugStateName.DMPS)
+                saveState = null;
+            if (saveState == null && progression.currentSaveState != null && progression.currentSaveState.saveStateNumber == DMEnums.DMPS.SlugStateName.DMPS)
+                saveState = progression.currentSaveState;
+            else if (saveState == null && progression.starvedSaveState != null && progression.starvedSaveState.saveStateNumber == DMEnums.DMPS.SlugStateName.DMPS)
+                saveState = progression.starvedSaveState;
+
+            if (saveState == null)
+            {
+                Plugin.Log("Unable to save pending skill tree changes: no active DMPS save state.");
+                return false;
+            }
+
+            skillTreeSave.ReplaceSkillTreeState(enabledSkills, currentEnergy);
+
+            SaveState previousSaveState = progression.currentSaveState;
+            try
+            {
+                // Death screens move the active state to starvedSaveState. EmgTx hooks
+                // DeathPersistentSaveData.SaveToString, which this API only reaches when
+                // progression.currentSaveState is non-null.
+                progression.currentSaveState = saveState;
+                progression.SaveDeathPersistentDataOfCurrentState(false, false);
+                hasPendingChanges = false;
+                return true;
+            }
+            finally
+            {
+                progression.currentSaveState = previousSaveState;
+            }
         }
 
-        public static void OpenSkillTree(ProcessManager manager, PauseMenu pauseMenu, bool previewMode)
+        public static void OpenSkillTree(ProcessManager manager, PauseMenu pauseMenu, bool previewMode, SaveState saveState = null)
         {
             if(Instance == null)
-                Instance = new SkillTreeMenu(manager, pauseMenu, previewMode);
+                Instance = new SkillTreeMenu(manager, pauseMenu, previewMode, saveState);
             manager.sideProcesses.Add(Instance);
         }
     }

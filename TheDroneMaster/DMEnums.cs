@@ -77,6 +77,14 @@ namespace TheDroneMaster
                 public static SoundID DMPS_ShootFuse;
             }
 
+            public static class ProcessManger
+            {
+                public static class ProcessID
+                {
+                    public static ProcessManager.ProcessID SleepDMPS = new ProcessManager.ProcessID("SleepDMPS", true);
+                    public static ProcessManager.ProcessID DeathDMPS = new ProcessManager.ProcessID("DeathDMPS", true); 
+                }
+            }
         }
     }
 }

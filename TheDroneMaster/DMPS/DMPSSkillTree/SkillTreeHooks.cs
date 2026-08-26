@@ -74,9 +74,10 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
 
         private static void RainWorldGame_ShutDownProcess(On.RainWorldGame.orig_ShutDownProcess orig, RainWorldGame self)
         {
+            var skillTreeMenu = SkillTreeMenu.SkillTreeMenu.Instance;
+            skillTreeMenu?.CommitAndSaveChanges();
             orig.Invoke(self);
-            if (SkillTreeMenu.SkillTreeMenu.Instance != null)
-                SkillTreeMenu.SkillTreeMenu.Instance.ShutDownProcess();
+            skillTreeMenu?.ShutDownProcess();
         }
 
         private static void RainWorldGame_Update(On.RainWorldGame.orig_Update orig, RainWorldGame self)

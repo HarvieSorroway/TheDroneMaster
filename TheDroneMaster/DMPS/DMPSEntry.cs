@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheDroneMaster.DMPS.DMPSDynamicParams;
+using TheDroneMaster.DMPS.DMPSGameHooks;
 using TheDroneMaster.DMPS.DMPShud;
 using TheDroneMaster.DMPS.DMPSSave;
 using TheDroneMaster.DMPS.DMPSSkillTree;
@@ -31,6 +32,7 @@ namespace TheDroneMaster.DMPS
             RenderNodeLoader.Load();
             SkillNodeLoader.Load();
             SkillTreeHooks.HooksOn();
+            TheDroneMaster.DMPS.DMPSGameHooks.GameHooks.HooksOn();
 
             DeathPersistentSaveDataRx.AppplyTreatment(new DMPSBasicSave(null));
             

@@ -1,4 +1,5 @@
-﻿using Menu;
+﻿using HUD;
+using Menu;
 using MoreSlugcats;
 using RWCustom;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu;
 using TheDroneMaster.DMPS.MenuHooks.KarmaLadderScreenHooks;
 using UnityEngine;
 
@@ -31,19 +33,15 @@ namespace TheDroneMaster.DMPS.DMPSMenu.DMPS_SleepAndDeathScreen
             AddButton(false);
         }
 
-        public virtual void GetDataFromGame(KarmaLadderScreen.SleepDeathScreenDataPackage package)
+        public virtual void GetDataFromGame(DMPSSleepAndDeathScreenDataPackage package)
         {
-            Custom.Log(new string[]
-            {
-                string.Format("{0} screen get data from game! karma: {1} reinf: {2} sMal:{3} gMal:{4}", new object[]
+            Plugin.Log(string.Format("{0} screen get data from game! karma: {1} reinf: {2}", new object[]
                 {
                     this.ID,
                     package.karma,
                     package.karmaReinforced,
-                    package.startMalnourished,
-                    package.goalMalnourished
-                })
-            });
+
+                }));
             //this.karma = new IntVector2(Custom.IntClamp(package.karma.x + ((this.ID == ProcessManager.ProcessID.SleepScreen && package.karma.y < 100) ? -1 : 0), 0, package.karma.y), package.karma.y);
             //this.karmaReinforced = package.karmaReinforced;
             this.saveState = package.saveState;
@@ -51,6 +49,13 @@ namespace TheDroneMaster.DMPS.DMPSMenu.DMPS_SleepAndDeathScreen
             //this.playKarmaDream = false;
             //this.goalMalnourished = package.goalMalnourished;
             //this.dreamsState = null;
+        }
+
+        public override void Update()
+        {
+            if (SkillTreeMenu.Instance != null)
+                return;
+            base.Update();
         }
 
         public void AddButton(bool black)
@@ -93,12 +98,37 @@ namespace TheDroneMaster.DMPS.DMPSMenu.DMPS_SleepAndDeathScreen
                     base.PlaySound(SoundID.MENU_Continue_From_Sleep_Death_Screen);
                     return;
                 }
+                if (message == "DMPS_SKILLS")
+                {
+                    PlaySound(SoundID.MENU_Passage_Button);
+                    SkillTreeMenu.OpenSkillTree(manager, null, false, saveState);
+                }
                 if (!(message == "EXIT"))
                 {
                     return;
                 }
+
                 this.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.MainMenu);
                 base.PlaySound(SoundID.MENU_Switch_Page_Out);
+            }
+        }
+
+        public class DMPSSleepAndDeathScreenDataPackage
+        {
+            public bool karmaReinforced;
+            public int playerRoom, karma;
+            public Vector2 playerPos;
+            public Map.MapData mapData;
+            public SlugcatStats characterStats;
+            public SaveState saveState;
+            public PlayerSessionRecord sessionRecord;
+
+            public bool goalMalnourished;
+            public DMPSSleepAndDeathScreenDataPackage(int karma, bool karmaReinforced, SaveState saveState)
+            {
+                this.karma = karma;
+                this.karmaReinforced = karmaReinforced;
+                this.saveState = saveState;
             }
         }
     }

@@ -65,6 +65,18 @@ namespace TheDroneMaster.DMPS.DMPSSave
             return enabledSkills.Value.Contains(id);
         }
 
+        public HashSet<string> GetEnabledSkillsSnapshot()
+        {
+            return new HashSet<string>(enabledSkills.Value);
+        }
+
+        public void ReplaceSkillTreeState(IEnumerable<string> skillIDs, float currentEnergy)
+        {
+            enabledSkills.Value.Clear();
+            enabledSkills.Value.UnionWith(skillIDs);
+            Energy = currentEnergy;
+        }
+
         public void EnableSkill(string id)
         {
             Plugin.LoggerLog($"EnableSkill : {id}");

@@ -23,7 +23,7 @@ namespace TheDroneMaster.DMPS.MenuHooks.KarmaLadderScreenHooks
             if(message == "DMPS_SKILLS")
             {
                 self.PlaySound(SoundID.MENU_Passage_Button);
-                SkillTreeMenu.OpenSkillTree(self.manager, null, false);
+                SkillTreeMenu.OpenSkillTree(self.manager, null, false, self.saveState);
             }
         }
 
