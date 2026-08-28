@@ -28,7 +28,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks
             {
                 float angle = Custom.AimFromOneVectorToAnother(player.firstChunk.pos, worldMousePos);
 
-            player.room.AddObject(new ShockObject(player.room, player.firstChunk.pos, angle, 120f, 5f, 0.4f, source: player));
+                player.room.AddObject(new ShockObject(player.room, player.firstChunk.pos, angle, 120f, 5f, 0.4f, source: player));
             }
             lastGdown = Gdown;
         }

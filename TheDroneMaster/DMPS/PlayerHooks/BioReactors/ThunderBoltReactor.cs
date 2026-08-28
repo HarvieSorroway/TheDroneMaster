@@ -9,6 +9,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
 {
     internal class ThunderBoltReactor : DMPSBioReactor
     {
+
         public ThunderBoltReactor(Player player, DMPSModule module) : base(player, module)
         {
         }

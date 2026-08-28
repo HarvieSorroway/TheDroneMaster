@@ -74,6 +74,8 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
 
         public float TotalWidth => pips.Count * (pipSizeFull.x + pipGap) - pipGap;
 
+        public virtual Vector2 Margin => Vector2.zero;
+
         public int TotalEnergy
         {
             get => pips.Count;

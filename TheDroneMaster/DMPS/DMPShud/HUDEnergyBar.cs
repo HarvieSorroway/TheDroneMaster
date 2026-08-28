@@ -35,11 +35,13 @@ namespace TheDroneMaster.DMPS.DMPShud
                 var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
 
                 barMode = save.ReactorType;
+
                 energyBar = save.ReactorType switch
                 {
                     DMPSBasicSave.BioReactorType.Default => new DMPSEnergyBarBase(hud.fContainers[1]),
                     DMPSBasicSave.BioReactorType.OverDrive => new OverDriveBar(hud.fContainers[1]),
                     DMPSBasicSave.BioReactorType.Feedback => new FeedBackBar(hud.fContainers[1]),
+                    DMPSBasicSave.BioReactorType.ThunderBolt => new ThunderBoltBar(hud.fContainers[1]),
                     _ => new DMPSEnergyBarBase(hud.fContainers[1])
                 };
 
@@ -77,7 +79,7 @@ namespace TheDroneMaster.DMPS.DMPShud
                 }
             }
             energyBar.currentEnergy = energy;
-            energyBar.pos = pos;
+            energyBar.pos = pos + energyBar.Margin;
             energyBar.Show = 1f;
             energyBar.expand = 1f;
             energyBar.alpha = 1f;

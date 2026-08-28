@@ -164,7 +164,7 @@ namespace TheDroneMaster.DMPS.DMPSSave
         {
             get
             {
-                return BioReactorType.Feedback;
+                return BioReactorType.ThunderBolt;
             }
         }
 

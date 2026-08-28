@@ -124,6 +124,7 @@ namespace TheDroneMaster.DMPS
 
             LoadOverDriveBarResources();
             LoadFeedBackBarResources();
+            LoadThunderBoltBarResources();
             DMPSResourceString.Load();
         }
 
@@ -149,6 +150,15 @@ namespace TheDroneMaster.DMPS
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Light", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Light.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Fan_Light", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Fan_Light.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Bar", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Bar.png"), false);
+
+        }
+
+        public static void LoadThunderBoltBarResources()
+        {
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_BarLeft", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_BarLeft.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_BarRight", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_BarRight.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_PingAnvil", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_PingAnvil.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_PingHammer", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_PingHammer.png"), false);
 
         }
 
