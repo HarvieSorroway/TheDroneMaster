@@ -32,6 +32,8 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
 
         PluseUnit[] pluseUnits = new PluseUnit[pluseSplit];
 
+        public override Vector2 Margin => new Vector2(18f, 0f);
+
 
         public FeedBackBar(FContainer container) : base(container)
         {
@@ -122,10 +124,6 @@ namespace TheDroneMaster.DMPS.DMPShud.EnergyBar
                 pluseMesh.verticeColors[pluseUnits[i].indexDown] = StaticColors.Menu.pink.CloneWithNewAlpha(0f);
             }
             GrafUpdatePluseSprite(0f);
-
-
-
-            pos = new Vector2(18f, 0f);
         }
 
         public override void Update()

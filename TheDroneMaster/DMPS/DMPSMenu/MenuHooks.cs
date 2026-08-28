@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheDroneMaster.DMPS.DMPShud;
+using TheDroneMaster.DMPS.DMPSMenu.DMPS_SleepAndDeathScreen;
 using TheDroneMaster.DMPS.SkillTree;
 using TheDroneMaster.DMPS.SkillTree.SkillTreeRender;
 using UnityEngine.Networking;
@@ -18,7 +19,7 @@ namespace TheDroneMaster.DMPS.MenuHooks
         {
             ContinueSlugPageHooks.HooksOn();
             KarmaLadderScreenHooks.KarmaLadderScreenHooks.HooksOn();
+            SleepAndDeathScreenHooks.HooksOn();
         }
-
     }
 }

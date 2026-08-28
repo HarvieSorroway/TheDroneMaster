@@ -97,10 +97,15 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
         //识别前置条件，根据not信息自动反转布尔值
         public static bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo, DMPSBasicSave save)
         {
+            return CheckCondition(conditionInfo, save.CheckSkill);
+        }
+
+        public static bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo, Func<string, bool> checkSkill)
+        {
             bool res = false;
             if (conditionInfo.type == SkillNode.ConditionType.SkillNode)
             {
-                res = save.CheckSkill(conditionInfo.info);
+                res = checkSkill(conditionInfo.info);
             }
             else if (conditionInfo.type == SkillNode.ConditionType.Item)
             {
@@ -118,19 +123,24 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree
 
         public static bool CheckAllConditions(SkillNode node, DMPSBasicSave save)
         {
+            return CheckAllConditions(node, save.CheckSkill);
+        }
+
+        public static bool CheckAllConditions(SkillNode node, Func<string, bool> checkSkill)
+        {
             if(node.conditions == null || node.conditions.Count == 0)
                 return true;
 
-            bool res = CheckCondition(node.conditions[0], save);
+            bool res = CheckCondition(node.conditions[0], checkSkill);
             for(int i = 0;i < node.conditions.Count; i++)
             {
                 if (node.conditions[i].boolType == SkillNode.ConditionBoolType.Or || node.conditions[i].boolType == SkillNode.ConditionBoolType.NotOr)
                 {
-                    res = res || CheckCondition(node.conditions[i], save);
+                    res = res || CheckCondition(node.conditions[i], checkSkill);
                 }
                 else
                 {
-                    res = res && CheckCondition(node.conditions[i], save);
+                    res = res && CheckCondition(node.conditions[i], checkSkill);
                 }
             }
             return res;

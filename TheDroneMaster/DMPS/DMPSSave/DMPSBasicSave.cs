@@ -1,8 +1,12 @@
 ﻿using CustomSaveTx;
+using EmgTx.CustomSaveTx;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -14,52 +18,69 @@ namespace TheDroneMaster.DMPS.DMPSSave
 {
     internal partial class DMPSBasicSave : DeathPersistentSaveDataTx
     {
-        public override string header => "DMPSSKILLTREESAVE";
+        public const string Header = "DMPSSKILLTREESAVE";
+        public override string header => Header;
 
-        float _energy;
+        readonly SaveUnit<float> energy;
+        readonly SaveUnit<int> activeDroneCountSaveUnit;
+        readonly SaveUnit<HashSet<string>> enabledSkills;
+
         public float Energy
         {
-            get => _energy;
-            set => _energy = Mathf.Clamp(value, 0, MaxEnergy);
+            get => energy.Value;
+            set => energy.Value = Mathf.Clamp(value, 0, MaxEnergy);
         }
-        public int activeDroneCount;
-        HashSet<string> enabledSkills = new HashSet<string>();
+        public int activeDroneCount
+        {
+            get => activeDroneCountSaveUnit.Value;
+            set => activeDroneCountSaveUnit.Value = value;
+        }
+
         public DMPSBasicSave(SlugcatStats.Name name) : base(name)
         {
+            energy = AddSaveUnit("energy", 0f);
+            activeDroneCountSaveUnit = AddSaveUnit("activeDroneCount", 0);
+            enabledSkills = AddSaveUnit("enabledSkills", new HashSet<string>());
         }
 
         public override void LoadDatas(string data)
         {
             base.LoadDatas(data);
 
-            if (string.IsNullOrEmpty(data))
-                return;
-
-            string[] items = Regex.Split(data, "<DMPS>");
-
-            Energy = float.Parse(items[0]);
-            activeDroneCount = int.Parse(items[1]);
-            enabledSkills = JsonConvert.DeserializeObject<HashSet<string>>(items[2]);
-
-            Plugin.LoggerLog($"LoadDatas : Energy={Energy}, activeDroneCount={activeDroneCount}, enabledSkills={string.Join(",", enabledSkills)}");
+            //Plugin.LoggerLog($"LoadDatas : Energy={Energy}, activeDroneCount={activeDroneCount}, enabledSkills={string.Join(",", enabledSkills.Value)}");
         }
 
         public override string SaveToString(bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
         {
-            if (saveAsIfPlayerDied | saveAsIfPlayerQuit) return origSaveData;
+            return string.Empty;
+        }
 
-            return $"{Energy}<DMPS>{activeDroneCount}<DMPS>{JsonConvert.SerializeObject(enabledSkills)}";
+        public override void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
+        {
+            base.ClearDataForNewSaveState(newSlugName);
         }
 
         public bool CheckSkill(string id)
         {
-            return enabledSkills.Contains(id);
+            return enabledSkills.Value.Contains(id);
+        }
+
+        public HashSet<string> GetEnabledSkillsSnapshot()
+        {
+            return new HashSet<string>(enabledSkills.Value);
+        }
+
+        public void ReplaceSkillTreeState(IEnumerable<string> skillIDs, float currentEnergy)
+        {
+            enabledSkills.Value.Clear();
+            enabledSkills.Value.UnionWith(skillIDs);
+            Energy = currentEnergy;
         }
 
         public void EnableSkill(string id)
         {
             Plugin.LoggerLog($"EnableSkill : {id}");
-            enabledSkills.Add(id);
+            enabledSkills.Value.Add(id);
         }
 
         public void DisableSkill(string id)
@@ -71,10 +92,10 @@ namespace TheDroneMaster.DMPS.DMPSSave
             {
                 foreach (var item in removedIDs)
                 {
-                    enabledSkills.Remove(item);
+                    enabledSkills.Value.Remove(item);
                     Plugin.LoggerLog($"DisableSkill : {item}");
 
-                    foreach (var skill in enabledSkills)
+                    foreach (var skill in enabledSkills.Value)
                     {
                         var skillInfo = SkillNodeLoader.loadedSkillNodes[skill];
 
@@ -91,6 +112,7 @@ namespace TheDroneMaster.DMPS.DMPSSave
                 nextCheck.Clear();
             }
         }
+
     }
 
     /// <summary>
@@ -142,7 +164,7 @@ namespace TheDroneMaster.DMPS.DMPSSave
         {
             get
             {
-                return BioReactorType.Feedback;
+                return BioReactorType.ThunderBolt;
             }
         }
 

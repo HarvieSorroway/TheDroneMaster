@@ -65,6 +65,9 @@
       <HintPath>..\includes\UnityEngine.UnityWebRequestModule.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DMPS\WorldDifficulty\" />
+  </ItemGroup>
   <Target Name="CopyBuildOutputToNewestPlugins" AfterTargets="Build">
     <PropertyGroup>
       <NewestPluginsDir>$(MSBuildProjectDirectory)\..\mod\newest\plugins</NewestPluginsDir>

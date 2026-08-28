@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using TheDroneMaster.DMPS.DMPShud.EnergyBar;
-using TheDroneMaster.DMPS.DMPSSave;
 using UnityEngine;
 
 namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
@@ -198,7 +197,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             if (SkillNodeLoader.loadedSkillNodes.TryGetValue(skillID, out var node))
             {
-                currentSkillState = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>().CheckSkill(skillID);
+                currentSkillState = (menu as SkillTreeMenu).CheckSkill(skillID);
                 icon.isVisible = true;
                 if (node.TryGetDescriptionInfo(Custom.rainWorld.inGameTranslator.currentLanguage, out var res))
                 {
@@ -224,7 +223,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
                 energyBar.redEnergy = node.cost;
                 costLabel.text = string.Format(DMPSResourceString.Get("SkillMenu_CostLabel"), node.cost);
 
-                float conditionAlpha = currentSkillState ? (DMPSSkillTreeHelper.CheckAllConditions(node, (menu as SkillTreeMenu).skillTreeSave) ? 1f : 0f) : 1f;
+                float conditionAlpha = currentSkillState ? ((menu as SkillTreeMenu).CheckAllConditions(node) ? 1f : 0f) : 1f;
                 float costAlpha = (menu as SkillTreeMenu).Energy - node.cost >= 0 ? 1f : 0f;
 
                 holdButton?.SetAlpha(costAlpha * conditionAlpha);
@@ -251,17 +250,12 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
         {
             if (string.IsNullOrEmpty(focusingSkillID))
                 return;
-           
-            if (currentSkillState)
-                (menu as SkillTreeMenu).skillTreeSave.DisableSkill(focusingSkillID);
-            else if(SkillNodeLoader.loadedSkillNodes.TryGetValue(focusingSkillID, out var node))
-            {
-                (menu as SkillTreeMenu).skillTreeSave.EnableSkill(focusingSkillID);
-                (menu as SkillTreeMenu).skillTreeSave.Energy -= node.cost;
-            }
-            (menu as SkillTreeMenu).Save();
 
-            (menu as SkillTreeMenu).SyncSkillState();
+            var skillTreeMenu = menu as SkillTreeMenu;
+            if (currentSkillState)
+                skillTreeMenu.DisableSkill(focusingSkillID);
+            else if(SkillNodeLoader.loadedSkillNodes.TryGetValue(focusingSkillID, out var node))
+                skillTreeMenu.EnableSkill(focusingSkillID, node.cost);
         }
 
         public override void RemoveSprites()
@@ -315,7 +309,7 @@ namespace TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu
 
             public bool CheckCondition(SkillNode.SKillNodeConditionInfo conditionInfo)
             {
-                return DMPSSkillTreeHelper.CheckCondition(conditionInfo, DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>());
+                return (owner.menu as SkillTreeMenu).CheckCondition(conditionInfo);
             }
 
             public string LabelText(SkillNode.SKillNodeConditionInfo conditionInfo, int i )
