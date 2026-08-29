@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 
 namespace TheDroneMaster.GameHooks
 {
-    public class RainWorldGamePatch
+    public static partial class RainWorldGamePatch
     {
         public static ConditionalWeakTable<RainWorldGame, RainWorldGameModule> modules = new ConditionalWeakTable<RainWorldGame, RainWorldGameModule>();
         public static void PatchOn()
         {
             On.RainWorldGame.ctor += RainWorldGame_ctor;
+            ShieldPatchOn();
         }
 
         private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
