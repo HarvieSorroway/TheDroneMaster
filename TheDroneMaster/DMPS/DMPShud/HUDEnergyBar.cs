@@ -76,6 +76,14 @@ namespace TheDroneMaster.DMPS.DMPShud
                         (energyBar as FeedBackBar).setFeedBackEfficiency = (module.energyBarMessage as FeedBackMessage).feedBackEfficiency;
                         (energyBar as FeedBackBar).Pluse((module.energyBarMessage as FeedBackMessage).pluseStack);
                         break;
+                    case DMPSBasicSave.BioReactorType.ThunderBolt:
+                        (energyBar as ThunderBoltBar).prog = (module.energyBarMessage as ThunderBoltMessage).chargeProgression;
+                        if ((module.energyBarMessage as ThunderBoltMessage).releaseThisFrame) 
+                        { 
+                            (energyBar as ThunderBoltBar).Smash();
+                            (module.energyBarMessage as ThunderBoltMessage).releaseThisFrame = false;
+                        }
+                        break;
                 }
             }
             energyBar.currentEnergy = energy;

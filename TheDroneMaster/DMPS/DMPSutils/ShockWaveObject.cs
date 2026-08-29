@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheDroneMaster.DMPS.DMPSDrone;
-using TheDroneMaster.DMPS.DMPSSkillTree.SkillTreeMenu.MenuAnim;
-using TheDroneMaster.DMPS.PlayerHooks.BioReactors;
 using UnityEngine;
 
 namespace TheDroneMaster.DMPS.DMPSutils
@@ -40,33 +38,15 @@ namespace TheDroneMaster.DMPS.DMPSutils
         private float shockEnergy;
         private float[] shockAngles;
         
-        // 按住 Spec 达到此帧数后施放震波。
-        private const int ChargeDurationFrames = 40;
-        // 提前松开 Spec 后，取消动画持续的帧数。
-        private const int CancelDurationFrames = 8;
-        // 震波施放后的提示圈淡出持续帧数。
-        private const int CastFadeDurationFrames = 12;
-
-        public enum State
-        {
-            Charge,
-            Cancel,
-            Cast,
-        }
-        private int stateAge;
-        private State state;
-        private int lastStateAge;
-
-        private Player player;
+        private readonly Player player;
+        private bool emitted;
         
         private UnityEngine.Random.State randomState;
         private float radius;
         private int maxPropagationDepth, minDepth;
-        ShockWaveHintCircle shockWaveHintCircle;
         Dictionary<ValueTuple<IntVector2, EdgeType>, EdgeShockWave> shockWaveEdges;
 
         private readonly List<ShockWaveTrailing> homelessTrailings;
-        ThunderBoltReactor reactor;
         internal enum EdgeType
         {
             HorizontalSurface,
@@ -107,17 +87,6 @@ namespace TheDroneMaster.DMPS.DMPSutils
             UnityEngine.Random.state = previousState;
             return result;
         }
-        public static bool IsPlayerReady(Player player, ThunderBoltReactor reactor)
-        {
-            bool animateFlag = (player.bodyMode == Player.BodyModeIndex.Stand && player.canJump > 0) ||
-                    player.bodyMode == Player.BodyModeIndex.Swimming ||
-                    player.bodyMode == Player.BodyModeIndex.ZeroG ||
-                    (player.bodyMode == Player.BodyModeIndex.Default && player.canJump > 0);   // from Player::watcherDynamicWarpInput
-            bool moveFlag = player.input[0].x == 0;
-            return player.Consious &&
-                !player.Stunned && animateFlag && moveFlag && reactor.reactorEnergy >= ThunderBoltReactor.Config.ShockWaveEnergyRequired;
-        }
-
         private void CastShockWave(Vector2 position)
         {
             IntVector2 tilePosition = room.GetTilePosition(position);
@@ -147,9 +116,8 @@ namespace TheDroneMaster.DMPS.DMPSutils
 
             Plugin.Log($"Spawn shockwaveedge with maxdepth {maxPropagationDepth} at center {position} with spawn count {spawnCount}");
         }
-        public ShockWaveObject(Player player, float radius, bool showHint, ThunderBoltReactor reactor)
+        public ShockWaveObject(Player player, float radius)
         {
-            this.reactor = reactor;
             this.player = player;
             room = player.room;
             shockWaveEdges = new Dictionary<ValueTuple<IntVector2, EdgeType>, EdgeShockWave>();
@@ -157,20 +125,10 @@ namespace TheDroneMaster.DMPS.DMPSutils
             this.radius = radius;
             maxPropagationDepth = Mathf.CeilToInt(radius / tileSize * tileShockDepthRatio);
             minDepth = maxPropagationDepth;
-            state = State.Charge;
-            stateAge = 0;
             shockCount = NextRandomRange(shockCountMin, shockCountMax);
             shockEnergy = radius * shockEnergyPerRadius;
             shockAngles = new float[shockCount];
             InitializeShockAngles();
-            if (showHint)
-            {
-                shockWaveHintCircle = new ShockWaveHintCircle(this);
-                room.AddObject(shockWaveHintCircle);
-            } else
-            {
-                shockWaveHintCircle = null;
-            }
             homelessTrailings = new List<ShockWaveTrailing>();
         }
 
@@ -183,46 +141,6 @@ namespace TheDroneMaster.DMPS.DMPSutils
                 // 保留原有随机上限（Random.Range 的整数上限不包含在内）。
                 float bias = NextRandomRange(-maximumBias, maximumBias);
                 shockAngles[i] = angleStep * i + bias;
-            }
-        }
-
-        private void ChargeUpdate()
-        {
-            if (!player.input[0].spec || !IsPlayerReady(player, reactor))
-            {
-                this.state = State.Cancel;
-                this.lastStateAge = this.stateAge;
-                this.stateAge = 0;
-            }
-            else if (this.stateAge >= ChargeDurationFrames)
-            {
-                this.state = State.Cast;
-                this.lastStateAge = this.stateAge;
-                this.stateAge = 0;
-            }
-        }
-        private void CancelUpdate()
-        {
-            if (this.stateAge >= CancelDurationFrames)
-            {
-                this.Destroy();
-                this.shockWaveHintCircle.Destroy();
-            }
-        }
-        private void CastUpdate()
-        {
-            if (stateAge == 1)
-            {
-                EmitShockWave();
-                reactor.TrySpendEnergy(ThunderBoltReactor.Config.ShockWaveEnergyRequired);
-            }
-
-            UpdateEdgeShockWaves();
-            if (Expired)
-            {
-                Plugin.Log("ShockWaveObject destroy");
-                Destroy();
-                this.shockWaveHintCircle.Destroy();
             }
         }
 
@@ -297,20 +215,18 @@ namespace TheDroneMaster.DMPS.DMPSutils
                 this.Destroy();
                 return;
             }
-            this.stateAge += 1;
-            if (this.state == State.Charge)
+            if (!emitted)
             {
-                ChargeUpdate();   
-            }
-            else if (state == State.Cancel)
-            {
-                CancelUpdate();
-            }
-            else if (state == State.Cast)
-            {
-                CastUpdate();
+                emitted = true;
+                EmitShockWave();
             }
 
+            UpdateEdgeShockWaves();
+            if (Expired)
+            {
+                Plugin.Log("ShockWaveObject destroy");
+                Destroy();
+            }
         }
 
 
@@ -771,103 +687,6 @@ namespace TheDroneMaster.DMPS.DMPSutils
             }
         }
 
-        private sealed class ShockWaveHintCircle : UpdatableAndDeletable, IDrawable
-        {
-            private const float ColorIndex = 1f / 255f;
-            private const float OuterAlpha = 0.05f;
-            private const float InnerAlpha = 0.15f;
-            private const float CancelMaxScale = 10f;
-            private const float SpriteTextureRadius = 8f;
-            private const string TargetContainer = "Foreground";
-
-            private readonly ShockWaveObject owner;
-            public ShockWaveHintCircle(ShockWaveObject owner)
-            {
-                this.owner = owner;
-            }
-
-            public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
-            {
-                sLeaser.sprites = new FSprite[3];
-                sLeaser.sprites[0] = new FSprite("Futile_White", true);
-                sLeaser.sprites[0].shader = rCam.game.rainWorld.Shaders["VectorCircleFadable"];
-                sLeaser.sprites[1] = new FSprite("Futile_White", true);
-                sLeaser.sprites[1].shader = rCam.game.rainWorld.Shaders["VectorCircleFadable"];
-                sLeaser.sprites[2] = new FSprite("Futile_White", true);
-                sLeaser.sprites[2].shader = rCam.game.rainWorld.Shaders["VectorCircleFadable"];
-                AddToContainer(sLeaser, rCam);
-            }
-
-            public void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
-            {
-                float innerRad;
-                Vector2 playerPos = Vector2.Lerp(owner.player.mainBodyChunk.lastPos, owner.player.mainBodyChunk.pos, timeStacker);
-                sLeaser.sprites[0].SetPosition(playerPos - camPos);
-                sLeaser.sprites[1].SetPosition(playerPos - camPos);
-                sLeaser.sprites[2].SetPosition(playerPos - camPos);
-                if (owner.state == State.Charge)
-                {
-                    innerRad = Mathf.Clamp01(owner.stateAge * 1.0f / ShockWaveObject.ChargeDurationFrames);
-                    innerRad *= owner.radius;
-                    sLeaser.sprites[1].scale = innerRad / SpriteTextureRadius;
-                    sLeaser.sprites[0].scale = owner.radius / SpriteTextureRadius;
-                    sLeaser.sprites[2].scale = owner.radius * ShockWaveObject.edgeShockWaveRadiusMultiplier / SpriteTextureRadius;
-                    sLeaser.sprites[0].color = new Color(ColorIndex, 0, OuterAlpha);
-                    sLeaser.sprites[1].color = new Color(ColorIndex, 0, InnerAlpha);
-                    sLeaser.sprites[2].color = new Color(0, 0, 1, 0.05f);
-                }
-                else if (owner.state == State.Cast)
-                {
-                    float decay = Mathf.Lerp(1f, 0f, owner.stateAge * 1.0f / ShockWaveObject.CastFadeDurationFrames);
-                    decay = Mathf.Clamp01(decay);
-                    float alphaDecay = decay;
-                    float scaleDecay = DMHelper.EaseInOutCubic(decay);
-                    sLeaser.sprites[0].scale = owner.radius / SpriteTextureRadius * scaleDecay;
-                    sLeaser.sprites[1].scale = owner.radius / SpriteTextureRadius * scaleDecay;
-                    sLeaser.sprites[2].scale = owner.radius * ShockWaveObject.edgeShockWaveRadiusMultiplier / SpriteTextureRadius * scaleDecay;
-                    sLeaser.sprites[0].color = new Color(ColorIndex, 0, OuterAlpha * alphaDecay);
-                    sLeaser.sprites[1].color = new Color(ColorIndex, 0, InnerAlpha * alphaDecay);
-                    sLeaser.sprites[2].color = new Color(0, 0, 1 * alphaDecay, 0.05f);
-                }
-                else if (owner.state == State.Cancel)
-                {
-                    innerRad = Mathf.Clamp01(owner.lastStateAge * 1.0f / ShockWaveObject.ChargeDurationFrames);
-                    innerRad *= owner.radius;
-                    float decay = Mathf.Lerp(1f, 0f, owner.stateAge * 1.0f / ShockWaveObject.CancelDurationFrames);
-                    decay = Mathf.Clamp01(decay);
-                    float scaleMultiplier = Mathf.Lerp(1f, CancelMaxScale, 1f - decay);
-                    float alphaDecay = decay;
-                    sLeaser.sprites[0].scale = owner.radius / SpriteTextureRadius * scaleMultiplier;
-                    sLeaser.sprites[1].scale = innerRad / SpriteTextureRadius * scaleMultiplier;
-                    sLeaser.sprites[2].scale = owner.radius * ShockWaveObject.edgeShockWaveRadiusMultiplier / SpriteTextureRadius * scaleMultiplier;
-                    sLeaser.sprites[0].color = new Color(ColorIndex, 0, OuterAlpha * alphaDecay);
-                    sLeaser.sprites[1].color = new Color(ColorIndex, 0, InnerAlpha * alphaDecay);
-                    sLeaser.sprites[2].color = new Color(0, 0, 1 * alphaDecay, 0.05f);
-                }
-            }
-
-            public void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
-            {
-            }
-
-            public void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContainer = null)
-            {
-                if (newContainer == null)
-                {
-                    newContainer = rCam.ReturnFContainer(TargetContainer);
-                }
-
-                foreach (FSprite sprite in sLeaser.sprites)
-                {
-                    sprite.RemoveFromContainer();
-                }
-
-                foreach (FSprite sprite in sLeaser.sprites)
-                {
-                    newContainer.AddChild(sprite);
-                }
-            }
-        }
         public void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             sLeaser.sprites = new FSprite[TrailSpritePoolCount];

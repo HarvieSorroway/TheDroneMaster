@@ -125,6 +125,7 @@ namespace TheDroneMaster.DMPS
             LoadOverDriveBarResources();
             LoadFeedBackBarResources();
             LoadThunderBoltBarResources();
+            LoadShockEffectResources();
             DMPSResourceString.Load();
         }
 
@@ -150,7 +151,6 @@ namespace TheDroneMaster.DMPS
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Light", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Light.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Fan_Light", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Fan_Light.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_FeedBackBar_Bar", LoadTexFromPath("illustrations/ReactorUI/FeedBack/DMPS_FeedBackBar_Bar.png"), false);
-
         }
 
         public static void LoadThunderBoltBarResources()
@@ -160,6 +160,23 @@ namespace TheDroneMaster.DMPS
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_PingAnvil", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_PingAnvil.png"), false);
             Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_PingHammer", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_PingHammer.png"), false);
 
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_BarLeft_HL", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_BarLeft_HL.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_BarRight_HL", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_BarRight_HL.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_PingAnvil_HL", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_PingAnvil_HL.png"), false);
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_ThunderBolt_PingHammer_HL", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_ThunderBolt_PingHammer_HL.png"), false);
+
+            Futile.atlasManager.LoadAtlasFromTexture("DMPS_TunderBolt_SmashLight", LoadTexFromPath("illustrations/ReactorUI/ThunderBolt/DMPS_TunderBolt_SmashLight.png"), false);
+
+        }
+
+        public static void LoadShockEffectResources()
+        {
+            //DMPS_ShockEffect_0
+            for(int i = 0;i < 4; i++)
+            {
+                Futile.atlasManager.LoadAtlasFromTexture($"DMPS_ShockEffect_{i}", LoadTexFromPath($"illustrations/ShockEffect/DMPS_ShockEffect_{i}.png"), false);
+                Futile.atlasManager.LoadAtlasFromTexture($"DMPS_ShockEffect_Blr_{i}", LoadTexFromPath($"illustrations/ShockEffect/DMPS_ShockEffect_Blr_{i}.png"), false);
+            }
         }
 
         public static Texture2D LoadTexFromPath(string path)

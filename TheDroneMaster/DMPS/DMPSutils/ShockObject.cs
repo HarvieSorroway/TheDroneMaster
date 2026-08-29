@@ -170,6 +170,7 @@ namespace TheDroneMaster.DMPS.DMPSutils
                     // 命中后立即转向一个尚未命中的可见 BodyChunk，形成明确的链式电击。
                     nextDirection = targetDirection;
                     turnCost = GetTurnEnergyCost(path.direction, nextDirection);
+                    room.AddObject(new ShockSpasm(room, source, travel.hitChunk, (int)Mathf.Lerp(5, 40, Mathf.InverseLerp(0,3,travel.energy)), (travel.hitChunk.rad + 20f) * 2f / 80f, travel.energy));
                 }
                 else if (!TryChooseLowestLossDirection(path.pos, path.direction, mustTurn, hasTarget, targetDirection, float.NaN, out nextDirection, out turnCost))
                 {
