@@ -120,7 +120,7 @@ namespace TheDroneMaster
                 RoomSpecificScriptPatch.PatchOn();
                 CustomEnding.PatchOn();
                 ObjectPatch.PatchOn();
-
+                RainWorldGamePatch.PatchOn();
                 DMPSEntry.OnModInit();
                 //PearlReaderPatchs.Patch();
 
