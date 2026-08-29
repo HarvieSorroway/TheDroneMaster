@@ -90,14 +90,22 @@ namespace TheDroneMaster.GameHooks
 
         private static void ViolenceHook<T>(Action<T, BodyChunk, Vector2?, BodyChunk, Appendage.Pos, DamageType, float, float> orig, 
             T self, BodyChunk source, Vector2? directionAndMomentum, 
-            BodyChunk hitChunk, Appendage.Pos hitAppendage, DamageType type, float damage, float stunBonus)
+            BodyChunk hitChunk, Appendage.Pos hitAppendage, DamageType type, float damage, float stunBonus) 
             where T : Creature
         {
+            if ((source.owner is Creature && source.owner is not Player) ||
+                (source.owner is Weapon weapon && weapon.thrownBy is not Player) ||
+                (self.abstractCreature.world.game.StoryCharacter.value != "dmps"))
+            {
+                orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+                return;
+            }
+
             var module = shieldModules.GetValue(self.abstractCreature, c => new CreatureShieldModule(self.abstractCreature));
 
             if (module.BypassShieldCalc == 0)
             {
-                //Plugin.Log($"CalcShieldViolence:{self.Template.type}, Method:{orig.Method.DeclaringType.FullName}::{orig.Method.Name}");
+                Plugin.Log($"CalcShieldViolence:{self.Template.type}, Method:{orig.Method.DeclaringType.FullName}::{orig.Method.Name}");
                 module.CalcShieldViolence(ref source, ref directionAndMomentum, ref hitChunk, ref hitAppendage, ref type, ref damage, ref stunBonus);
             }
             try
