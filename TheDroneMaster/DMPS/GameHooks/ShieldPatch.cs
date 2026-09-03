@@ -16,29 +16,28 @@ using UnityEngine;
 using static Creature;
 using static PhysicalObject;
 
-namespace TheDroneMaster.GameHooks
+namespace TheDroneMaster.DMPS.GameHooks
 
 {
-    public partial class RainWorldGamePatch
+    public static partial class DMPSGamePatch
     {
-
         public static void ViolenceWithShield(this Creature creature, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, Appendage.Pos onAppendagePos, DamageType type, float damage, float stunBonus, float shieldDamage)
         {
             shieldModules.GetValue(creature.abstractCreature, c => new CreatureShieldModule(c)).Violence(creature, source, directionAndMomentum, hitChunk, onAppendagePos, type, damage, stunBonus, shieldDamage);
         }
 
     }
-    public partial class RainWorldGamePatch
+    public static partial class DMPSGamePatch
     {
         private static ConditionalWeakTable<AbstractCreature, CreatureShieldModule> shieldModules = new();
 
-        private static readonly MethodInfo ViolenceHookEntry = typeof(RainWorldGamePatch).GetMethod(nameof(ViolenceHook), BindingFlags.NonPublic | BindingFlags.Static)!;
+        private static readonly MethodInfo ViolenceHookEntry = typeof(DMPSGamePatch).GetMethod(nameof(ViolenceHook), BindingFlags.NonPublic | BindingFlags.Static)!;
 
         private static Dictionary<(CreatureTemplate.Type, int), float> shieldSettings = new();
 
         private static readonly List<Hook> violenceHooks = new();
 
-        private static void ShieldPatchOn()
+        internal static void ShieldPatchOn()
         {
             foreach (var ass in AppDomain.CurrentDomain.GetAssemblies())
             {

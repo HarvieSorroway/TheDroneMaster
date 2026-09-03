@@ -65,7 +65,7 @@ namespace TheDroneMaster.DMPS.MenuHooks
                 var dmpsData = new DMPSSaveGameData()
                 {
                     energy = dmpsSave.Energy,
-                    maxEnergy = dmpsSave.MaxEnergy,
+                    maxEnergy = dmpsSave.SkillData.MaxEnergy,
                 };
 
                 if (dmpsDataTable.TryGetValue(data, out _))
@@ -96,7 +96,7 @@ namespace TheDroneMaster.DMPS.MenuHooks
                         var dmpsData = new DMPSSaveGameData()
                         {
                             energy = save.Energy,
-                            maxEnergy = save.MaxEnergy,
+                            maxEnergy = save.SkillData.MaxEnergy,
                         };
                         if (dmpsDataTable.TryGetValue(data, out _))
                             dmpsDataTable.Remove(data);

@@ -34,18 +34,19 @@ namespace DMPS.PlayerHooks
         public int reactorIndex = -1;
 
         JetJump jetJumpModule;
+        public bool IsJetJumping => jetJumpModule?.Active == true;
 
         public DMPSModule(Player player) : base(player)
         {
             var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
 
-            bioReactor = save.ReactorType switch
+            bioReactor = save.SkillData.ReactorType switch
             {
-                DMPSBasicSave.BioReactorType.Default => new DMPSBioReactor(player, this),
-                DMPSBasicSave.BioReactorType.OverDrive => new OverDriveReactor(player, this),
-                DMPSBasicSave.BioReactorType.ThunderBolt => new ThunderBoltReactor(player, this),
-                DMPSBasicSave.BioReactorType.Feedback => new FeedbackReactor(player, this),
-                _ => throw new ArgumentOutOfRangeException($"Illeagal reactor type :{save.ReactorType}")
+                DMPSSkillData.BioReactorType.Default => new DMPSBioReactor(player, this),
+                DMPSSkillData.BioReactorType.OverDrive => new OverDriveReactor(player, this),
+                DMPSSkillData.BioReactorType.ThunderBolt => new ThunderBoltReactor(player, this),
+                DMPSSkillData.BioReactorType.Feedback => new FeedbackReactor(player, this),
+                _ => throw new ArgumentOutOfRangeException($"Illeagal reactor type :{save.SkillData.ReactorType}")
             };
             AddUtil(bioReactor);
 

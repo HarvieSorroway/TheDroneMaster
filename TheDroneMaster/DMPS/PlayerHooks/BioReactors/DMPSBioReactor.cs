@@ -18,7 +18,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
         public static readonly float hypothermia2energyRatio = 2f;
         public static readonly float food2energyRatio = 4f;
         public float lowEnergyLim = 30;
-        public int maxReactorEnergy => save.MaxEnergy;
+        public int maxReactorEnergy => save.SkillData.MaxEnergy;
         public float reactorEnergy
         {   
             get => save.Energy;

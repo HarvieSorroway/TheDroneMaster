@@ -21,7 +21,7 @@ namespace TheDroneMaster.DMPS.DMPShud
             if (PlayerPatchs.modules.TryGetValue((self.owner as Player), out var m) && m is DMPSModule module)
             {
                 //self.AddPart(new ReactorEnergyBar(self));
-                self.AddPart(new HUDEnergyBar(self));
+                self.AddPart(new DMPSEnergyHud(self));
             }
         }
     }

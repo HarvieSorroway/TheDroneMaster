@@ -13,8 +13,10 @@ using TheDroneMaster.DMPS.DMPSGameHooks;
 using TheDroneMaster.DMPS.DMPShud;
 using TheDroneMaster.DMPS.DMPSSave;
 using TheDroneMaster.DMPS.DMPSSkillTree;
+using TheDroneMaster.DMPS.GameHooks;
 using TheDroneMaster.DMPS.MenuHooks;
 using TheDroneMaster.DMPS.MenuHooks.KarmaLadderScreenHooks;
+using TheDroneMaster.DMPS.MistTest;
 using TheDroneMaster.DMPS.PlayerHooks;
 using UnityEngine;
 
@@ -33,63 +35,11 @@ namespace TheDroneMaster.DMPS
             SkillNodeLoader.Load();
             SkillTreeHooks.HooksOn();
             TheDroneMaster.DMPS.DMPSGameHooks.GameHooks.HooksOn();
-
+            DMPSGamePatch.ShieldPatchOn();
             DeathPersistentSaveDataRx.AppplyTreatment(new DMPSBasicSave(null));
+
+            RWMistEntry.HooksOn();
             
-            //DMPSSkillTree.SkillTreeRenderNode nodeTest = new DMPSSkillTree.SkillTreeRenderNode();
-            //nodeTest.bindSkillNodeInfo = "SkillTree.TestSkill1";
-            //nodeTest.renderNodeIDInfo = "RenderNode.TestSkill1";
-            //nodeTest.scaleInfo = 1.5f;
-            //nodeTest.typeInfo = DMPSSkillTree.SkillTreeRenderType.StaticNode;
-            //nodeTest.posInfo = new Vector2[3] { Vector2.zero, new Vector2(10f, 0f), new Vector2(10f, -5f) };
-            //nodeTest.subRenderNodeInfo = new string[] { "RenderNode.DronePortUpg", "RenderNode.PackUpg", "RenderNode.ReactorUpg" };
-
-            //DMPSSkillTree.SkillTreeRenderNode nodeTest2 = new DMPSSkillTree.SkillTreeRenderNode();
-            //nodeTest2.bindSkillNodeInfo = "SkillTree.DronePortUpg";
-            //nodeTest2.renderNodeIDInfo = "RenderNode.DronePortUpg";
-            //nodeTest2.scaleInfo = 1;
-            //nodeTest2.typeInfo = DMPSSkillTree.SkillTreeRenderType.StaticNode;
-            //nodeTest2.posInfo = new Vector2[] {  new Vector2(10f, -5f) };
-            //nodeTest2.subRenderNodeInfo = new string[] { "RenderNode.DronePortUpg.CoolDown0" };
-
-            //SkillNode skillNodeTest = new SkillNode();
-            //skillNodeTest.skillID = "Skill.DronePortUpg.CoolDown1";
-            //skillNodeTest.cost = 10f;
-            //skillNodeTest.descriptionInfos = new Dictionary<string, SkillNodeDescriptionInfo>()
-            //{
-            //   { InGameTranslator.LanguageID.English.value, new SkillNodeDescriptionInfo()
-            //       {
-            //           name = "Drone produce cd upgrade lv.1",
-            //           description = "Wawa description test."
-            //       } 
-            //   },
-            //   { InGameTranslator.LanguageID.Chinese.value, new SkillNodeDescriptionInfo()
-            //       {
-            //           name = "无人机召唤cd lv.1",
-            //           description = "wawa这是一个测试"
-            //       }
-            //   }
-            //};
-            //skillNodeTest.conditions = new List<SKillNodeConditionInfo>()
-            //{
-            //    new SKillNodeConditionInfo()
-            //    {
-            //        type = ConditionType.SkillNode,
-            //        boolType = ConditionBoolType.And,
-            //        info = "Skill.DronePortUpg.CoolDown0"
-            //    }
-            //};
-            //Plugin.LoggerLog(DMPSSkillTreeHelper.SerializeSkillNode(skillNodeTest));
-
-
-            //SkillNodeLoader.Load();
-            //foreach (var id in SkillNodeLoader.loadedSkillNodes.Keys)
-            //{
-            //    Plugin.LoggerLog(DMPSSkillTreeHelper.SerializeSkillNode(SkillNodeLoader.loadedSkillNodes[id]));
-
-            //}
-
-            //Plugin.LoggerLog(DMPSSkillTreeHelper.SerializeRenderNodes(new List<DMPSSkillTree.SkillTreeRenderNode>() { nodeTest, nodeTest2}));
         }
 
         public static void LoadResources()
@@ -127,6 +77,8 @@ namespace TheDroneMaster.DMPS
             LoadThunderBoltBarResources();
             LoadShockEffectResources();
             DMPSResourceString.Load();
+
+            RWMistEntry.LoadResources();
         }
 
         public static void LoadOverDriveBarResources()

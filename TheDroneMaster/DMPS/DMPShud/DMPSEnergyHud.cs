@@ -14,10 +14,10 @@ using UnityEngine;
 
 namespace TheDroneMaster.DMPS.DMPShud
 {
-    internal class HUDEnergyBar : HUD.HudPart
+    internal class DMPSEnergyHud : HUD.HudPart
     {
         DMPSEnergyBarBase energyBar;
-        DMPSBasicSave.BioReactorType barMode;
+        DMPSSkillData.BioReactorType barMode;
 
         Vector2 pos, lastPos;
         float downInCorner, fade, lastFade;
@@ -25,7 +25,7 @@ namespace TheDroneMaster.DMPS.DMPShud
         float energy, lowEnergyLim;
         bool expand;
 
-        public HUDEnergyBar(HUD.HUD hud) : base(hud)
+        public DMPSEnergyHud(HUD.HUD hud) : base(hud)
         {
             lastPos = pos = new Vector2(Mathf.Max(50f, hud.rainWorld.options.SafeScreenOffset.x + 5.5f), Mathf.Max(25f, hud.rainWorld.options.SafeScreenOffset.y + 17.25f));
 
@@ -34,14 +34,14 @@ namespace TheDroneMaster.DMPS.DMPShud
             {
                 var save = DeathPersistentSaveDataRx.GetTreatmentOfType<DMPSBasicSave>();
 
-                barMode = save.ReactorType;
+                barMode = save.SkillData.ReactorType;
 
-                energyBar = save.ReactorType switch
+                energyBar = save.SkillData.ReactorType switch
                 {
-                    DMPSBasicSave.BioReactorType.Default => new DMPSEnergyBarBase(hud.fContainers[1]),
-                    DMPSBasicSave.BioReactorType.OverDrive => new OverDriveBar(hud.fContainers[1]),
-                    DMPSBasicSave.BioReactorType.Feedback => new FeedBackBar(hud.fContainers[1]),
-                    DMPSBasicSave.BioReactorType.ThunderBolt => new ThunderBoltBar(hud.fContainers[1]),
+                    DMPSSkillData.BioReactorType.Default => new DMPSEnergyBarBase(hud.fContainers[1]),
+                    DMPSSkillData.BioReactorType.OverDrive => new OverDriveBar(hud.fContainers[1]),
+                    DMPSSkillData.BioReactorType.Feedback => new FeedBackBar(hud.fContainers[1]),
+                    DMPSSkillData.BioReactorType.ThunderBolt => new ThunderBoltBar(hud.fContainers[1]),
                     _ => new DMPSEnergyBarBase(hud.fContainers[1])
                 };
 
@@ -69,14 +69,14 @@ namespace TheDroneMaster.DMPS.DMPShud
 
                 switch (barMode)
                 {
-                    case DMPSBasicSave.BioReactorType.OverDrive:
+                    case DMPSSkillData.BioReactorType.OverDrive:
                         (energyBar as OverDriveBar).setOverDriveEnergy = (module.energyBarMessage as OverDriveMessage).overDriveEnergy;
                         break;
-                    case DMPSBasicSave.BioReactorType.Feedback:
+                    case DMPSSkillData.BioReactorType.Feedback:
                         (energyBar as FeedBackBar).setFeedBackEfficiency = (module.energyBarMessage as FeedBackMessage).feedBackEfficiency;
                         (energyBar as FeedBackBar).Pluse((module.energyBarMessage as FeedBackMessage).pluseStack);
                         break;
-                    case DMPSBasicSave.BioReactorType.ThunderBolt:
+                    case DMPSSkillData.BioReactorType.ThunderBolt:
                         (energyBar as ThunderBoltBar).prog = (module.energyBarMessage as ThunderBoltMessage).chargeProgression;
                         if ((module.energyBarMessage as ThunderBoltMessage).releaseThisFrame) 
                         { 

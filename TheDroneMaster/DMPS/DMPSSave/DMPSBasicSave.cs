@@ -25,10 +25,12 @@ namespace TheDroneMaster.DMPS.DMPSSave
         readonly SaveUnit<int> activeDroneCountSaveUnit;
         readonly SaveUnit<HashSet<string>> enabledSkills;
 
+        public DMPSSkillData SkillData { get; } = new DMPSSkillData();
+
         public float Energy
         {
             get => energy.Value;
-            set => energy.Value = Mathf.Clamp(value, 0, MaxEnergy);
+            set => energy.Value = Mathf.Clamp(value, 0, SkillData.MaxEnergy);
         }
         public int activeDroneCount
         {
@@ -41,11 +43,14 @@ namespace TheDroneMaster.DMPS.DMPSSave
             energy = AddSaveUnit("energy", 0f);
             activeDroneCountSaveUnit = AddSaveUnit("activeDroneCount", 0);
             enabledSkills = AddSaveUnit("enabledSkills", new HashSet<string>());
+            UpdateSkillData();
         }
 
         public override void LoadDatas(string data)
         {
             base.LoadDatas(data);
+
+            UpdateSkillData();
 
             //Plugin.LoggerLog($"LoadDatas : Energy={Energy}, activeDroneCount={activeDroneCount}, enabledSkills={string.Join(",", enabledSkills.Value)}");
         }
@@ -58,6 +63,7 @@ namespace TheDroneMaster.DMPS.DMPSSave
         public override void ClearDataForNewSaveState(SlugcatStats.Name newSlugName)
         {
             base.ClearDataForNewSaveState(newSlugName);
+            UpdateSkillData();
         }
 
         public bool CheckSkill(string id)
@@ -74,13 +80,15 @@ namespace TheDroneMaster.DMPS.DMPSSave
         {
             enabledSkills.Value.Clear();
             enabledSkills.Value.UnionWith(skillIDs);
+            UpdateSkillData();
             Energy = currentEnergy;
         }
 
         public void EnableSkill(string id)
         {
             Plugin.LoggerLog($"EnableSkill : {id}");
-            enabledSkills.Value.Add(id);
+            if (enabledSkills.Value.Add(id))
+                UpdateSkillData();
         }
 
         public void DisableSkill(string id)
@@ -111,109 +119,14 @@ namespace TheDroneMaster.DMPS.DMPSSave
                 }
                 nextCheck.Clear();
             }
+
+            UpdateSkillData();
         }
 
-    }
-
-    /// <summary>
-    /// 躯干技能部分
-    /// </summary>
-    internal partial class DMPSBasicSave : DeathPersistentSaveDataTx
-    {
-    }
-
-    /// <summary>
-    /// 无人机港技能部分
-    /// </summary>
-    internal partial class DMPSBasicSave : DeathPersistentSaveDataTx
-    {
-        public bool JetJump => CheckSkill("Skill.DronePortUpg.JetJump.Lv0");
-        public float JetJumpCost
+        private void UpdateSkillData()
         {
-            get
-            {
-                return 3f;
-            }
-        }
-    }
-
-    /// <summary>
-    /// 燃烧室技能点部分
-    /// </summary>
-    internal partial class DMPSBasicSave : DeathPersistentSaveDataTx
-    {
-        public int MaxEnergy
-        {
-            get
-            {
-                return 50;
-                //if (CheckSkill("Skill.BioReactorUpg.EnergyRegen.Lv3"))
-                //    return 2.5f;
-                //else if (CheckSkill("Skill.BioReactorUpg.EnergyRegen.Lv2"))
-                //    return 2.0f;
-                //else if (CheckSkill("Skill.BioReactorUpg.EnergyRegen.Lv1"))
-                //    return 1.8f;
-                //else if (CheckSkill("Skill.BioReactorUpg.EnergyRegen.Lv0"))
-                //    return 1.5f;
-                //else
-                //    return 1.0f;
-            }
-        }
-
-        public BioReactorType ReactorType
-        {
-            get
-            {
-                return BioReactorType.ThunderBolt;
-            }
-        }
-
-        public enum BioReactorType
-        {
-            Default,
-            OverDrive,
-            ThunderBolt,
-            Feedback,
-        }
-    }
-
-    /// <summary>
-    /// 无人机技能点部分
-    /// </summary>
-    internal partial class DMPSBasicSave : DeathPersistentSaveDataTx
-    {
-        public float DroneDmgMultiplier
-        {
-            get
-            {
-                if (CheckSkill("Skill.DroneUpg.DamageUpg.Lv3"))
-                    return 2.5f;
-                else if (CheckSkill("Skill.DroneUpg.DamageUpg.Lv2"))
-                    return 2.0f;
-                else if(CheckSkill("Skill.DroneUpg.DamageUpg.Lv1"))
-                    return 1.8f;
-                else if(CheckSkill("Skill.DroneUpg.DamageUpg.Lv0"))
-                    return 1.5f;
-                else
-                    return 1.0f;
-            }
-        }
-
-        public int DroneMaxCount
-        {
-            get
-            {
-                if (CheckSkill("Skill.DroneUpg.Count.Lv3"))
-                    return 5;
-                else if (CheckSkill("SSkill.DroneUpg.Count.Lv2"))
-                    return 4;
-                else if (CheckSkill("Skill.DroneUpg.Count.Lv1"))
-                    return 3;
-                else if (CheckSkill("Skill.DroneUpg.Count.Lv0"))
-                    return 2;
-                else
-                    return 1;
-            }
+            SkillData.Update(enabledSkills.Value);
+            Energy = Energy;
         }
     }
 }

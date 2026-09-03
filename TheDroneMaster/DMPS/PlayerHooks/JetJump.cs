@@ -14,6 +14,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks
 
         int jetRemain;
         int inJetCounter;
+        public bool Active => inJetCounter > 0;
 
         public Action IntoJetAction, ExitJetAction;
 

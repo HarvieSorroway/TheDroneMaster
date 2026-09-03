@@ -13,7 +13,6 @@ namespace TheDroneMaster.GameHooks
         public static void PatchOn()
         {
             On.RainWorldGame.ctor += RainWorldGame_ctor;
-            ShieldPatchOn();
         }
 
         private static void RainWorldGame_ctor(On.RainWorldGame.orig_ctor orig, RainWorldGame self, ProcessManager manager)
