@@ -15,7 +15,7 @@ namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
         public static class Config
         {
             public const int ShockWaveEnergyRequired = 4;
-            public const int ShockWaveChargeDurationFrames = 40, ShockWaveChargeEffectSpawnTime = 5;
+            public const int ShockWaveChargeDurationFrames = 60, ShockWaveChargeEffectSpawnTime = 5;
             public const float ShockWaveRadiaus = 300f;
             public const int CoolDown = 120;
             public const int ChargeLosingSpeed = 10;
