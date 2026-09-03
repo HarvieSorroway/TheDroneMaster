@@ -1,21 +1,24 @@
 ﻿using DMPS.PlayerHooks;
 using TheDroneMaster.DMPS.DMPShud.EnergyBar;
 using TheDroneMaster.DMPS.DMPSutils;
+using UnityEngine;
 
 namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
 {
     internal class ThunderBoltReactor : DMPSBioReactor
     {
         private ShockWaveObject shockWave;
+        private ShockWaveChargingEffect chargingEffect;
         private int shockWaveChargeFrames, coolDownFrames;
         private bool shockWaveCastLocked;
 
         public static class Config
         {
             public const int ShockWaveEnergyRequired = 4;
-            public const int ShockWaveChargeDurationFrames = 40;
+            public const int ShockWaveChargeDurationFrames = 60, ShockWaveChargeEffectSpawnTime = 5;
             public const float ShockWaveRadiaus = 300f;
             public const int CoolDown = 120;
+            public const int ChargeLosingSpeed = 10;
         }
 
         ThunderBoltMessage ThunderBoltMsg => message as ThunderBoltMessage;
@@ -48,7 +51,11 @@ namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
             {
                 if(shockWaveChargeFrames < Config.ShockWaveChargeDurationFrames)
                     shockWaveChargeFrames++;
-
+                if (shockWaveChargeFrames == Config.ShockWaveChargeEffectSpawnTime)
+                {
+                    chargingEffect = new ShockWaveChargingEffect(player);
+                    player.room.AddObject(chargingEffect);
+                }
                 if (shockWaveChargeFrames == Config.ShockWaveChargeDurationFrames)
                 {
                     shockWaveChargeFrames = 0;
@@ -64,7 +71,13 @@ namespace TheDroneMaster.DMPS.PlayerHooks.BioReactors
             }
             else if(shockWaveChargeFrames > 0)
             {
-                shockWaveChargeFrames--;
+                coolDownFrames = Mathf.Max(coolDownFrames, Mathf.CeilToInt(shockWaveChargeFrames * 1.0f / Config.ChargeLosingSpeed));
+                shockWaveChargeFrames = Mathf.Max(0, shockWaveChargeFrames - Config.ChargeLosingSpeed);
+                if (chargingEffect is not null && !chargingEffect.slatedForDeletetion)
+                {
+                    chargingEffect.Destroy();
+                    chargingEffect = null;
+                }
             }
 
             ThunderBoltMsg.chargeProgression = shockWaveChargeFrames / (float)Config.ShockWaveChargeDurationFrames;
