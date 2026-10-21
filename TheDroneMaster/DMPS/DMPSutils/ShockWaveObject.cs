@@ -156,8 +156,8 @@ namespace TheDroneMaster.DMPS.DMPSutils
                     }
                 }
                 foreach (ShockWaveTrailing trailing in homelessTrailings)
-            {
-                if (!trailing.Expired)
+                {
+                    if (!trailing.Expired)
                     {
                         return false;
                     }
